@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>elrond-sdk.dotnet</PackageId>
+    <Authors>GUILLIN Yannick</Authors>
+    <Product />
+    <PackageTags>elrond</PackageTags>
+    <AssemblyName>Elrond-sdk.dotnet</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="dotnetstandard-bip32" Version="1.0.0" />
+    <PackageReference Include="dotnetstandard-bip39" Version="1.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="5.0.3" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
+  </ItemGroup>
+</Project>
