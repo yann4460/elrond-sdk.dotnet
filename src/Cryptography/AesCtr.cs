@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace Sdk.Cryptography
+namespace Elrond.Dotnet.Sdk.Cryptography
 {
     public sealed class AesCtr
     {

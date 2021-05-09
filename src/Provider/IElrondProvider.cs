@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Sdk.Provider.Dtos;
+using Elrond.Dotnet.Sdk.Provider.Dtos;
 
-namespace Sdk.Provider
+namespace Elrond.Dotnet.Sdk.Provider
 {
     public interface IElrondProvider
     {

@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Sdk.Provider.Dtos;
+using Elrond.Dotnet.Sdk.Provider.Dtos;
 
-namespace Sdk.Provider
+namespace Elrond.Dotnet.Sdk.Provider
 {
     public class ElrondProvider : IElrondProvider
     {

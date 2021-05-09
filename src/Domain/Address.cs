@@ -1,7 +1,7 @@
 ﻿using System;
-using Sdk.Cryptography;
+using Elrond.Dotnet.Sdk.Cryptography;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Address
     {

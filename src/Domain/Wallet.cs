@@ -4,12 +4,12 @@ using System.Security.Cryptography;
 using System.Text;
 using dotnetstandard_bip32;
 using dotnetstandard_bip39;
+using Elrond.Dotnet.Sdk.Cryptography;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
-using Sdk.Cryptography;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Wallet
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Argument
     {

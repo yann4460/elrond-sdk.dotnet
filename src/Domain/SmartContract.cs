@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Elrond.Dotnet.Sdk.Cryptography;
 using Org.BouncyCastle.Crypto.Digests;
-using Sdk.Cryptography;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class SmartContract
     {

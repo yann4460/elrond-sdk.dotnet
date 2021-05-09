@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using System.Numerics;
-using Sdk.Domain.Exceptions;
+using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Balance
     {

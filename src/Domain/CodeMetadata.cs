@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class CodeMetadata
     {

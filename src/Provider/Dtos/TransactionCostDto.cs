@@ -1,4 +1,4 @@
-﻿namespace Sdk.Provider.Dtos
+﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
     public class TransactionCostDto
     {

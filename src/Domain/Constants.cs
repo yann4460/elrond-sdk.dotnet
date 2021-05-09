@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Sdk.Provider;
+using Elrond.Dotnet.Sdk.Provider;
 
-namespace Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Constants
     {

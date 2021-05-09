@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Sdk.Cryptography
+namespace Elrond.Dotnet.Sdk.Cryptography
 {
     public static class Bech32Engine
     {

@@ -5,6 +5,12 @@ VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elrond-sdk.dotnet", "Elrond-sdk.dotnet.csproj", "{27131229-2F55-4FCE-8CA9-515FEB9A790D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CAD5A9A8-7F27-45FC-875C-4566C53233E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4C11B2A7-FE67-440D-9627-4C5E1FFA6909}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elrond.SDK.Console", "..\tests\Elrond.SDK.Console\Elrond.SDK.Console.csproj", "{257F798C-41CD-4C86-8033-75E8FCF189D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +21,17 @@ Global
 		{27131229-2F55-4FCE-8CA9-515FEB9A790D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27131229-2F55-4FCE-8CA9-515FEB9A790D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27131229-2F55-4FCE-8CA9-515FEB9A790D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{257F798C-41CD-4C86-8033-75E8FCF189D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{257F798C-41CD-4C86-8033-75E8FCF189D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{257F798C-41CD-4C86-8033-75E8FCF189D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{257F798C-41CD-4C86-8033-75E8FCF189D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{27131229-2F55-4FCE-8CA9-515FEB9A790D} = {CAD5A9A8-7F27-45FC-875C-4566C53233E3}
+		{257F798C-41CD-4C86-8033-75E8FCF189D0} = {4C11B2A7-FE67-440D-9627-4C5E1FFA6909}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {00A01422-F2F4-4A42-B110-DC3E89A50C6A}

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdk.Domain.Exceptions
+namespace Elrond.Dotnet.Sdk.Domain.Exceptions
 {
     public class InvalidBalanceException : Exception
     {
