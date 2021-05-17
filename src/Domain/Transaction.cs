@@ -8,18 +8,18 @@ namespace Elrond.Dotnet.Sdk.Domain
     public class Transaction
     {
         public string Status { get; private set; }
-        public string SmartContractResult { get; private set; }
-        private readonly string _hash;
+        public string TxHash { get; }
 
-        private Transaction(string hash, string status)
+        private SmartContractResult[] _smartContractResult;
+
+        public Transaction(string hash)
         {
-            Status = status;
-            _hash = hash;
+            TxHash = hash;
         }
 
-        public static Transaction From(TransactionResponseDto transaction)
+        public static Transaction From(CreateTransactionResponseDto createTransactionResponse)
         {
-            return new Transaction(transaction.TxHash, transaction.Status);
+            return new Transaction(createTransactionResponse.Data.TxHash);
         }
 
         /// <summary>
@@ -67,26 +67,18 @@ namespace Elrond.Dotnet.Sdk.Domain
             return Status == "invalid";
         }
 
-
-        public T GetSmartContractResult<T>(int index = 0)
+        public T GetSmartContractResult<T>(int result = 0, int index = 0)
         {
-            return Argument.GetValue<T>(SmartContractResult, index);
+            var smartContractResult = _smartContractResult.ElementAt(result);
+            return Argument.GetValue<T>(smartContractResult.Data, index);
         }
-
 
         public async Task Sync(IElrondProvider provider)
         {
-            var response = await provider.GetTransactionDetail(_hash);
-            Status = response.Status;
-
-            if (response.ScResults != null)
-            {
-                if (response.ScResults.Any())
-                {
-                    // Only take the first result atm
-                    SmartContractResult = response.ScResults[0].Data;
-                }
-            }
+            var detail = await provider.GetTransactionDetail(TxHash);
+            var transaction = detail.Data.Transaction;
+            _smartContractResult = transaction.SmartContractResults;
+            Status = transaction.Status;
         }
     }
 }

@@ -26,11 +26,11 @@ namespace Elrond.Dotnet.Sdk.Domain
             var constants = await provider.GetConstants();
             return new Constants
             {
-                ChainId = constants.ChainId,
-                GasPerDataByte = constants.GasPerDataByte,
-                MinGasLimit = constants.MinGasLimit,
-                MinGasPrice = constants.MinGasPrice,
-                MinTransactionVersion = constants.MinTransactionVersion
+                ChainId = constants.Data.Config.erd_chain_id,
+                GasPerDataByte = constants.Data.Config.erd_gas_per_data_byte,
+                MinGasLimit = constants.Data.Config.erd_min_gas_limit,
+                MinGasPrice = constants.Data.Config.erd_min_gas_price,
+                MinTransactionVersion = constants.Data.Config.erd_min_transaction_version
             };
         }
     }

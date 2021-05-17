@@ -27,9 +27,9 @@ namespace Elrond.Dotnet.Sdk.Provider
             _httpClient = httpClient;
         }
 
-        public async Task<ConstantsDto> GetConstants()
+        public async Task<ConfigDto> GetConstants()
         {
-            var response = await _httpClient.GetAsync("constants");
+            var response = await _httpClient.GetAsync("network/config");
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var badRequestResponse = await response.Content.ReadFromJsonAsync<BadRequestDto>();
@@ -37,12 +37,12 @@ namespace Elrond.Dotnet.Sdk.Provider
             }
 
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<ConstantsDto>();
+            return await response.Content.ReadFromJsonAsync<ConfigDto>();
         }
 
         public async Task<AccountDto> GetAccount(string address)
         {
-            var response = await _httpClient.GetAsync($"accounts/{address}");
+            var response = await _httpClient.GetAsync($"address/{address}");
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var badRequestResponse = await response.Content.ReadFromJsonAsync<BadRequestDto>();
@@ -56,7 +56,7 @@ namespace Elrond.Dotnet.Sdk.Provider
 
         public async Task<IReadOnlyCollection<ESDTTokenDto>> GetESDTTokens(string address)
         {
-            var response = await _httpClient.GetAsync($"accounts/{address}/token");
+            var response = await _httpClient.GetAsync($"address/{address}/esdt");
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var badRequestResponse = await response.Content.ReadFromJsonAsync<BadRequestDto>();
@@ -69,12 +69,12 @@ namespace Elrond.Dotnet.Sdk.Provider
             return new List<ESDTTokenDto>(result);
         }
 
-        public async Task<TransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto)
+        public async Task<CreateTransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto)
         {
             var raw = JsonSerializer.Serialize(transactionRequestDto, SerializeOptions);
             var content = new StringContent(raw, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("transactions", content);
+            var response = await _httpClient.PostAsync("transaction/send", content);
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var badRequestResponse = await response.Content.ReadFromJsonAsync<BadRequestDto>();
@@ -82,7 +82,7 @@ namespace Elrond.Dotnet.Sdk.Provider
             }
 
             response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<TransactionResponseDto>();
+            var result = await response.Content.ReadFromJsonAsync<CreateTransactionResponseDto>();
 
             return result;
         }
@@ -127,7 +127,7 @@ namespace Elrond.Dotnet.Sdk.Provider
 
         public async Task<TransactionResponseDto> GetTransactionDetail(string txHash)
         {
-            var response = await _httpClient.GetAsync($"transactions/{txHash}");
+            var response = await _httpClient.GetAsync($"transaction/{txHash}?withResults=true");
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var badRequestResponse = await response.Content.ReadFromJsonAsync<BadRequestDto>();
