@@ -15,7 +15,6 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static T GetValue<T>(string value, int index = 0)
         {
             var split = value.Split('@', StringSplitOptions.RemoveEmptyEntries);
-            //var base64 = Encoding.UTF8.GetString(Convert.FromBase64String(value));
             var arg = split[index];
 
 

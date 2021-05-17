@@ -2,7 +2,7 @@
 
 namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
-    public class ESDTTokenDto
+    public class ESDTTokenResponseDto
     {
         public ESDTTokenDataDto Data { get; set; }
         public string Error { get; set; }
@@ -11,10 +11,10 @@ namespace Elrond.Dotnet.Sdk.Provider.Dtos
 
     public class ESDTTokenDataDto
     {
-        public Dictionary<string, EsdtsItem> Esdts { get; set; }
+        public Dictionary<string, EsdtsItemDto> Esdts { get; set; }
     }
 
-    public class EsdtsItem
+    public class EsdtsItemDto
     {
         public string Attributes { get; set; }
         public string Balance { get; set; }

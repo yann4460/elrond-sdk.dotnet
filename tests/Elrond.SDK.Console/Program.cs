@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Provider;
+using Elrond.Dotnet.Sdk.Provider.Dtos;
 
 namespace Elrond.SDK.Console
 {
@@ -11,65 +12,60 @@ namespace Elrond.SDK.Console
     {
         public static async Task Main(string[] args)
         {
-            var mnemonicBob =
-                "corn maximum tunnel inhale urge lazy language trash balance artwork pyramid width unable amused style water royal absorb vessel photo creek tent picnic mercy";
-            var mnemonicAlice =
-                "maximum tunnel inhale corn urge lazy language trash balance artwork pyramid width unable amused style water royal absorb vessel photo creek tent picnic mercy";
-
-
-            var bob = CreateNewAccount(mnemonicBob, "bob");
-            var alice = CreateNewAccount(mnemonicAlice, "alice");
-
-            Debug.Assert(bob.Bech32 == "erd15eaep0g7y9r5543ucfwsvnzjf05ld4l240txcj365qk2q4rrrqlq7qnsrp");
-            Debug.Assert(alice.Bech32 == "erd1y8lulq84pf2snsmjwuudx46pukky76rey7kepxxul6e5x3rwlqns3nhr89");
-
-            var provider = new ElrondProvider(new HttpClient {BaseAddress = new Uri("https://testnet-api.elrond.com")});
-            var constants = await Constants.GetFromNetwork(provider);
-
-            var accountBob = new Account(Address.FromBech32(bob.Bech32));
-            var walletBob = Wallet.DeriveFromKeyFile(bob, "bob");
-
-            await accountBob.Sync(provider);
-
-            var accountAlice = new Account(Address.FromHex(alice.Address));
-            var walletAlice = Wallet.DeriveFromKeyFile(alice, "alice");
-            await accountAlice.Sync(provider);
-
-            var smartContractAddress = Address.FromBech32("erd1qqqqqqqqqqqqqpgq68cl28dccd6th6fcajej8q8ru6gpmhcqlqnscht36c"); //Belong to alice
-            var mintRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, accountAlice,
-                smartContractAddress, "mint", Balance.Zero(), new[]
-                {
-                    Argument.CreateArgumentFromInt64(1),
-                    Argument.CreateArgumentFromHex(bob.Address)
-                });
-
-            await mintRequest.ComputeGasLimit(provider);
-            var mintTransaction = await mintRequest.Send(walletAlice, provider);
-            await WaitForTransactionExecution("mint", mintTransaction, provider);
-
-
-            var totalMintedRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, accountBob,
-                smartContractAddress, "totalMinted", Balance.Zero());
-            await totalMintedRequest.ComputeGasLimit(provider);
-            var totalMintedTransaction = await totalMintedRequest.Send(walletBob, provider);
-            await WaitForTransactionExecution("totalMinted", totalMintedTransaction, provider);
-
-            var totalMinted = totalMintedTransaction.GetSmartContractResult<long>(1);
-
-            var lastTokenId = totalMinted - 1;
-
-            var tokenOwnerRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, accountBob,
-                smartContractAddress, "tokenOwner", Balance.Zero(),
-                new[] {Argument.CreateArgumentFromInt64(lastTokenId)});
-            await tokenOwnerRequest.ComputeGasLimit(provider);
-            var tokenOwnerTransaction = await tokenOwnerRequest.Send(walletBob, provider);
-
-            await WaitForTransactionExecution("tokenOwner", tokenOwnerTransaction, provider);
-
-            var tokenOwner = tokenOwnerTransaction.GetSmartContractResult<Address>(1);
-            System.Console.WriteLine($"Owner of token {lastTokenId} is {tokenOwner}");
+            await CreateToken();
         }
 
+        private static async Task CreateToken()
+        {
+            var privateKey =
+                "C5A89BFA5E8FFFA4BAA732D8D8EE9503FAFA538599C3DDEE28D21F64DFFDBF00FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42";
+            var wallet = new Wallet(privateKey);
+            var kf = wallet.BuildKeyFile(string.Empty);
+            var account = new Account(Address.FromBech32(kf.Bech32));
+
+            var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
+            var provider = new ElrondProvider(client);
+            var constants = await Constants.GetFromNetwork(provider);
+
+            await account.Sync(provider);
+
+            //1. Deploy smart contract from wasm
+            var wasmFile = await File.ReadAllBytesAsync("SmartContracts/adder/adder.wasm");
+            var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account,
+                new Code(wasmFile),
+                new CodeMetadata(false, true, false),
+                new[]
+                {
+                    Argument.CreateArgumentFromInt64(5)
+                });
+            deployRequest.SetGasLimit(new GasLimit(60000000));
+
+            var deployTransaction = await deployRequest.Send(wallet, provider);
+            var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce - 1);
+            await WaitForTransactionExecution("Deployment", deployTransaction, provider);
+
+            //2. Call 'add' method
+            var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
+                smartContractAddress, "add", Balance.Zero(),
+                new[]
+                {
+                    Argument.CreateArgumentFromInt64(12)
+                });
+            addRequest.SetGasLimit(new GasLimit(60000000));
+            var addRequestTransaction = await addRequest.Send(wallet, provider);
+            await WaitForTransactionExecution("Add", addRequestTransaction, provider);
+
+            //3. Query VM
+            var result = await provider.QueryVm(new QueryVmRequestDto
+            {
+                FuncName = "getSum",
+                ScAddress = smartContractAddress.Bech32
+            });
+
+            var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
+            var sumHex = Convert.ToHexString(sumBytes);
+            var sum = Argument.GetValue<long>(sumHex, 0); //Should be 17 !
+        }
 
         private static async Task WaitForTransactionExecution(string transactionName, Transaction transaction,
             IElrondProvider provider)
@@ -84,15 +80,8 @@ namespace Elrond.SDK.Console
 
             if (!transaction.IsSuccessful())
                 throw new Exception("Invalid transaction : {transactionName}");
-            System.Console.WriteLine(
-                $" - SmartContractResponseStatus : {transaction.GetSmartContractResult<string>()}");
-            System.Console.WriteLine("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
-        }
 
-        private static KeyFile CreateNewAccount(string mnemonic, string password)
-        {
-            var wallet = Wallet.DeriveFromMnemonic(mnemonic);
-            return wallet.BuildKeyFile(password);
+            System.Console.WriteLine("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
         }
     }
 }
