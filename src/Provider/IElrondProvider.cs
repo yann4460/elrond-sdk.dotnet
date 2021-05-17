@@ -6,13 +6,13 @@ namespace Elrond.Dotnet.Sdk.Provider
 {
     public interface IElrondProvider
     {
-        Task<ConstantsDto> GetConstants();
+        Task<ConfigDto> GetConstants();
 
         Task<AccountDto> GetAccount(string address);
 
         Task<IReadOnlyCollection<ESDTTokenDto>> GetESDTTokens(string address);
 
-        Task<TransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto);
+        Task<CreateTransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto);
 
         Task SimulateTransaction(TransactionRequestDto transactionRequestDto);
 

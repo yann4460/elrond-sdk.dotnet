@@ -2,12 +2,12 @@
 {
     public class TransactionCostDto
     {
-        public Data Data { get; set; }
+        public TransactionCostDataDto Data { get; set; }
         public string Code { get; set; }
         public string Error { get; set; }
     }
 
-    public class Data
+    public class TransactionCostDataDto
     {
         public long TxGasUnits { get; set; }
         public string ReturnMessage { get; set; }
