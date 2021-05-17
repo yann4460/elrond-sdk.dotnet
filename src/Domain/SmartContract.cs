@@ -59,7 +59,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="ownerAddress">The owner of the Smart Contract</param>
         /// <param name="nonce">The owner nonce used for the deployment transaction</param>
         /// <returns>The smart contract address</returns>
-        public static string ComputeAddress(Address ownerAddress, long nonce)
+        public static Address ComputeAddress(Address ownerAddress, long nonce)
         {
             var ownerPubKey = Convert.FromHexString(ownerAddress.Hex);
             var initialPadding = new byte[8];
@@ -80,7 +80,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 shardSelector);
 
             var erdAddress = Bech32Engine.Encode("erd", addressBytes);
-            return erdAddress;
+            return Address.FromBech32(erdAddress);
         }
 
         private static byte[] ConcatByteArrays(params byte[][] arrays)

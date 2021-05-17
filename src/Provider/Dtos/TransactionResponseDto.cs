@@ -9,10 +9,10 @@
 
     public class TransactionResponseData
     {
-        public Transaction Transaction { get; set; }
+        public TransactionDto Transaction { get; set; }
     }
 
-    public class Transaction
+    public class TransactionDto
     {
 
         public string Type { get; set; }
@@ -39,10 +39,10 @@
         public string Status { get; set; }
         public long HyperblockNonce { get; set; }
         public string HyperblockHash { get; set; }
-        public SmartContractResult[] SmartContractResults { get; set; }
+        public SmartContractResultDto[] SmartContractResults { get; set; }
     }
 
-    public class SmartContractResult
+    public class SmartContractResultDto
     {
         public string Hash { get; set; }
         public long Nonce { get; set; }

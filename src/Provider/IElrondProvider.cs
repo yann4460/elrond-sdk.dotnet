@@ -6,11 +6,11 @@ namespace Elrond.Dotnet.Sdk.Provider
 {
     public interface IElrondProvider
     {
-        Task<ConfigDto> GetConstants();
+        Task<ConfigResponseDto> GetConstants();
 
-        Task<AccountDto> GetAccount(string address);
+        Task<AccountResponseDto> GetAccount(string address);
 
-        Task<IReadOnlyCollection<ESDTTokenDto>> GetESDTTokens(string address);
+        Task<IReadOnlyCollection<ESDTTokenResponseDto>> GetESDTTokens(string address);
 
         Task<CreateTransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto);
 
@@ -19,5 +19,7 @@ namespace Elrond.Dotnet.Sdk.Provider
         Task<TransactionResponseDto> GetTransactionDetail(string txHash);
 
         Task<TransactionCostDto> GetTransactionCost(TransactionRequestDto transactionRequestDto);
+
+        Task<QueryVmResultDto> QueryVm(QueryVmRequestDto queryVmRequestDto);
     }
 }

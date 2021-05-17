@@ -10,7 +10,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public string Status { get; private set; }
         public string TxHash { get; }
 
-        private SmartContractResult[] _smartContractResult;
+        private SmartContractResultDto[] _smartContractResult;
 
         public Transaction(string hash)
         {

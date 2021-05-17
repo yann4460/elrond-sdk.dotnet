@@ -1,6 +1,6 @@
 ﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
-    public class AccountDto
+    public class AccountResponseDto
     {
         public AccountDataDto Data { get; set; }
         public string Error { get; set; }
@@ -9,10 +9,10 @@
 
     public class AccountDataDto
     {
-        public Account Account { get; set; }
+        public AccountDto Account { get; set; }
     }
 
-    public class Account
+    public class AccountDto
     {
         public string Address { get; set; }
         public int Nonce { get; set; }

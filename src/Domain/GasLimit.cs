@@ -14,7 +14,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             Value = value;
         }
 
-        public static GasLimit ForTransfer(ConfigDto constants, TransactionRequestDto transaction)
+        public static GasLimit ForTransfer(ConfigResponseDto constants, TransactionRequestDto transaction)
         {
             var value = constants.Data.Config.erd_min_gas_limit;
             if (string.IsNullOrEmpty(transaction.Data)) return new GasLimit(value);

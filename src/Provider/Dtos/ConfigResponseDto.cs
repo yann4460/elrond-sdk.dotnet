@@ -1,6 +1,6 @@
 ﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
-    public class ConfigDto
+    public class ConfigResponseDto
     {
         public ConfigDataDto Data { get; set; }
         public string Error { get; set; }
@@ -9,10 +9,10 @@
 
     public class ConfigDataDto
     {
-        public Config Config { get; set; }
+        public ConfigDto Config { get; set; }
     }
 
-    public class Config
+    public class ConfigDto
     {
         public string erd_chain_id { get; set; }
         public int erd_denomination { get; set; }
