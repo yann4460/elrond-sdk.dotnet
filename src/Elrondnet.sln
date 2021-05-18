@@ -11,7 +11,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4C11B2A7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elrond.SDK.Console", "..\tests\Elrond.SDK.Console\Elrond.SDK.Console.csproj", "{257F798C-41CD-4C86-8033-75E8FCF189D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elrond-sdk.dotnet.tests", "..\tests\Elrond-sdk.dotnet.tests\Elrond-sdk.dotnet.tests.csproj", "{140EA6B2-4387-47C2-AEB7-DAD43638ABB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Elrond-sdk.dotnet.tests", "..\tests\Elrond-sdk.dotnet.tests\Elrond-sdk.dotnet.tests.csproj", "{140EA6B2-4387-47C2-AEB7-DAD43638ABB1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{89BE6A83-2144-4EB2-A314-B9FCA2CFFD90}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
