@@ -26,3 +26,7 @@ jobs:
     - name: Test
       working-directory: tests/Elrond-sdk.dotnet.tests
       run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Publish package
+      working-directory: src
+      run: dotnet nuget push .\bin\Release\*.nupkg --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
