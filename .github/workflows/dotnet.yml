@@ -5,7 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
+  workflow_dispatch:
+  
 jobs:
   build:
 
@@ -17,9 +18,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+      
     - name: Build
-      run: dotnet build --no-restore
+      working-directory: src
+      run: dotnet build .\Elrondnet.sln  --configuration Release
+      
     - name: Test
+      working-directory: tests/Elrond-sdk.dotnet.tests
       run: dotnet test --no-build --verbosity normal
