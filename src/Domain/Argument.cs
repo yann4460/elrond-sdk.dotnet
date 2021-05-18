@@ -95,35 +95,46 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new Argument(hexValue);
         }
 
-        public static Argument CreateArgumentFromUInt16(ushort value)
+        public static Argument CreateArgumentFromInt16(short value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value), true);
+            return isOptional
+                ? CreateOptionalNumberArgument(4, value)
+                : CreateArgumentFromBigInteger(new BigInteger(value));
         }
 
-        public static Argument CreateArgumentFromInt16(short value)
+        public static Argument CreateArgumentFromUInt16(ushort value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value));
+            return isOptional
+                ? CreateOptionalNumberArgument(4, value, true)
+                : CreateArgumentFromBigInteger(new BigInteger(value), true);
         }
 
-        public static Argument CreateArgumentFromUInt32(uint value)
+        public static Argument CreateArgumentFromUInt32(uint value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value), true);
+            return isOptional
+                ? CreateOptionalNumberArgument(8, value, true)
+                : CreateArgumentFromBigInteger(new BigInteger(value), true);
         }
 
-        public static Argument CreateArgumentFromInt32(int value)
+        public static Argument CreateArgumentFromInt32(int value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value));
+            return isOptional
+                ? CreateOptionalNumberArgument(8, value)
+                : CreateArgumentFromBigInteger(new BigInteger(value));
         }
 
-
-        public static Argument CreateArgumentFromUInt64(ulong value)
+        public static Argument CreateArgumentFromUInt64(ulong value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value), true);
+            return isOptional
+                ? CreateOptionalNumberArgument(16, value, true)
+                : CreateArgumentFromBigInteger(new BigInteger(value), true);
         }
 
-        public static Argument CreateArgumentFromInt64(long value)
+        public static Argument CreateArgumentFromInt64(long value, bool isOptional = false)
         {
-            return CreateArgumentFromBigInteger(new BigInteger(value));
+            return isOptional
+                ? CreateOptionalNumberArgument(16, value)
+                : CreateArgumentFromBigInteger(new BigInteger(value));
         }
 
         public static Argument CreateArgumentFromAddress(Address address)
@@ -143,6 +154,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static Argument CreateArgumentFromBalance(Balance balance)
         {
             return CreateArgumentFromBigInteger(balance.Value);
+        }
+
+        private static Argument CreateOptionalNumberArgument(int size, BigInteger number, bool isUnsigned = false)
+        {
+            var bytes = number.ToByteArray(isUnsigned: isUnsigned, isBigEndian: true);
+            var hex = Convert.ToHexString(bytes);
+            return new Argument("01" + hex.PadLeft(size, '0'));
         }
     }
 }
