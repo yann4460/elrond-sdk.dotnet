@@ -25,4 +25,4 @@ jobs:
       
     - name: Test
       working-directory: tests/Elrond-sdk.dotnet.tests
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release --no-build --verbosity normal
