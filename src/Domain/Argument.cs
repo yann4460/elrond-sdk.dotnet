@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Text;
 
 namespace Elrond.Dotnet.Sdk.Domain
@@ -7,7 +8,7 @@ namespace Elrond.Dotnet.Sdk.Domain
     {
         private Argument(string hexValue)
         {
-            Value = hexValue;
+            Value = hexValue.ToLowerInvariant();
         }
 
         public string Value { get; }
@@ -20,7 +21,7 @@ namespace Elrond.Dotnet.Sdk.Domain
 
             if (typeof(T) == typeof(Address))
             {
-                return (T)Convert.ChangeType(Address.FromHex(arg), typeof(Address));
+                return (T) Convert.ChangeType(Address.FromHex(arg), typeof(Address));
             }
 
             var type = Type.GetTypeCode(typeof(T));
@@ -30,37 +31,37 @@ namespace Elrond.Dotnet.Sdk.Domain
                     switch (arg)
                     {
                         case "01":
-                            return (T)Convert.ChangeType(true, typeof(bool));
+                            return (T) Convert.ChangeType(true, typeof(bool));
                         default:
-                            return (T)Convert.ChangeType(false, typeof(bool));
+                            return (T) Convert.ChangeType(false, typeof(bool));
                     }
                 case TypeCode.Int16:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(short));
-                    return (T)Convert.ChangeType(Convert.ToInt16(arg, 16), typeof(short));
+                        return (T) Convert.ChangeType(0, typeof(short));
+                    return (T) Convert.ChangeType(Convert.ToInt16(arg, 16), typeof(short));
                 case TypeCode.Int32:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(int));
-                    return (T)Convert.ChangeType(Convert.ToInt32(arg, 16), typeof(int));
+                        return (T) Convert.ChangeType(0, typeof(int));
+                    return (T) Convert.ChangeType(Convert.ToInt32(arg, 16), typeof(int));
                 case TypeCode.Int64:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(long));
-                    return (T)Convert.ChangeType(Convert.ToInt64(arg, 16), typeof(long));
+                        return (T) Convert.ChangeType(0, typeof(long));
+                    return (T) Convert.ChangeType(Convert.ToInt64(arg, 16), typeof(long));
                 case TypeCode.String:
                     var stringValue = Encoding.UTF8.GetString(Convert.FromHexString(arg));
-                    return (T)Convert.ChangeType(stringValue, typeof(string));
+                    return (T) Convert.ChangeType(stringValue, typeof(string));
                 case TypeCode.UInt16:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(ushort));
-                    return (T)Convert.ChangeType(Convert.ToUInt16(arg, 16), typeof(ushort));
+                        return (T) Convert.ChangeType(0, typeof(ushort));
+                    return (T) Convert.ChangeType(Convert.ToUInt16(arg, 16), typeof(ushort));
                 case TypeCode.UInt32:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(uint));
-                    return (T)Convert.ChangeType(Convert.ToUInt32(arg, 16), typeof(uint));
+                        return (T) Convert.ChangeType(0, typeof(uint));
+                    return (T) Convert.ChangeType(Convert.ToUInt32(arg, 16), typeof(uint));
                 case TypeCode.UInt64:
                     if (arg == null)
-                        return (T)Convert.ChangeType(0, typeof(ulong));
-                    return (T)Convert.ChangeType(Convert.ToUInt64(arg, 16), typeof(ulong));
+                        return (T) Convert.ChangeType(0, typeof(ulong));
+                    return (T) Convert.ChangeType(Convert.ToUInt64(arg, 16), typeof(ulong));
                 case TypeCode.Single:
                 case TypeCode.Double:
                 case TypeCode.Decimal:
@@ -94,22 +95,54 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new Argument(hexValue);
         }
 
+        public static Argument CreateArgumentFromUInt16(ushort value)
+        {
+            return CreateArgumentFromBigInteger(new BigInteger(value), true);
+        }
+
         public static Argument CreateArgumentFromInt16(short value)
         {
-            var hex = value.ToString("X");
-            return CreateArgumentFromHex(hex);
+            return CreateArgumentFromBigInteger(new BigInteger(value));
+        }
+
+        public static Argument CreateArgumentFromUInt32(uint value)
+        {
+            return CreateArgumentFromBigInteger(new BigInteger(value), true);
         }
 
         public static Argument CreateArgumentFromInt32(int value)
         {
-            var hex = value.ToString("X");
-            return CreateArgumentFromHex(hex);
+            return CreateArgumentFromBigInteger(new BigInteger(value));
+        }
+
+
+        public static Argument CreateArgumentFromUInt64(ulong value)
+        {
+            return CreateArgumentFromBigInteger(new BigInteger(value), true);
         }
 
         public static Argument CreateArgumentFromInt64(long value)
         {
-            var hex = value.ToString("X");
-            return CreateArgumentFromHex(hex);
+            return CreateArgumentFromBigInteger(new BigInteger(value));
+        }
+
+        public static Argument CreateArgumentFromAddress(Address address)
+        {
+            return CreateArgumentFromHex(address.Hex);
+        }
+
+        public static Argument CreateArgumentFromBigInteger(BigInteger bigInteger, bool isUnsigned = false)
+        {
+            if (bigInteger.IsZero)
+                return new Argument(string.Empty);
+
+            var bytes = bigInteger.ToByteArray(isUnsigned, true);
+            return CreateArgumentFromBytes(bytes);
+        }
+
+        public static Argument CreateArgumentFromBalance(Balance balance)
+        {
+            return CreateArgumentFromBigInteger(balance.Value);
         }
     }
 }
