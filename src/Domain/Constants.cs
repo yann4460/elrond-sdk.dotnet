@@ -15,12 +15,6 @@ namespace Elrond.Dotnet.Sdk.Domain
         public long MinGasPrice { get; set; }
         public int MinTransactionVersion { get; set; }
 
-        public static Constants New()
-        {
-            return new Constants();
-        }
-
-
         public static async Task<Constants> GetFromNetwork(IElrondProvider provider)
         {
             var constants = await provider.GetConstants();
