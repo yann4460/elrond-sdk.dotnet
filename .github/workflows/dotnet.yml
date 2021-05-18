@@ -27,6 +27,15 @@ jobs:
       working-directory: tests/Elrond-sdk.dotnet.tests
       run: dotnet test --configuration Release --no-build --verbosity normal
 
-    - name: Publish package
+    - name: Publish on nuget.org
       working-directory: src
       run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+    
+    - name: Add github source package
+      run: dotnet nuget add source --username Yann4460 --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/yann4460/index.json"
+
+    - name: Publish on github
+      working-directory: src
+      run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source github --skip-duplicate
+      
+      
