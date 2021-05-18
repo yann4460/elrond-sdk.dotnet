@@ -19,9 +19,9 @@ jobs:
       with:
         dotnet-version: 5.0.x
       
-    - name: Build
+    - name: Build with dotnet
+      run: dotnet build Elrondnet.sln --configuration Release
       working-directory: src
-      run: dotnet build .\Elrondnet.sln  --configuration Release
       
     - name: Test
       working-directory: tests/Elrond-sdk.dotnet.tests
