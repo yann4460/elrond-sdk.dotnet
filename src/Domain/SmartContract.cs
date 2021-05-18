@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Elrond.Dotnet.Sdk.Cryptography;
 using Org.BouncyCastle.Crypto.Digests;
@@ -88,7 +89,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             return arrays.SelectMany(x => x).ToArray();
         }
 
-        private static byte[] CalculateHash(byte[] value)
+        private static IEnumerable<byte> CalculateHash(byte[] value)
         {
             var digest = new KeccakDigest(256);
             var output = new byte[digest.GetDigestSize()];

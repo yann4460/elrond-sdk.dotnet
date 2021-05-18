@@ -14,12 +14,12 @@ namespace Elrond.Dotnet.Sdk.Domain
             Value = value;
         }
 
-        public static GasLimit ForTransfer(ConfigResponseDto constants, TransactionRequestDto transaction)
+        public static GasLimit ForTransfer(Constants constants, TransactionRequest transaction)
         {
-            var value = constants.Data.Config.erd_min_gas_limit;
+            var value = constants.MinGasLimit;
             if (string.IsNullOrEmpty(transaction.Data)) return new GasLimit(value);
             var bytes = Convert.FromBase64String(transaction.Data);
-            value += constants.Data.Config.erd_gas_per_data_byte * bytes.Length;
+            value += constants.GasPerDataByte * bytes.Length;
 
             return new GasLimit(value);
         }
