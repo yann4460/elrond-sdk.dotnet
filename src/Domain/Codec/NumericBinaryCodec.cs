@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using dotnetstandard_bip32;
 
@@ -9,13 +10,28 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
     {
         public (NumericValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
         {
-            const int offset = 0;
-            var length = type.SizeInBytes();
-            var payload = data.Slice(offset, offset + length);
-            var result = DecodeTopLevel(payload, type);
+            if (type.HasFixedSize())
+            {
+                const int offset = 0;
+                var length = type.SizeInBytes();
+                var payload = data.Slice(offset, offset + length);
+                var result = DecodeTopLevel(payload, type);
 
-            var decodedLength = length + offset;
-            return (result, decodedLength);
+                var decodedLength = length + offset;
+                return (result, decodedLength);
+            }
+            else
+            {
+                var sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, 4));
+                if (BitConverter.IsLittleEndian)
+                {
+                    sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, 4).Reverse().ToArray());
+                }
+
+                var payload = data.Skip(4).ToArray();
+                var bigNumber = new BigInteger(payload, !type.HasSign(), isBigEndian: true);
+                return (new NumericValue(type, bigNumber), sizeInBytes);
+            }
         }
 
         public NumericValue DecodeTopLevel(byte[] data, TypeValue type = null)
@@ -33,30 +49,38 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             if (value.Type.HasFixedSize())
             {
-                var number = value.ValueOf();
-                if (number.IsZero)
-                    return new byte[] {0x00};
-
-
-                var buffer = new List<byte>();
                 var sizeInBytes = value.Type.SizeInBytes();
-                var lengthBytes = new List<byte>();
-                if (BitConverter.IsLittleEndian)
+                var number = value.ValueOf();
+                var fullArray = Enumerable.Repeat((byte) 0x00, sizeInBytes).ToArray();
+                if (number.IsZero)
                 {
-                    //lengthBytes = lengthBytes.Reverse().ToArray();
+                    return fullArray;
                 }
 
-                buffer.AddRange(lengthBytes);
-                buffer.AddRange(value.ValueOf().ToByteArray(!value.Type.HasSign(), true));
+                var bigNumber = value.ValueOf();
+                var payload = bigNumber.ToByteArray(!value.Type.HasSign(), true);
+                var payloadLength = payload.Length;
 
+                var buffer = new List<byte>();
+                buffer.AddRange(fullArray.Slice(0, sizeInBytes - payloadLength));
+                buffer.AddRange(payload);
                 var data = buffer.ToArray();
                 return data;
             }
             else
             {
-                var binaryCoder = new BytesBinaryCodec();
-                var buffer = EncodeTopLevel(value);
-                return binaryCoder.EncodeNested(new BytesValue(buffer));
+                var payload = EncodeTopLevel(value);
+                var sizeBytes = BitConverter.GetBytes(payload.Length).ToList();
+                if (BitConverter.IsLittleEndian)
+                {
+                    sizeBytes.Reverse();
+                }
+
+                var buffer = new List<byte>();
+                buffer.AddRange(sizeBytes);
+                buffer.AddRange(payload);
+                var data = buffer.ToArray();
+                return data;
             }
         }
 
@@ -69,11 +93,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
 
             var bigNumber = value.ValueOf();
-
             var isUnsigned = !value.Type.HasSign();
-            var buffer2= bigNumber.ToByteArray(isUnsigned, isBigEndian: true);
+            var buffer = bigNumber.ToByteArray(isUnsigned, isBigEndian: true);
 
-            return buffer2;
+            return buffer;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using NUnit.Framework;
 
@@ -124,45 +125,84 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
-        [TestCase(ulong.MinValue)]
-        [TestCase((ulong) 1)]
-        [TestCase((ulong) 42)]
-        [TestCase(ulong.MaxValue)]
-        public void EncodeTopLevel_AndDecode_U64Value(ulong number)
+        [TestCase(ulong.MinValue, "")]
+        [TestCase((ulong) 1, "01")]
+        [TestCase((ulong) 42, "2A")]
+        [TestCase(ulong.MaxValue, "FFFFFFFFFFFFFFFF")]
+        public void EncodeTopLevel_AndDecode_U64Value(ulong number, string hexEncoded)
         {
             // Arrange
             var value = NumericValue.U64Value(number);
             // Act
             var encoded = _sut.EncodeTopLevel(value);
             var actual = _sut.DecodeTopLevel(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
             Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
-        [TestCase(long.MinValue)]
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(42)]
-        [TestCase(long.MaxValue)]
-        public void EncodeTopLevel_AndDecode_I64Value(long number)
+        [TestCase(long.MinValue, "8000000000000000")]
+        [TestCase((long) 0, "")]
+        [TestCase((long) 1, "01")]
+        [TestCase((long) 42, "2A")]
+        [TestCase(long.MaxValue, "7FFFFFFFFFFFFFFF")]
+        public void EncodeTopLevel_AndDecode_I64Value(long number, string hexEncoded)
         {
             // Arrange
             var value = NumericValue.I64Value(number);
             // Act
             var encoded = _sut.EncodeTopLevel(value);
             var actual = _sut.DecodeTopLevel(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
             Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
+        [TestCase("0", "")]
+        [TestCase("1", "01")]
+        [TestCase("42", "2A")]
+        [TestCase("1844674407370955161576567687", "05F5E0FFFFFFFFFFFE9A7387")]
+        public void EncodeTopLevel_AndDecode_BigUintValue(string number, string hexEncoded)
+        {
+            // Arrange
+            var value = NumericValue.BigUintValue(BigInteger.Parse(number));
+            // Act
+            var encoded = _sut.EncodeTopLevel(value);
+            var actual = _sut.DecodeTopLevel(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
 
+            // Assert
+            Assert.AreEqual(number, actual.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
+        }
+
+        [TestCase("-1844674407370955161576567687", "FA0A1F000000000001658C79")]
+        [TestCase("0", "")]
+        [TestCase("1", "01")]
+        [TestCase("42", "2A")]
+        [TestCase("1844674407370955161576567687", "05F5E0FFFFFFFFFFFE9A7387")]
+        public void EncodeTopLevel_AndDecode_BigIntValue(string number, string hexEncoded)
+        {
+            // Arrange
+            var value = NumericValue.BigIntValue(BigInteger.Parse(number));
+            // Act
+            var encoded = _sut.EncodeTopLevel(value);
+            var actual = _sut.DecodeTopLevel(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
+
+            // Assert
+            Assert.AreEqual(number, actual.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
+        }
         // Nested
 
         [TestCase(byte.MinValue, "00")]
-        [TestCase((byte)1, "01")]
-        [TestCase((byte)42, "2A")]
+        [TestCase((byte) 1, "01")]
+        [TestCase((byte) 42, "2A")]
         [TestCase(byte.MaxValue, "FF")]
         public void EncodeNested_AndDecode_U8Value(byte number, string hexEncoded)
         {
@@ -179,9 +219,9 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         }
 
         [TestCase(sbyte.MinValue, "80")]
-        [TestCase((sbyte)0, "00")]
-        [TestCase((sbyte)1, "01")]
-        [TestCase((sbyte)42, "2A")]
+        [TestCase((sbyte) 0, "00")]
+        [TestCase((sbyte) 1, "01")]
+        [TestCase((sbyte) 42, "2A")]
         [TestCase(sbyte.MaxValue, "7F")]
         public void EncodeNested_AndDecode_I8Value(sbyte number, string hexEncoded)
         {
@@ -198,8 +238,8 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         }
 
         [TestCase(ushort.MinValue, "0000")]
-        [TestCase((ushort)1, "0001")]
-        [TestCase((ushort)42, "002A")]
+        [TestCase((ushort) 1, "0001")]
+        [TestCase((ushort) 42, "002A")]
         [TestCase(ushort.MaxValue, "FFFF")]
         public void EncodeNested_AndDecode_U16Value(ushort number, string hexEncoded)
         {
@@ -216,9 +256,9 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         }
 
         [TestCase(short.MinValue, "8000")]
-        [TestCase((short)0, "0000")]
-        [TestCase((short)1, "0001")]
-        [TestCase((short)42, "002A")]
+        [TestCase((short) 0, "0000")]
+        [TestCase((short) 1, "0001")]
+        [TestCase((short) 42, "002A")]
         [TestCase(short.MaxValue, "7FFF")]
         public void EncodeNested_AndDecode_I16Value(short number, string hexEncoded)
         {
@@ -271,37 +311,78 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
-        [TestCase(ulong.MinValue)]
-        [TestCase((ulong) 1)]
-        [TestCase((ulong) 42)]
-        [TestCase(ulong.MaxValue)]
-        public void EncodeNested_AndDecode_U64Value(ulong number)
+        [TestCase(ulong.MinValue, "0000000000000000")]
+        [TestCase((ulong) 1, "0000000000000001")]
+        [TestCase((ulong) 42, "000000000000002A")]
+        [TestCase(ulong.MaxValue, "FFFFFFFFFFFFFFFF")]
+        public void EncodeNested_AndDecode_U64Value(ulong number, string hexEncoded)
         {
             // Arrange
             var value = NumericValue.U64Value(number);
             // Act
             var encoded = _sut.EncodeNested(value);
             var actual = _sut.DecodeNested(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
             Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
-        [TestCase(long.MinValue)]
-        [TestCase(0)]
-        [TestCase(1)]
-        [TestCase(42)]
-        [TestCase(long.MaxValue)]
-        public void EncodeNested_AndDecode_I64Value(long number)
+        [TestCase(-922337203685477580, "F333333333333334")]
+        [TestCase((long) 0, "0000000000000000")]
+        [TestCase((long) 1, "0000000000000001")]
+        [TestCase((long) 42, "000000000000002A")]
+        [TestCase(922337203685477580, "0CCCCCCCCCCCCCCC")]
+        public void EncodeNested_AndDecode_I64Value(long number, string hexEncoded)
         {
             // Arrange
             var value = NumericValue.I64Value(number);
             // Act
             var encoded = _sut.EncodeNested(value);
             var actual = _sut.DecodeNested(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
             Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
+        }
+
+        [TestCase("0", "00000000")]
+        [TestCase("1", "0000000101")]
+        [TestCase("42", "000000012A")]
+        [TestCase("1844674407370955161576567687", "0000000C05F5E0FFFFFFFFFFFE9A7387")]
+        public void EncodeNested_AndDecode_BigUintValue(string number, string hexEncoded)
+        {
+            // Arrange
+            var value = NumericValue.BigUintValue(BigInteger.Parse(number));
+            // Act
+            var encoded = _sut.EncodeNested(value);
+            var actual = _sut.DecodeNested(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
+
+            // Assert
+            Assert.AreEqual(number, actual.Value.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
+        }
+
+        [TestCase("-1844674407370955161576567687", "0000000CFA0A1F000000000001658C79")]
+        [TestCase("0", "00000000")]
+        [TestCase("1", "0000000101")]
+        [TestCase("42", "000000012A")]
+        [TestCase("1844674407370955161576567687", "0000000C05F5E0FFFFFFFFFFFE9A7387")]
+        public void EncodeNested_AndDecode_BigIntValue(string number, string hexEncoded)
+        {
+            // Arrange
+            var value = NumericValue.BigIntValue(BigInteger.Parse(number));
+            // Act
+            var encoded = _sut.EncodeNested(value);
+            var actual = _sut.DecodeNested(encoded, value.Type);
+            var actualHexEncoded = Convert.ToHexString(encoded);
+
+            // Assert
+            Assert.AreEqual(number, actual.Value.ValueOf().ToString());
+            Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
     }
 }

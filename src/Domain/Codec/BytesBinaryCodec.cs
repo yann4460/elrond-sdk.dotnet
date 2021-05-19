@@ -11,14 +11,13 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public (BytesValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
         {
-            var value = BitConverter.ToUInt32(data);
+            var sizeInBytes = BitConverter.ToUInt32(data);
             if (BitConverter.IsLittleEndian)
             {
-                var valueBytes = BitConverter.GetBytes(value);
-                value = BitConverter.ToUInt32(valueBytes.Reverse().ToArray());
+                sizeInBytes = BitConverter.ToUInt32(BitConverter.GetBytes(sizeInBytes).Reverse().ToArray());
             }
 
-            var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + (int) value);
+            var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + (int)sizeInBytes);
 
             return (new BytesValue(payload), payload.Length);
         }
