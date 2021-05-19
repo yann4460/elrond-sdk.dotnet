@@ -1,9 +1,10 @@
 ﻿using System;
 using Elrond.Dotnet.Sdk.Cryptography;
+using Elrond.Dotnet.Sdk.Domain.Codec;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class Address
+    public class Address : PrimitiveValue
     {
         public string Bech32 { get; }
         public string Hex { get; }
@@ -13,6 +14,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         {
             Bech32 = bech32.ToLowerInvariant();
             Hex = hex.ToLowerInvariant();
+        }
+
+        public static Address FromBytes(byte[] data)
+        {
+            var hex = Convert.ToHexString(data);
+            var bech32 = Bech32Engine.Encode(Hrp, data);
+            return new Address(hex, bech32);
         }
 
         public static Address FromHex(string hex)
@@ -26,6 +34,11 @@ namespace Elrond.Dotnet.Sdk.Domain
             Bech32Engine.Decode(bech32, out _, out var data);
             var hex = Convert.ToHexString(data);
             return new Address(hex, bech32);
+        }
+
+        public byte[] PublicKey()
+        {
+            return Convert.FromHexString(Hex);
         }
 
         /// <summary>

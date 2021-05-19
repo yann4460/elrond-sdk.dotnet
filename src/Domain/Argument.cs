@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Numerics;
 using System.Text;
+using Elrond.Dotnet.Sdk.Domain.Codec;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class Argument
+    public class Argument : PrimitiveValue
     {
         private Argument(string hexValue)
         {

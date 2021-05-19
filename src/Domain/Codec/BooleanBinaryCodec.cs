@@ -8,11 +8,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         private const byte True = 0x01;
         private const byte False = 0x00;
 
-        public Tuple<BooleanValue, int> DecodeNested(byte[] data)
+        public (BooleanValue Value, int BytesLength) DecodeNested(byte[] data)
         {
             // We don't check the size of the buffer, we just read the first byte.
             var firstByte = data[0];
-            return new Tuple<BooleanValue, int>(new BooleanValue(firstByte == True), 1);
+            return (new BooleanValue(firstByte == True), 1);
         }
 
         public BooleanValue DecodeTopLevel(byte[] data)
