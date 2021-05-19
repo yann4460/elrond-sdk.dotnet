@@ -9,7 +9,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
     {
         private const int BytesSizeOfU32 = 4;
 
-        public (BytesValue Value, int BytesLength) DecodeNested(byte[] data)
+        public (BytesValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
         {
             var value = BitConverter.ToUInt32(data);
             if (BitConverter.IsLittleEndian)
@@ -23,7 +23,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return (new BytesValue(payload), payload.Length);
         }
 
-        public BytesValue DecodeTopLevel(byte[] data)
+        public BytesValue DecodeTopLevel(byte[] data, TypeValue type = null)
         {
             return new BytesValue(data);
         }
@@ -32,7 +32,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             var buffer = new List<byte>();
             var lengthBytes = BitConverter.GetBytes(value.GetLength());
-
             if (BitConverter.IsLittleEndian)
             {
                 lengthBytes = lengthBytes.Reverse().ToArray();

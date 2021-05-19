@@ -8,14 +8,14 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         private const byte True = 0x01;
         private const byte False = 0x00;
 
-        public (BooleanValue Value, int BytesLength) DecodeNested(byte[] data)
+        public (BooleanValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
         {
             // We don't check the size of the buffer, we just read the first byte.
             var firstByte = data[0];
             return (new BooleanValue(firstByte == True), 1);
         }
 
-        public BooleanValue DecodeTopLevel(byte[] data)
+        public BooleanValue DecodeTopLevel(byte[] data, TypeValue type = null)
         {
             if (data.Length > 1)
             {

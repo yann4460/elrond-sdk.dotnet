@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Elrond.Dotnet.Sdk.Domain;
-using Elrond.Dotnet.Sdk.Domain.Codec;
-using Moq;
+﻿using Elrond.Dotnet.Sdk.Domain.Codec;
 using NUnit.Framework;
 
 namespace Elrond_sdk.dotnet.tests.Domain.Codec
