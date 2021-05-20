@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Elrond.Dotnet.Sdk.Domain.Values;
 
@@ -10,9 +9,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         private readonly BinaryCodec _binaryCodec;
         public string Type => TypeValue.BinaryTypes.Struct;
 
-        public StructBinaryCodec()
+        public StructBinaryCodec(BinaryCodec binaryCodec)
         {
-            _binaryCodec = new BinaryCodec();
+            _binaryCodec = binaryCodec;
         }
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
@@ -23,11 +22,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             var offset = 0;
             foreach (var fieldDefinition in fieldDefinitions)
             {
-                var fieldType = TypeValue.FromRustType(fieldDefinition.RustType);
-                var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), fieldType);
+                var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), fieldDefinition.Type);
                 fields.Add(new StructField(value, fieldDefinition.Name));
-
-                var hex = Convert.ToHexString(buffer.ToArray());
 
                 offset += bytesLength;
                 buffer = buffer.Skip(bytesLength).ToList();

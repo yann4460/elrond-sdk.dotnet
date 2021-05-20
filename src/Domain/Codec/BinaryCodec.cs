@@ -16,7 +16,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 new NumericBinaryCodec(),
                 new AddressBinaryCodec(),
                 new BooleanBinaryCodec(),
-                new BytesBinaryCodec()
+                new BytesBinaryCodec(),
+                new TokenIdentifierCodec(),
+                new StructBinaryCodec(this),
+                new OptionBinaryCodec(this),
             };
         }
 

@@ -14,14 +14,14 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         [SetUp]
         public void Setup()
         {
-            _sut = new StructBinaryCodec();
+            _sut = new StructBinaryCodec(new BinaryCodec());
         }
 
         [Test]
         public void Encode_Simple_Value()
         {
             // Arrange
-            var fieldDefinition = new FieldDefinition("azeazeaze", "", TypeValue.RustTypes.u16);
+            var fieldDefinition = new FieldDefinition("azeazeaze", "", TypeValue.U16TypeValue);
             var structField = new StructField(NumericValue.U16Value(12), "azeazeaze");
             var type = TypeValue.StructValue("azeae", new[] {fieldDefinition});
 
@@ -39,13 +39,13 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             // Arrange
             var type = TypeValue.StructValue("Foo", new[]
             {
-                new FieldDefinition("ticket_price", "", TypeValue.RustTypes.BigUint),
-                new FieldDefinition("tickets_left", "", TypeValue.RustTypes.u32),
-                new FieldDefinition("deadline", "", TypeValue.RustTypes.u64),
-                new FieldDefinition("max_entries_per_user", "", TypeValue.RustTypes.u32),
-                new FieldDefinition("prize_distribution", "", TypeValue.RustTypes.Bytes),
-                new FieldDefinition("current_ticket_number", "", TypeValue.RustTypes.u32),
-                new FieldDefinition("prize_pool", "", TypeValue.RustTypes.BigUint)
+                new FieldDefinition("ticket_price", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("tickets_left", "", TypeValue.U32TypeValue),
+                new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+                new FieldDefinition("max_entries_per_user", "", TypeValue.U32TypeValue),
+                new FieldDefinition("prize_distribution", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("current_ticket_number", "", TypeValue.U32TypeValue),
+                new FieldDefinition("prize_pool", "", TypeValue.BigUintTypeValue)
             });
             var structValue = new StructValue(type, new[]
             {
@@ -71,23 +71,25 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         [Test]
         public void Encode_Complex_Value2()
         {
-            var hex =
-                "0000000445474c44000000000000000000000008016345785d8a0000000000088ac7230489e800000000000060a44594fdb32e9ed34caf6009834c5a5bef293097ea39698b3e82efd8c71183cb731b420000000000000000000000000000000000000000000000000000000000000000000000000000000201f400000000";
-            var data = Convert.FromHexString(hex);
+            var base64= "AAAABEVHTEQAAAAAAAAAAAAAAAgBY0V4XYoAAAAAAAiKxyMEiegAAAAAAABgpEWU/bMuntNMr2AJg0xaW+8pMJfqOWmLPoLv2McRg8tzG0IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAfQAAAAA";
+            var data = Convert.FromBase64String(base64);
 
             // Arrange
             var type = TypeValue.StructValue("Auction", new[]
             {
-                new FieldDefinition("token_type", "", TypeValue.RustTypes.TokenIdentifier),
-                new FieldDefinition("nonce", "", TypeValue.RustTypes.u64),
-                new FieldDefinition("min_bid", "", TypeValue.RustTypes.BigUint),
-                new FieldDefinition("max_bid", "", TypeValue.RustTypes.BigUint),
-                new FieldDefinition("deadline", "", TypeValue.RustTypes.u64),
-                new FieldDefinition("original_owner", "", TypeValue.RustTypes.Address),
-                new FieldDefinition("current_bid", "", TypeValue.RustTypes.BigUint),
-                new FieldDefinition("current_winner", "", TypeValue.RustTypes.Address),
-                new FieldDefinition("marketplace_cut_percentage", "", TypeValue.RustTypes.BigUint),
-                new FieldDefinition("creator_royalties_percentage", "", TypeValue.RustTypes.BigUint),
+                new FieldDefinition("EsdtToken", "", TypeValue.StructValue("EsdtToken", new []
+                {
+                    new FieldDefinition("token_type","",TypeValue.TokenIdentifierValue), 
+                    new FieldDefinition("nonce","",TypeValue.U64TypeValue),
+                })),
+                new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("max_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+                new FieldDefinition("original_owner", "", TypeValue.AddressValue),
+                new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("current_winner", "", TypeValue.AddressValue),
+                new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue),
             });
 
             // Act

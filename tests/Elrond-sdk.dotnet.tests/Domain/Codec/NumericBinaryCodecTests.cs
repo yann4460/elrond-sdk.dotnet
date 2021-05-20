@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.Numerics;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;

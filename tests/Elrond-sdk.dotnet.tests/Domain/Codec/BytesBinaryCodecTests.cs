@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using NUnit.Framework;

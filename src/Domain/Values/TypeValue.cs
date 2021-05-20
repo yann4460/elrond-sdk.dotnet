@@ -53,6 +53,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             public const string Numeric = nameof(Numeric);
             public const string Struct = nameof(Struct);
             public const string Bytes = nameof(Bytes);
+            public const string TokenIdentifier = nameof(TokenIdentifier);
+            public const string Option = nameof(Option);
         }
 
         public static class RustTypes
@@ -96,10 +98,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public static TypeValue TokenIdentifierValue => new TypeValue(BinaryTypes.Bytes, RustTypes.TokenIdentifier);
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
         public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
+        public static TypeValue OptionValue => new TypeValue(BinaryTypes.Option, "");
 
         public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) =>
             new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);
-
 
         public static TypeValue FromRustType(string rustType)
         {
@@ -135,6 +137,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                     return AddressValue;
                 case RustTypes.TokenIdentifier:
                     return TokenIdentifierValue;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(rustType));
             }

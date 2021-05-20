@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Elrond_sdk.dotnet.tests</RootNamespace>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

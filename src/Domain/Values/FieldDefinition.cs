@@ -1,26 +1,23 @@
-﻿using System.Text.Json;
-
-namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class FieldDefinition
     {
         public string Name { get; }
         public string Description { get; }
-        public string RustType { get; }
+        public TypeValue Type { get; }
 
-        public FieldDefinition(string name, string description, string rustType)
+        public FieldDefinition(string name, string description, TypeValue type)
         {
             Name = name;
             Description = description;
-            RustType = rustType;
+            Type = type;
         }
 
+        //public static FieldDefinition FromJson(string json)
+        //{
+        //    var dynamic = JsonSerializer.Deserialize<dynamic>(json);
 
-        public static FieldDefinition FromJson(string json)
-        {
-            var dynamic = JsonSerializer.Deserialize<dynamic>(json);
-
-            return new FieldDefinition("", "", "");
-        }
+        //    return new FieldDefinition("", "", "");
+        //}
     }
 }

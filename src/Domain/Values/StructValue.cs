@@ -5,9 +5,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
     public class StructValue : IBinaryType
     {
         public TypeValue Type { get; }
-
-        public byte[] Buffer => throw new System.NotImplementedException();
-
         public StructField[] Fields { get; }
 
         public StructValue(TypeValue structType, StructField[] fields)
@@ -16,7 +13,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             Fields = fields;
             CheckTyping();
         }
-
 
         private void CheckTyping()
         {
@@ -32,7 +28,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                 var definition = definitions[i];
                 var fieldType = field.Value.Type;
 
-                if (fieldType.RustType != definition.RustType)
+                if (fieldType.RustType != definition.Type.RustType)
                     throw new BinaryCodecException("field rustType vs. field definitions rustType");
             }
         }
