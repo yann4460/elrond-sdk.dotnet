@@ -8,6 +8,10 @@ Elrond SDK for .NET Core.
 
 All notable changes will be documented in this file.
 
+## [1.0.5] - 21.05.2021
+
+-   [Add mutliples codec](https://github.com/yann4460/elrond-sdk.dotnet/pull/5)
+
 ## [1.0.4] - 18.05.2021
 
 -   [Compute GasLimit for transfer #4](https://github.com/yann4460/elrond-sdk.dotnet/pull/4)
