@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
@@ -10,6 +9,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public string Status { get; private set; }
         public string TxHash { get; }
 
+        //TODO : Check smart contract result to compute status
         private SmartContractResultDto[] _smartContractResult;
 
         public Transaction(string hash)
@@ -65,12 +65,6 @@ namespace Elrond.Dotnet.Sdk.Domain
         public bool IsInvalid()
         {
             return Status == "invalid";
-        }
-
-        public T GetSmartContractResult<T>(int result = 0, int index = 0)
-        {
-            var smartContractResult = _smartContractResult.ElementAt(result);
-            return Argument.GetValue<T>(smartContractResult.Data, index);
         }
 
         public async Task Sync(IElrondProvider provider)

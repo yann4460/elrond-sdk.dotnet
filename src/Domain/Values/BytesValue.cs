@@ -13,6 +13,11 @@
             return Buffer.Length;
         }
 
+        public static BytesValue FromBuffer(byte[] data)
+        {
+            return new BytesValue(data, TypeValue.BytesValue);
+        }
+
         public TypeValue Type { get; }
 
         public byte[] Buffer { get; }

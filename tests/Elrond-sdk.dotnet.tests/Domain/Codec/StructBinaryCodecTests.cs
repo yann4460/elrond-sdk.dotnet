@@ -53,7 +53,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
                 new StructField(NumericValue.U32Value(0), "tickets_left"),
                 new StructField(NumericValue.U64Value(0x000000005fc2b9db), "deadline"),
                 new StructField(NumericValue.U32Value(0xffffffff), "max_entries_per_user"),
-                new StructField(new BytesValue(new byte[] {0x64}, TypeValue.BytesValue), "prize_distribution"),
+                new StructField(BytesValue.FromBuffer(new byte[] {0x64}), "prize_distribution"),
                 new StructField(NumericValue.U32Value(9472), "current_ticket_number"),
                 new StructField(NumericValue.BigUintValue(BigInteger.Parse("94720000000000000000000")), "prize_pool"),
             });
@@ -63,7 +63,9 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var hexEncode = Convert.ToHexString(actual);
 
             // Assert
-            Assert.That(hexEncode, Is.EqualTo("000000088AC7230489E8000000000000000000005FC2B9DBFFFFFFFF0000000164000025000000000A140EC80FA7EE88000000"));
+            Assert.That(hexEncode,
+                Is.EqualTo(
+                    "000000088AC7230489E8000000000000000000005FC2B9DBFFFFFFFF0000000164000025000000000A140EC80FA7EE88000000"));
         }
 
         [Test]
@@ -100,7 +102,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             Assert.That(payment_token, Is.Not.Null);
             Assert.That(payment_token, Is.TypeOf<StructValue>());
             Assert.That(payment_token.ValueOf<StructValue>().Fields.Length, Is.EqualTo(2));
-            
+
             var esdtTokenStructValue = payment_token.ValueOf<StructValue>();
             var token_type = esdtTokenStructValue.GetStructField("token_type").Value;
             Assert.That(token_type.ValueOf<TokenIdentifierValue>().TokenName, Is.EqualTo("EGLD"));
@@ -121,7 +123,8 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             Assert.That(structValue.GetStructField("original_owner"), Is.Not.Null);
             var original_owner = structValue.GetStructField("original_owner").Value;
-            Assert.That(original_owner.ValueOf<AddressValue>().Bech32, Is.EqualTo("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq"));
+            Assert.That(original_owner.ValueOf<AddressValue>().Bech32,
+                Is.EqualTo("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq"));
 
             Assert.That(structValue.GetStructField("current_bid"), Is.Not.Null);
             var current_bid = structValue.GetStructField("current_bid").Value;

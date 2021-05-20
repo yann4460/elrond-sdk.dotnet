@@ -20,13 +20,14 @@ namespace Elrond.Dotnet.Sdk.Domain
             Account account,
             Code code,
             CodeMetadata codeMetadata,
-            Argument[] args)
+            IBinaryType[] args = null)
         {
+            var binaryCoder = new BinaryCodec();
             var transaction = TransactionRequest.CreateTransaction(account, constants);
             var data = $"{code.Value}@{ArwenVirtualMachine}@{codeMetadata.Value}";
             if (args != null)
             {
-                data = args?.Aggregate(data, (current, argument) => current + $"@{argument.Value}");
+                data = args?.Aggregate(data, (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
             }
 
             transaction.SetData(data);
@@ -45,13 +46,15 @@ namespace Elrond.Dotnet.Sdk.Domain
             AddressValue smartContractAddress,
             string functionName,
             Balance value,
-            Argument[] args = null)
+            IBinaryType[] args = null)
         {
+            var binaryCoder = new BinaryCodec();
             var transaction = TransactionRequest.CreateTransaction(account, constants, smartContractAddress, value);
             var data = $"{functionName}";
             if (args != null)
             {
-                data = args.Aggregate(data, (current, argument) => current + $"@{argument.Value}");
+                data = args.Aggregate(data,
+                    (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
             }
 
             transaction.SetData(data);
