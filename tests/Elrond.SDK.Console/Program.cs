@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text;
@@ -53,9 +54,9 @@ namespace Elrond.SDK.Console
             //2. Call 'add' method
             var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
                 smartContractAddress, "add", Balance.Zero(),
-                new[]
+                new IBinaryType[]
                 {
-                    Argument.CreateArgumentFromInt64(12)
+                    NumericValue.BigIntValue(12)
                 });
             addRequest.SetGasLimit(new GasLimit(60000000));
             var addRequestTransaction = await addRequest.Send(wallet, provider);
@@ -70,7 +71,8 @@ namespace Elrond.SDK.Console
 
             var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
             var sumHex = Convert.ToHexString(sumBytes);
-            var sum = Argument.GetValue<long>(sumHex, 0); //Should be 17 !
+
+            Debug.Assert(sumHex.Equals("11"));
         }
 
         private static async Task<AddressValue> DeploySmartContract(
@@ -87,9 +89,9 @@ namespace Elrond.SDK.Console
             var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account,
                 new Code(wasmFile),
                 new CodeMetadata(false, true, false),
-                new[]
+                new IBinaryType[]
                 {
-                    Argument.CreateArgumentFromInt64(5)
+                    NumericValue.BigIntValue(5)
                 });
 
             deployRequest.SetGasLimit(new GasLimit(60000000));

@@ -7,6 +7,10 @@ Elrond SDK for .NET Core.
 # Change Log
 
 All notable changes will be documented in this file.
+## [1.0.6] - 21.05.2021
+
+-   Remove Argument class. Prefer the use of IBinaryType
+
 
 ## [1.0.5] - 21.05.2021
 
