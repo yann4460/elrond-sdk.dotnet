@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
-using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
@@ -21,51 +20,11 @@ namespace Elrond.SDK.Console
 
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
-
-            var query = new QueryVmRequestDto()
-            {
-                ScAddress = "erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy",
-                FuncName = "getFullAuctionData",
-                Args = new[]
-                {
-                    Argument.FromTypeValue(TokenIdentifierValue.From("TSTKR-209ea0")).Value,
-                    Argument.FromTypeValue(NumericValue.U64Value(3)).Value,
-                }
-            };
-
-            // Arrange
-            var esdtToken = TypeValue.StructValue("EsdtToken", new[]
-            {
-                new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
-                new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
-            });
-
-            var auction = TypeValue.StructValue("Auction", new[]
-            {
-                new FieldDefinition("payment_token", "", esdtToken),
-                new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
-                new FieldDefinition("max_bid", "", TypeValue.BigUintTypeValue),
-                new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
-                new FieldDefinition("original_owner", "", TypeValue.AddressValue),
-                new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
-                new FieldDefinition("current_winner", "", TypeValue.AddressValue),
-                new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
-                new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
-            });
-
-            var response = await provider.QueryVm(query);
-
-            var data = Convert.FromBase64String(response.Data.Data.ReturnData[0]);
-
-            var codec = new BinaryCodec();
-            var decoded = codec.DecodeTopLevel(data, auction);
             var wallet = new Wallet(testPrivateKey);
-
-            await TestAbi(provider);
-            //await DeployAdderSmartContractAndQuery(provider, wallet);
+            await DeployAdderSmartContractAndQuery(provider, wallet);
         }
 
-        private static async Task TestAbi(IElrondProvider provider)
+        private static async Task QuerySmartContractWithAbi(IElrondProvider provider)
         {
             var fileBytes = await File.ReadAllBytesAsync("SmartContracts/auction/auction.abi.json");
             var json = Encoding.UTF8.GetString(fileBytes);
