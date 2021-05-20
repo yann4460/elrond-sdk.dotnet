@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {

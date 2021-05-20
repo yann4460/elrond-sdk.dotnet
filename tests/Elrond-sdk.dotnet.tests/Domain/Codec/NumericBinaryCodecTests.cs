@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Numerics;
 using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using NUnit.Framework;
 
 namespace Elrond_sdk.dotnet.tests.Domain.Codec
@@ -15,6 +17,12 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             _sut = new NumericBinaryCodec();
         }
 
+        private static void Check(string number, IBinaryType value, string actualHexEncoded, string expectedHexEncoded)
+        {
+            Assert.AreEqual(number, (value.ValueOf<NumericValue>()).Number.ToString());
+            Assert.AreEqual(expectedHexEncoded, actualHexEncoded);
+        }
+
         [TestCase(byte.MinValue, "")]
         [TestCase((byte) 1, "01")]
         [TestCase((byte) 42, "2A")]
@@ -27,10 +35,12 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var encoded = _sut.EncodeTopLevel(value);
             var actual = _sut.DecodeTopLevel(encoded, value.Type);
             var actualHexEncoded = Convert.ToHexString(encoded);
+
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
+
+
 
         [TestCase(sbyte.MinValue, "80")]
         [TestCase((sbyte) 0, "")]
@@ -47,8 +57,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase((ushort) 0, "")]
@@ -65,8 +74,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(short.MinValue, "8000")]
@@ -84,8 +92,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(uint.MinValue, "")]
@@ -102,8 +109,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(int.MinValue, "80000000")]
@@ -121,8 +127,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(ulong.MinValue, "")]
@@ -139,8 +144,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(long.MinValue, "8000000000000000")]
@@ -158,8 +162,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase("0", "")]
@@ -176,8 +179,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
         [TestCase("-1844674407370955161576567687", "FA0A1F000000000001658C79")]
@@ -195,8 +197,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, (actual.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
         // Nested
 
@@ -214,8 +215,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(sbyte.MinValue, "80")]
@@ -233,8 +233,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(ushort.MinValue, "0000")]
@@ -251,8 +250,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(short.MinValue, "8000")]
@@ -270,8 +268,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(uint.MinValue, "00000000")]
@@ -288,8 +285,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(int.MinValue, "80000000")]
@@ -307,8 +303,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(ulong.MinValue, "0000000000000000")]
@@ -325,8 +320,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase(-922337203685477580, "F333333333333334")]
@@ -344,8 +338,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase("0", "00000000")]
@@ -362,8 +355,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase("-1844674407370955161576567687", "0000000CFA0A1F000000000001658C79")]
@@ -381,8 +373,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, (actual.Value.ValueOf() as NumericValue).Number.ToString());
-            Assert.AreEqual(hexEncoded, actualHexEncoded);
+            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
         }
     }
 }

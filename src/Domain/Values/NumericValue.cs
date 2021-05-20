@@ -1,12 +1,11 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
+using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class NumericValue : IBinaryType
     {
-
         public NumericValue(TypeValue type, BigInteger number)
         {
             Type = type;
@@ -20,10 +19,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public TypeValue Type { get; }
 
-        public IBinaryType ValueOf()
-        {
-            return this;
-        }
 
         public static NumericValue U8Value(byte value) => new NumericValue(TypeValue.U8Type, new BigInteger(value));
         public static NumericValue I8Value(sbyte value) => new NumericValue(TypeValue.I8Type, new BigInteger(value));

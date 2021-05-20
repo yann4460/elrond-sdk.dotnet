@@ -1,6 +1,7 @@
 ﻿using System;
 using Elrond.Dotnet.Sdk.Cryptography;
 using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
@@ -61,6 +62,11 @@ namespace Elrond.Dotnet.Sdk.Domain
         public IBinaryType ValueOf()
         {
             return this;
+        }
+
+        public T ValueOf<T>() where T : IBinaryType
+        {
+            throw new NotImplementedException();
         }
     }
 }

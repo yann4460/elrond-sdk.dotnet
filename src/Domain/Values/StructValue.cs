@@ -1,6 +1,6 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Exceptions;
+﻿using Elrond.Dotnet.Sdk.Domain.Codec;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class StructValue : IBinaryType
     {
@@ -37,6 +37,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public IBinaryType ValueOf()
         {
             return this;
+        }
+
+        public T ValueOf<T>() where T : IBinaryType
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using dotnetstandard_bip32;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
@@ -31,7 +32,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public byte[] EncodeNested(IBinaryType value)
         {
-            var bytes = value.ValueOf() as BytesValue;
+            var bytes = value.ValueOf<BytesValue>();
             var buffer = new List<byte>();
             var lengthBytes = BitConverter.GetBytes(bytes.GetLength());
             if (BitConverter.IsLittleEndian)
@@ -49,7 +50,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public byte[] EncodeTopLevel(IBinaryType value)
         {
-            var bytes = value.ValueOf() as BytesValue;
+            var bytes = value.ValueOf<BytesValue>();
             return bytes.Buffer;
         }
     }

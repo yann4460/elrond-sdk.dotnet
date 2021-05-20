@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Elrond.Dotnet.Sdk.Domain.Exceptions;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
@@ -28,16 +29,15 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return new BooleanValue(firstByte == True);
         }
 
-
         public byte[] EncodeNested(IBinaryType value)
         {
-            var boolean = value.ValueOf() as BooleanValue;
+            var boolean = value.ValueOf<BooleanValue>();
             return boolean.IsTrue() ? new[] {True} : new[] {False};
         }
 
         public byte[] EncodeTopLevel(IBinaryType value)
         {
-            var boolean = value.ValueOf() as BooleanValue;
+            var boolean = value.ValueOf<BooleanValue>();
             return boolean.IsTrue() ? new[] {True} : new byte[0];
         }
     }

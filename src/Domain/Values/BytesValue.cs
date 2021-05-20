@@ -1,4 +1,6 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Codec
+﻿using Elrond.Dotnet.Sdk.Domain.Codec;
+
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class BytesValue : IBinaryType
     {
@@ -16,10 +18,5 @@
         public TypeValue Type => TypeValue.Bytes;
 
         public byte[] Buffer { get; }
-
-        public IBinaryType ValueOf()
-        {
-            return this;
-        }
     }
 }

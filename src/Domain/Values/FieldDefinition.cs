@@ -16,7 +16,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         }
 
 
-        public static FieldDefinition FromJSON(string json)
+        public static FieldDefinition FromJson(string json)
         {
             var dynamic = JsonSerializer.Deserialize<dynamic>(json);
 

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Elrond.Dotnet.Sdk.Domain.Exceptions;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
@@ -24,14 +26,24 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public byte[] EncodeNested(IBinaryType value)
         {
-            var address = value.ValueOf() as Address;
+            var address = Get(value);
             return address.PublicKey();
         }
 
         public byte[] EncodeTopLevel(IBinaryType value)
         {
-            var address = value.ValueOf() as Address;
+            var address = Get(value);
             return address.PublicKey();
+        }
+
+        private static Address Get(IBinaryType value)
+        {
+            if (value is Address address)
+            {
+                return address;
+            }
+
+            throw new WrongBinaryValueCodecException();
         }
     }
 }

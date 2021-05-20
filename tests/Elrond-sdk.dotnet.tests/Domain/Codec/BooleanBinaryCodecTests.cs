@@ -1,4 +1,5 @@
 ﻿using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using NUnit.Framework;
 
 namespace Elrond_sdk.dotnet.tests.Domain.Codec
@@ -23,7 +24,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actual = _sut.DecodeNested(buffer, TypeValue.Boolean);
 
             // Assert
-            Assert.IsTrue((actual.Value.ValueOf() as BooleanValue).IsTrue());
+            Assert.IsTrue((actual.Value.ValueOf<BooleanValue>()).IsTrue());
         }
 
         [Test]
@@ -36,7 +37,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actual = _sut.DecodeNested(buffer, TypeValue.Boolean);
 
             // Assert
-            Assert.IsTrue((actual.Value.ValueOf() as BooleanValue).IsFalse());
+            Assert.IsTrue((actual.Value.ValueOf<BooleanValue>()).IsFalse());
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using dotnetstandard_bip32;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
@@ -61,7 +62,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public byte[] EncodeNested(IBinaryType value)
         {
-            var numericValue = value.ValueOf() as NumericValue;
+            var numericValue = value.ValueOf<NumericValue>();
             if (value.Type.HasFixedSize())
             {
                 var sizeInBytes = value.Type.SizeInBytes();
@@ -100,7 +101,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public byte[] EncodeTopLevel(IBinaryType value)
         {
-            var numericValue = value.ValueOf() as NumericValue;
+            var numericValue = value.ValueOf<NumericValue>();
             // Nothing or Zero:
             if (numericValue.Number.IsZero)
             {

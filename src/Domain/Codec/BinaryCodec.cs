@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Elrond.Dotnet.Sdk.Domain.Exceptions;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
@@ -15,7 +16,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 new NumericBinaryCodec(),
                 new AddressBinaryCodec(),
                 new BooleanBinaryCodec(),
-                new BytesBinaryCodec()
+                new BytesBinaryCodec(),
+                new StructBinaryCodec()
             };
         }
 
