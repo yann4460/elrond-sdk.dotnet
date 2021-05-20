@@ -1,6 +1,4 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Codec;
-
-namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class BytesValue : IBinaryType
     {
@@ -14,8 +12,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return Buffer.Length;
         }
 
-
-        public TypeValue Type => TypeValue.Bytes;
+        public TypeValue Type => TypeValue.BigIntTypeValue;
 
         public byte[] Buffer { get; }
     }

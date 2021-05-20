@@ -9,19 +9,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
     public class NumericBinaryCodec : IBinaryCodec
     {
-        public IEnumerable<TypeValue> Types => new[]
-        {
-            TypeValue.U8Type,
-            TypeValue.U16Type,
-            TypeValue.U32Type,
-            TypeValue.U64Type,
-            TypeValue.BigUintType,
-            TypeValue.I8Type,
-            TypeValue.I16Type,
-            TypeValue.I32Type,
-            TypeValue.I64Type,
-            TypeValue.BigIntType,
-        };
+        public string Type => TypeValue.BinaryTypes.Numeric;
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {

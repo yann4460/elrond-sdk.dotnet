@@ -15,11 +15,11 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void BooleanBinaryCodec_DecodeNested_True()
         {
             // Arrange
-            var buffer = new byte[] {0x01};
-            var codec = new BinaryCoder();
+            var buffer = new byte[] { 0x01 };
+            var codec = new BinaryCodec();
 
             // Act
-            var actual = codec.DecodeNested(buffer, TypeValue.Boolean);
+            var actual = codec.DecodeNested(buffer, TypeValue.BooleanValue);
 
             // Assert
             Assert.AreEqual(true, (actual.Value.ValueOf<BooleanValue>()).IsTrue());

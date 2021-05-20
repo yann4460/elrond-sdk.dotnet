@@ -5,11 +5,11 @@ using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class BinaryCoder
+    public class BinaryCodec
     {
         private readonly List<IBinaryCodec> _codecs;
 
-        public BinaryCoder()
+        public BinaryCodec()
         {
             _codecs = new List<IBinaryCodec>
             {
@@ -25,7 +25,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             CheckBufferLength(data);
 
-            var codec = _codecs.SingleOrDefault(c => c.Types.Any(t => t.Name == type.Name));
+            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
             var decode = codec.DecodeNested(data, type);
             return decode;
         }
@@ -34,21 +34,21 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             CheckBufferLength(data);
 
-            var codec = _codecs.SingleOrDefault(c => c.Types.Any(t => t.Name == type.Name));
+            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
             var decode = codec.DecodeTopLevel(data, type);
             return decode;
         }
 
         public byte[] EncodeNested(IBinaryType value, TypeValue type)
         {
-            var codec = _codecs.SingleOrDefault(c => c.Types.Any(t => t.Name == type.Name));
+            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
             var encode = codec.EncodeNested(value);
             return encode;
         }
 
         public byte[] EncodeTopLevel(IBinaryType value, TypeValue type)
         {
-            var codec = _codecs.SingleOrDefault(c => c.Types.Any(t => t.Name == type.Name));
+            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
             var encode = codec.EncodeNested(value);
             return encode;
         }

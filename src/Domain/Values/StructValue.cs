@@ -1,47 +1,36 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Codec;
+﻿using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class StructValue : IBinaryType
     {
-        public string Name { get; }
-        private readonly FieldDefinition[] _fields;
+        public TypeValue Type { get; }
+        private readonly StructField[] _fields;
 
-        public StructValue(string name, FieldDefinition[] fields)
+        public StructValue(TypeValue structType, StructField[] fields)
         {
-            Name = name;
+            Type = structType;
             _fields = fields;
-            //CheckTyping();
+            CheckTyping();
         }
 
-        //private void CheckTyping()
-        //{
-        //    var definitions = this._type.GetFields();
-        //    if (_fields.Length != definitions.Length)
-        //    {
-        //        throw new BinaryCodecException("fields length vs. field definitions length");
-        //    }
-
-        //    for (var i = 0; i < _fields.Length; i++)
-        //    {
-        //        var field = _fields[i];
-        //        var definition = definitions[i];
-        //        var fieldType = field.Type;
-
-        //        if (fieldType.Name != definition.Type.Name)
-        //            throw new BinaryCodecException("field name vs. field definitions name");
-        //    }
-        //}
-        public TypeValue Type => TypeValue.Struct;
-
-        public IBinaryType ValueOf()
+        private void CheckTyping()
         {
-            return this;
-        }
+            var definitions = Type.GetFieldDefinitions();
+            if (_fields.Length != definitions.Length)
+            {
+                throw new BinaryCodecException("fields length vs. field definitions length");
+            }
 
-        public T ValueOf<T>() where T : IBinaryType
-        {
-            throw new System.NotImplementedException();
+            for (var i = 0; i < _fields.Length; i++)
+            {
+                var field = _fields[i];
+                var definition = definitions[i];
+                var fieldType = field.Value.Type;
+
+                if (fieldType.RustType != definition.RustType)
+                    throw new BinaryCodecException("field rustType vs. field definitions rustType");
+            }
         }
     }
 }

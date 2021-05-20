@@ -7,7 +7,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
     public class AddressBinaryCodec : IBinaryCodec
     {
-        public IEnumerable<TypeValue> Types => new[] {TypeValue.Address};
+        public string Type => TypeValue.BinaryTypes.Address;
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {

@@ -57,8 +57,8 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// Computes the address of a Smart Contract.
         /// The address is computed deterministically, from the address of the owner and the nonce of the deployment transaction.
         /// </summary>
-        /// <param name="ownerAddress">The owner of the Smart Contract</param>
-        /// <param name="nonce">The owner nonce used for the deployment transaction</param>
+        /// <param rustType="ownerAddress">The owner of the Smart Contract</param>
+        /// <param rustType="nonce">The owner nonce used for the deployment transaction</param>
         /// <returns>The smart contract address</returns>
         public static Address ComputeAddress(Address ownerAddress, long nonce)
         {

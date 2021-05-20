@@ -8,7 +8,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
     public class BytesBinaryCodec : IBinaryCodec
     {
-        public IEnumerable<TypeValue> Types => new[] {TypeValue.Bytes};
+        public string Type => TypeValue.BinaryTypes.Bytes;
 
         private const int BytesSizeOfU32 = 4;
 

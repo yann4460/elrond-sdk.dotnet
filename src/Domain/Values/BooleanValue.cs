@@ -13,7 +13,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public bool IsTrue()
         {
-            return _value == true;
+            return _value;
         }
 
         public bool IsFalse()
@@ -21,6 +21,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return _value == false;
         }
 
-        public TypeValue Type => TypeValue.Boolean;
+        public TypeValue Type => TypeValue.BooleanValue;
     }
 }

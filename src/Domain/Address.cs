@@ -57,7 +57,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             return Bech32;
         }
 
-        public TypeValue Type => TypeValue.Address;
+        public TypeValue Type => TypeValue.AddressValue;
 
         public IBinaryType ValueOf()
         {

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
-using Elrond.Dotnet.Sdk.Domain.Values;
+﻿using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
     internal interface IBinaryCodec
     {
-        IEnumerable<TypeValue> Types { get; }
+        /// <summary>
+        /// <see cref="TypeValue.BinaryTypes"/> constants
+        /// </summary>
+        string Type { get; }
 
         (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type);
 

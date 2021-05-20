@@ -6,7 +6,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
     public class BooleanBinaryCodec : IBinaryCodec
     {
-        public IEnumerable<TypeValue> Types => new[] {TypeValue.Boolean};
+        public string Type => TypeValue.BinaryTypes.Boolean;
 
         private const byte True = 0x01;
         private const byte False = 0x00;

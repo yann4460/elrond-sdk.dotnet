@@ -1,18 +1,18 @@
 ﻿using System.Text.Json;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class FieldDefinition
     {
         public string Name { get; }
         public string Description { get; }
-        public TypeValue Type { get; }
+        public string RustType { get; }
 
-        public FieldDefinition(string name, string description, TypeValue type)
+        public FieldDefinition(string name, string description, string rustType)
         {
             Name = name;
             Description = description;
-            Type = type;
+            RustType = rustType;
         }
 
 
@@ -20,7 +20,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             var dynamic = JsonSerializer.Deserialize<dynamic>(json);
 
-            return new FieldDefinition("", "", TypeValue.U16Type);
+            return new FieldDefinition("", "", "");
         }
     }
 }

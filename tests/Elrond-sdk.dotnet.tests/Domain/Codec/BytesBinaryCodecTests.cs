@@ -22,7 +22,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var buffer = Convert.FromHexString("0000000445474c44");
 
             // Act
-            var actual = _sut.DecodeNested(buffer, TypeValue.Bytes);
+            var actual = _sut.DecodeNested(buffer, TypeValue.BytesValue);
 
             var hex = Convert.ToHexString((actual.Value.ValueOf<BytesValue>()).Buffer);
 
@@ -56,7 +56,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             // Act
             var encoded = _sut.EncodeNested(value);
-            var actual = _sut.DecodeNested(encoded, TypeValue.Bytes);
+            var actual = _sut.DecodeNested(encoded, TypeValue.BytesValue);
             var hex = Convert.ToHexString((actual.Value.ValueOf<BytesValue>()).Buffer);
 
             // Assert

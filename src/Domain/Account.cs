@@ -20,7 +20,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <summary>
         /// Synchronizes account properties (such as nonce, balance) with the ones queried from the Network
         /// </summary>
-        /// <param name="provider">the Network provider</param>
+        /// <param rustType="provider">the Network provider</param>
         /// <returns></returns>
         public async Task Sync(IElrondProvider provider)
         {
