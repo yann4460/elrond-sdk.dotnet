@@ -11,6 +11,9 @@ All notable changes will be documented in this file.
 ## [1.0.6] - 21.05.2021
 
 -   Remove Argument class. Prefer the use of IBinaryType
+-   Ex : `Argument.CreateArgumentFromInt64(12)` is ow obsolete. Use : `NumericValue.BigIntValue(12)` instead.
+    - Build a balance argument : `NumericValue.BigUintValue(Balance.EGLD("10").Value)`
+    - Build from a byte array : `BytesValue.FromBuffer(new byte[] {0x00});`
 
 
 ## [1.0.5] - 21.05.2021
