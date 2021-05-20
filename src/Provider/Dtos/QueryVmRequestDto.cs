@@ -3,12 +3,12 @@
     public class QueryVmRequestDto
     {
         /// <summary>
-        /// The Address (bech32) of the Smart Contract.
+        /// The AddressValue (bech32) of the Smart Contract.
         /// </summary>
         public string ScAddress { get; set; }
 
         /// <summary>
-        /// The name of the Pure Function to execute.
+        /// The rustType of the Pure Function to execute.
         /// </summary>
         public string FuncName { get; set; }
 
@@ -18,7 +18,7 @@
         public string[] Args { get; set; }
 
         /// <summary>
-        /// The Address (bech32) of the caller.
+        /// The AddressValue (bech32) of the caller.
         /// </summary>
         public string? Caller { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Elrond.Dotnet.Sdk.Domain;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using NUnit.Framework;
 
 namespace Elrond_sdk.dotnet.tests
@@ -14,7 +15,7 @@ namespace Elrond_sdk.dotnet.tests
         public void CreateArgumentFromAddress()
         {
             // Arrange
-            var address = Address.FromBech32("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq");
+            var address = AddressValue.FromBech32("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq");
 
             // Act
             var actual = Argument.CreateArgumentFromAddress(address);

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
@@ -14,11 +15,11 @@ namespace Elrond.Dotnet.Sdk.Domain
         private readonly string _chainId;
         private const int TransactionVersion = 4;
 
-        public Address Sender { get; }
+        public AddressValue Sender { get; }
         public long Nonce { get; }
         public long GasPrice { get; }
         public Balance Value { get; private set; }
-        public Address Receiver { get; private set; }
+        public AddressValue Receiver { get; private set; }
         public GasLimit GasLimit { get; private set; }
         public string Data { get; private set; }
 
@@ -26,7 +27,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         {
             _account = account;
             Sender = account.Address;
-            Receiver = Address.Zero();
+            Receiver = AddressValue.Zero();
             Value = new Balance(0);
             Nonce = account.Nonce;
             GasLimit = new GasLimit(constants.MinGasLimit);
@@ -39,7 +40,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new TransactionRequest(account, constants);
         }
 
-        public static TransactionRequest CreateTransaction(Account account, Constants constants, Address receiver,
+        public static TransactionRequest CreateTransaction(Account account, Constants constants, AddressValue receiver,
             Balance value)
         {
             return new TransactionRequest(account, constants)

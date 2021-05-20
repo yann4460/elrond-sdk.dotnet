@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
@@ -12,37 +15,40 @@ namespace Elrond.SDK.Console
     {
         public static async Task Main(string[] args)
         {
-            await CreateToken();
-        }
-
-        private static async Task CreateToken()
-        {
-            var privateKey =
+            var testPrivateKey =
                 "C5A89BFA5E8FFFA4BAA732D8D8EE9503FAFA538599C3DDEE28D21F64DFFDBF00FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42";
-            var wallet = new Wallet(privateKey);
-            var kf = wallet.BuildKeyFile(string.Empty);
-            var account = new Account(Address.FromBech32(kf.Bech32));
 
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
-            var constants = await Constants.GetFromNetwork(provider);
+            var wallet = new Wallet(testPrivateKey);
+            await DeployAdderSmartContractAndQuery(provider, wallet);
+        }
 
-            await account.Sync(provider);
-
-            //1. Deploy smart contract from wasm
-            var wasmFile = await File.ReadAllBytesAsync("SmartContracts/adder/adder.wasm");
-            var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account,
-                new Code(wasmFile),
-                new CodeMetadata(false, true, false),
-                new[]
+        private static async Task QuerySmartContractWithAbi(IElrondProvider provider)
+        {
+            var fileBytes = await File.ReadAllBytesAsync("SmartContracts/auction/auction.abi.json");
+            var json = Encoding.UTF8.GetString(fileBytes);
+            var jsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
+            var abiDefinition = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
+            var response = await SmartContract.QuerySmartContract(
+                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"),
+                "getFullAuctionData",
+                new IBinaryType[]
                 {
-                    Argument.CreateArgumentFromInt64(5)
-                });
-            deployRequest.SetGasLimit(new GasLimit(60000000));
+                    TokenIdentifierValue.From("TSTKR-209ea0"),
+                    NumericValue.U64Value(3),
+                },
+                abiDefinition, provider);
+        }
 
-            var deployTransaction = await deployRequest.Send(wallet, provider);
-            var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce - 1);
-            await WaitForTransactionExecution("Deployment", deployTransaction, provider);
+        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Wallet wallet)
+        {
+            var constants = await Constants.GetFromNetwork(provider);
+            var kf = wallet.BuildKeyFile(string.Empty);
+            var account = new Account(AddressValue.FromBech32(kf.Bech32));
+
+            var smartContractAddress =
+                await DeploySmartContract(provider, constants, wallet, account, "SmartContracts/adder/adder.wasm");
 
             //2. Call 'add' method
             var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
@@ -67,6 +73,33 @@ namespace Elrond.SDK.Console
             var sum = Argument.GetValue<long>(sumHex, 0); //Should be 17 !
         }
 
+        private static async Task<AddressValue> DeploySmartContract(
+            IElrondProvider provider,
+            Constants constants,
+            Wallet wallet,
+            Account account,
+            string filePath)
+        {
+            await account.Sync(provider);
+
+            //1. Deploy smart contract from wasm
+            var wasmFile = await File.ReadAllBytesAsync(filePath);
+            var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account,
+                new Code(wasmFile),
+                new CodeMetadata(false, true, false),
+                new[]
+                {
+                    Argument.CreateArgumentFromInt64(5)
+                });
+
+            deployRequest.SetGasLimit(new GasLimit(60000000));
+
+            var deployTransaction = await deployRequest.Send(wallet, provider);
+            await WaitForTransactionExecution("DeploySmartContract", deployTransaction, provider);
+            var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce - 1);
+            return smartContractAddress;
+        }
+
         private static async Task WaitForTransactionExecution(string transactionName, Transaction transaction,
             IElrondProvider provider)
         {
@@ -80,8 +113,6 @@ namespace Elrond.SDK.Console
 
             if (!transaction.IsSuccessful())
                 throw new Exception("Invalid transaction : {transactionName}");
-
-            System.Console.WriteLine("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-");
         }
     }
 }
