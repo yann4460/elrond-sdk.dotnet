@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
+using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
@@ -16,24 +18,6 @@ namespace Elrond.SDK.Console
             var testPrivateKey =
                 "C5A89BFA5E8FFFA4BAA732D8D8EE9503FAFA538599C3DDEE28D21F64DFFDBF00FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42";
 
-            //ESDTNFTTransfer@5453544b522d323039656130@02@01@00000000000000000500962a35981507ba18fb921f1a7a508d2687687f941b42@61756374696f6e546f6b656e@016345785d8a0000@008ac7230489e80000@60a443a1@@
-            //0000000445474c44000000000000000000000008016345785d8a0000000000088ac7230489e800000000000060a44594fdb32e9ed34caf6009834c5a5bef293097ea39698b3e82efd8c71183cb731b420000000000000000000000000000000000000000000000000000000000000000000000000000000201f400000000
-
-            //00000004
-            //45474c44                                                                      //payment_token
-            //0000000000000000
-            //00000008                                                                       //
-            //016345785d8a0000                                                              //min_bid 
-            //00000008                                                                      //
-            //8ac7230489e80000                                                              //max_bid
-            //00000000                                                                      //
-            //60a44594                                                                      //deadline
-            //fdb32e9ed34caf6009834c5a5bef293097ea39698b3e82efd8c71183cb731b42              //original_owner
-            //00000000000000000000000000000000000000000000000000000000000000000000000000000002
-            //01f                                                                           //marketplace_cut_percentage
-            //400000000
-
-            var wallet = new Wallet(testPrivateKey);
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
 
@@ -43,43 +27,42 @@ namespace Elrond.SDK.Console
                 FuncName = "getFullAuctionData",
                 Args = new[]
                 {
-                    Argument.CreateArgumentFromUtf8String("TSTKR-209ea0").Value,
-                    Argument.CreateArgumentFromInt64(3).Value,
+                    Argument.FromTypeValue(TokenIdentifierValue.From("TSTKR-209ea0")).Value,
+                    Argument.FromTypeValue(NumericValue.U64Value(3)).Value,
                 }
             };
-            var result = await provider.QueryVm(query);
-          
-            var data = Convert.FromBase64String("RVNEVE5GVFRyYW5zZmVyQDU0NTM1NDRiNTIyZDMyMzAzOTY1NjEzMEAwMkAwMUAwMDAwMDAwMDAwMDAwMDAwMDUwMDk2MmEzNTk4MTUwN2JhMThmYjkyMWYxYTdhNTA4ZDI2ODc2ODdmOTQxYjQyQDYxNzU2Mzc0Njk2ZjZlNTQ2ZjZiNjU2ZUAwMTYzNDU3ODVkOGEwMDAwQDAwOGFjNzIzMDQ4OWU4MDAwMEA2MGE0NDNhMUBA");
-            var strinsazeg = Encoding.UTF8.GetString(data);
 
+            // Arrange
+            var esdtToken = TypeValue.StructValue("EsdtToken", new[]
+            {
+                new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+                new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+            });
 
-            var kf = wallet.BuildKeyFile(string.Empty);
-            var account = new Account(Address.FromBech32(kf.Bech32));
-            var constants = await Constants.GetFromNetwork(provider);
-            await account.Sync(provider);
+            var auction = TypeValue.StructValue("Auction", new[]
+            {
+                new FieldDefinition("payment_token", "", esdtToken),
+                new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("max_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+                new FieldDefinition("original_owner", "", TypeValue.AddressValue),
+                new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("current_winner", "", TypeValue.AddressValue),
+                new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
+            });
 
-            var unixTime = (ulong)((DateTimeOffset)DateTime.Now.AddMinutes(1)).ToUnixTimeSeconds();
-            var transaction = SmartContract.CreateCallSmartContractTransactionRequest(constants, account, account.Address, "ESDTNFTTransfer", Balance.Zero(),
-                new[]
-                {
-                    Argument.CreateArgumentFromUtf8String("TSTKR-209ea0"),
-                    Argument.CreateArgumentFromInt64(2), Argument.CreateArgumentFromInt64(1),
-                    Argument.CreateArgumentFromAddress(Address.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy")),
-                    Argument.CreateArgumentFromUtf8String("auctionToken"),
-                    Argument.CreateArgumentFromBalance(Balance.EGLD("0.1")),
-                    Argument.CreateArgumentFromBalance(Balance.EGLD("10")), Argument.CreateArgumentFromUInt64(unixTime),
-                    Argument.CreateArgumentFromUtf8String(string.Empty), Argument.CreateArgumentFromUtf8String(string.Empty)
-                });
+            var optionAuction = TypeValue.OptionValue(auction);
 
-            transaction.SetGasLimit(new GasLimit(60000000));
+            var response = await provider.QueryVm(query);
 
-            var aze = await transaction.Send(wallet, provider);
+            var data = Convert.FromBase64String(response.Data.Data.ReturnData[0]);
 
+            var codec = new BinaryCodec();
+            var decoded = codec.DecodeTopLevel(data, optionAuction);
 
+            var wallet = new Wallet(testPrivateKey);
             //await DeployAdderSmartContractAndQuery(provider, wallet);
-            //45474c44
-            //000000000000000000000008016345785d8a0000000000088ac7230489e800000000000060a42a8dfdb32e9ed34caf6009834c5a5bef293097ea39698b3e82efd8c71183cb731b420000000000000000000000000000000000000000000000000000000000000000000000000000000201f400000000
-
         }
 
         private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Wallet wallet)

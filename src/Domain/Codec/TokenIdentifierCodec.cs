@@ -16,13 +16,14 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
-            return _bytesBinaryCodec.DecodeNested(data, type);
+            var (value, bytesLength) = _bytesBinaryCodec.DecodeNested(data, type);
+            return (TokenIdentifierValue.From(value.ValueOf<BytesValue>().Buffer), bytesLength);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
             var bytesValue = _bytesBinaryCodec.DecodeTopLevel(data, type);
-            return bytesValue;
+            return TokenIdentifierValue.From(bytesValue.ValueOf<BytesValue>().Buffer);
         }
 
         public byte[] EncodeNested(IBinaryType value)

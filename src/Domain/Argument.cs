@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Text;
 using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
@@ -155,6 +156,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static Argument CreateArgumentFromBalance(Balance balance)
         {
             return CreateArgumentFromBigInteger(balance.Value);
+        }
+
+        public static Argument FromTypeValue(IBinaryType binaryType)
+        {
+            var codec = new BinaryCodec();
+            var encoded = codec.EncodeTopLevel(binaryType, binaryType.Type);
+            return new Argument(Convert.ToHexString(encoded));
         }
 
         private static Argument CreateOptionalNumberArgument(int size, BigInteger number, bool isUnsigned = false)

@@ -1,4 +1,5 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Exceptions;
+﻿using System.Linq;
+using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
@@ -12,6 +13,12 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             Type = structType;
             Fields = fields;
             CheckTyping();
+        }
+
+        public StructField GetStructField(string name)
+        {
+            var field = Fields.SingleOrDefault(f => f.Name == name);
+            return field;
         }
 
         private void CheckTyping()

@@ -50,7 +50,8 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void BytesBinaryCodec_EncodeNested_AndDecode()
         {
             // Arrange
-            var buffer = Convert.FromHexString("FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42");
+            var expected = "FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42";
+            var buffer = Convert.FromHexString(expected);
             var value = new BytesValue(buffer, TypeValue.BytesValue);
 
             // Act
@@ -59,8 +60,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var hex = Convert.ToHexString((actual.Value.ValueOf<BytesValue>()).Buffer);
 
             // Assert
-            Assert.AreEqual(buffer.Length, actual.BytesLength);
-            Assert.AreEqual("FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42", hex);
+            Assert.AreEqual(expected, hex);
         }
     }
 }

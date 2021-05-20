@@ -15,12 +15,12 @@
 
         public static OptionValue NewMissing(TypeValue type)
         {
-            return new OptionValue(TypeValue.OptionValue, type);
+            return new OptionValue(TypeValue.OptionValue(type), type);
         }
 
         public static OptionValue NewProvided(TypeValue type, IBinaryType value)
         {
-            return new OptionValue(TypeValue.OptionValue, type, value);
+            return new OptionValue(TypeValue.OptionValue(type), type, value);
         }
 
         public bool IsSet()

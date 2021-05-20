@@ -5,6 +5,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
     public class TypeValue
     {
         public string BinaryType { get; }
+        public TypeValue? InnerType { get; }
         public string RustType { get; }
         private readonly int? _sizeInBytes;
         private readonly bool? _withSign;
@@ -25,6 +26,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             _fieldDefinitions = fieldDefinitions;
         }
 
+        public TypeValue(string binaryType, TypeValue innerType)
+        {
+            BinaryType = binaryType;
+            InnerType = innerType;
+        }
 
         public int SizeInBytes()
         {
@@ -95,10 +101,13 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public static TypeValue BooleanValue => new TypeValue(BinaryTypes.Boolean, RustTypes.Bool);
         public static TypeValue AddressValue => new TypeValue(BinaryTypes.Address, RustTypes.Address);
-        public static TypeValue TokenIdentifierValue => new TypeValue(BinaryTypes.Bytes, RustTypes.TokenIdentifier);
+
+        public static TypeValue TokenIdentifierValue =>
+            new TypeValue(BinaryTypes.TokenIdentifier, RustTypes.TokenIdentifier);
+
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
         public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
-        public static TypeValue OptionValue => new TypeValue(BinaryTypes.Option, "");
+        public static TypeValue OptionValue(TypeValue innerType) => new TypeValue(BinaryTypes.Option, innerType);
 
         public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) =>
             new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);

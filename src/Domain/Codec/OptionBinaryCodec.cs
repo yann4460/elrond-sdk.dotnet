@@ -28,8 +28,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 throw new BinaryCodecException("invalid buffer for optional value");
             }
 
-            var decoded = _binaryCodec.DecodeNested(data.Slice(1), type);
-            return (OptionValue.NewProvided(type, decoded.Value), decoded.BytesLength + 1);
+            var (value, bytesLength) = _binaryCodec.DecodeNested(data.Slice(1), type);
+            return (OptionValue.NewProvided(type, value), bytesLength + 1);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
@@ -44,8 +44,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 throw new BinaryCodecException("invalid buffer for optional value");
             }
 
-            var decoded = _binaryCodec.DecodeNested(data.Slice(1), type);
-            return OptionValue.NewProvided(type, decoded.Value);
+            var (value, _) = _binaryCodec.DecodeNested(data.Slice(1), type);
+            return OptionValue.NewProvided(type, value);
         }
 
         public byte[] EncodeNested(IBinaryType value)

@@ -28,6 +28,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             CheckBufferLength(data);
 
             var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
+            if (codec == null)
+                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+
             var decode = codec.DecodeNested(data, type);
             return decode;
         }
@@ -37,6 +40,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             CheckBufferLength(data);
 
             var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
+            if (codec == null)
+                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+
             var decode = codec.DecodeTopLevel(data, type);
             return decode;
         }
@@ -44,6 +50,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeNested(IBinaryType value, TypeValue type)
         {
             var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
+            if (codec == null)
+                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+           
             var encode = codec.EncodeNested(value);
             return encode;
         }
@@ -51,12 +60,14 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeTopLevel(IBinaryType value, TypeValue type)
         {
             var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
-            var encode = codec.EncodeNested(value);
+            if (codec == null)
+                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+            
+            var encode = codec.EncodeTopLevel(value);
             return encode;
         }
 
-
-        private void CheckBufferLength(byte[] buffer)
+        private static void CheckBufferLength(byte[] buffer)
         {
             if (buffer.Length > 4096)
             {
