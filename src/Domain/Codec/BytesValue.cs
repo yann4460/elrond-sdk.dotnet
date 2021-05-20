@@ -1,22 +1,25 @@
 ﻿namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class BytesValue : PrimitiveValue
+    public class BytesValue : IBinaryType
     {
-        private readonly byte[] _data;
-
         public BytesValue(byte[] data)
         {
-            _data = data;
+            Buffer = data;
         }
 
         public int GetLength()
         {
-            return _data.Length;
+            return Buffer.Length;
         }
 
-        public byte[] ValueOf()
+
+        public TypeValue Type => TypeValue.Bytes;
+
+        public byte[] Buffer { get; }
+
+        public IBinaryType ValueOf()
         {
-            return _data;
+            return this;
         }
     }
 }

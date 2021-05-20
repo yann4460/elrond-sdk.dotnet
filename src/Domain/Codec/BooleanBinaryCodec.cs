@@ -1,21 +1,23 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class BooleanBinaryCodec : IBinaryCodec<BooleanValue>
+    public class BooleanBinaryCodec : IBinaryCodec
     {
+        public IEnumerable<TypeValue> Types => new[] {TypeValue.Boolean};
+
         private const byte True = 0x01;
         private const byte False = 0x00;
 
-        public (BooleanValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
+        public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             // We don't check the size of the buffer, we just read the first byte.
             var firstByte = data[0];
             return (new BooleanValue(firstByte == True), 1);
         }
 
-        public BooleanValue DecodeTopLevel(byte[] data, TypeValue type = null)
+        public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
             if (data.Length > 1)
             {
@@ -27,39 +29,16 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         }
 
 
-        public byte[] EncodeNested(BooleanValue value)
+        public byte[] EncodeNested(IBinaryType value)
         {
-            return value.IsTrue() ? new[] {True} : new[] {False};
+            var boolean = value.ValueOf() as BooleanValue;
+            return boolean.IsTrue() ? new[] {True} : new[] {False};
         }
 
-        public byte[] EncodeTopLevel(BooleanValue value)
+        public byte[] EncodeTopLevel(IBinaryType value)
         {
-            return value.IsTrue() ? new[] {True} : new byte[0];
-        }
-    }
-
-    public class BooleanValue : PrimitiveValue
-    {
-        private readonly bool _value;
-
-        public BooleanValue(bool value)
-        {
-            _value = value;
-        }
-
-        public bool IsTrue()
-        {
-            return _value;
-        }
-
-        public bool IsFalse()
-        {
-            return _value;
-        }
-
-        public bool ValueOf()
-        {
-            return _value;
+            var boolean = value.ValueOf() as BooleanValue;
+            return boolean.IsTrue() ? new[] {True} : new byte[0];
         }
     }
 }

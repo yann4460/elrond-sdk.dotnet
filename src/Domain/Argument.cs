@@ -5,7 +5,7 @@ using Elrond.Dotnet.Sdk.Domain.Codec;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class Argument : PrimitiveValue
+    public class Argument
     {
         private Argument(string hexValue)
         {

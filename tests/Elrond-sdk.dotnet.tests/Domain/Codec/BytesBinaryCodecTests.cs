@@ -21,8 +21,9 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var buffer = Convert.FromHexString("0000000445474c44");
 
             // Act
-            var actual = _sut.DecodeNested(buffer);
-            var hex = Convert.ToHexString(actual.Value.ValueOf());
+            var actual = _sut.DecodeNested(buffer, TypeValue.Bytes);
+
+            var hex = Convert.ToHexString((actual.Value.ValueOf() as BytesValue).Buffer);
 
             // Assert
             Assert.AreEqual("45474C44", hex);
@@ -54,8 +55,8 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             // Act
             var encoded = _sut.EncodeNested(value);
-            var actual = _sut.DecodeNested(encoded);
-            var hex = Convert.ToHexString(actual.Value.ValueOf());
+            var actual = _sut.DecodeNested(encoded, TypeValue.Bytes);
+            var hex = Convert.ToHexString((actual.Value.ValueOf() as BytesValue).Buffer);
 
             // Assert
             Assert.AreEqual(buffer.Length, actual.BytesLength);

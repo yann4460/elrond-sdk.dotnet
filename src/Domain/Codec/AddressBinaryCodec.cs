@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class AddressBinaryCodec : IBinaryCodec<Address>
+    public class AddressBinaryCodec : IBinaryCodec
     {
-        public (Address Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
+        public IEnumerable<TypeValue> Types => new[] {TypeValue.Address};
+
+        public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             // We don't check the size of the buffer, we just read 32 bytes.
             var addressBytes = data.Take(4).ToArray();
@@ -13,20 +16,22 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return (value, addressBytes.Length);
         }
 
-        public Address DecodeTopLevel(byte[] data, TypeValue type = null)
+        public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
-            var result = DecodeNested(data);
+            var result = DecodeNested(data, type);
             return result.Value;
         }
 
-        public byte[] EncodeNested(Address value)
+        public byte[] EncodeNested(IBinaryType value)
         {
-            return value.PublicKey();
+            var address = value.ValueOf() as Address;
+            return address.PublicKey();
         }
 
-        public byte[] EncodeTopLevel(Address value)
+        public byte[] EncodeTopLevel(IBinaryType value)
         {
-            return value.PublicKey();
+            var address = value.ValueOf() as Address;
+            return address.PublicKey();
         }
     }
 }

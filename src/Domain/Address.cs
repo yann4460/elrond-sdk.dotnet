@@ -4,7 +4,7 @@ using Elrond.Dotnet.Sdk.Domain.Codec;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class Address : PrimitiveValue
+    public class Address : IBinaryType
     {
         public string Bech32 { get; }
         public string Hex { get; }
@@ -54,6 +54,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         public override string ToString()
         {
             return Bech32;
+        }
+
+        public TypeValue Type => TypeValue.Address;
+
+        public IBinaryType ValueOf()
+        {
+            return this;
         }
     }
 }

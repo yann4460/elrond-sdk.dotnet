@@ -28,7 +28,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actual = _sut.DecodeTopLevel(encoded, value.Type);
             var actualHexEncoded = Convert.ToHexString(encoded);
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -47,7 +47,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -65,7 +65,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -84,7 +84,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -102,7 +102,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -121,7 +121,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -139,7 +139,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -158,7 +158,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -176,7 +176,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, actual.ValueOf().ToString());
+            Assert.AreEqual(number, (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -195,7 +195,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, actual.ValueOf().ToString());
+            Assert.AreEqual(number, (actual.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
         // Nested
@@ -214,7 +214,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -233,7 +233,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -251,7 +251,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -270,7 +270,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -288,7 +288,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -307,7 +307,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -325,7 +325,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -344,7 +344,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number.ToString(), actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -362,7 +362,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number.ToString(), (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
 
@@ -381,7 +381,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Assert.AreEqual(number, actual.Value.ValueOf().ToString());
+            Assert.AreEqual(number, (actual.Value.ValueOf() as NumericValue).Number.ToString());
             Assert.AreEqual(hexEncoded, actualHexEncoded);
         }
     }

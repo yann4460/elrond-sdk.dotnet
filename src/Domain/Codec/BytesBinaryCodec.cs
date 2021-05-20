@@ -5,11 +5,13 @@ using dotnetstandard_bip32;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class BytesBinaryCodec : IBinaryCodec<BytesValue>
+    public class BytesBinaryCodec : IBinaryCodec
     {
+        public IEnumerable<TypeValue> Types => new[] {TypeValue.Bytes};
+
         private const int BytesSizeOfU32 = 4;
 
-        public (BytesValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
+        public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             var sizeInBytes = BitConverter.ToUInt32(data);
             if (BitConverter.IsLittleEndian)
@@ -17,36 +19,38 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 sizeInBytes = BitConverter.ToUInt32(BitConverter.GetBytes(sizeInBytes).Reverse().ToArray());
             }
 
-            var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + (int)sizeInBytes);
+            var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + (int) sizeInBytes);
 
             return (new BytesValue(payload), payload.Length);
         }
 
-        public BytesValue DecodeTopLevel(byte[] data, TypeValue type = null)
+        public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
             return new BytesValue(data);
         }
 
-        public byte[] EncodeNested(BytesValue value)
+        public byte[] EncodeNested(IBinaryType value)
         {
+            var bytes = value.ValueOf() as BytesValue;
             var buffer = new List<byte>();
-            var lengthBytes = BitConverter.GetBytes(value.GetLength());
+            var lengthBytes = BitConverter.GetBytes(bytes.GetLength());
             if (BitConverter.IsLittleEndian)
             {
                 lengthBytes = lengthBytes.Reverse().ToArray();
             }
 
             buffer.AddRange(lengthBytes);
-            buffer.AddRange(value.ValueOf());
+            buffer.AddRange(bytes.Buffer);
 
             var data = buffer.ToArray();
 
             return data;
         }
 
-        public byte[] EncodeTopLevel(BytesValue value)
+        public byte[] EncodeTopLevel(IBinaryType value)
         {
-            return value.ValueOf();
+            var bytes = value.ValueOf() as BytesValue;
+            return bytes.Buffer;
         }
     }
 }

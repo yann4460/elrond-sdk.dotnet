@@ -20,10 +20,10 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var buffer = new byte[] {0x01};
 
             // Act
-            var actual = _sut.DecodeNested(buffer);
+            var actual = _sut.DecodeNested(buffer, TypeValue.Boolean);
 
             // Assert
-            Assert.AreEqual(true, actual.Value.ValueOf());
+            Assert.IsTrue((actual.Value.ValueOf() as BooleanValue).IsTrue());
         }
 
         [Test]
@@ -33,10 +33,10 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var buffer = new byte[] {0x00};
 
             // Act
-            var actual = _sut.DecodeNested(buffer);
+            var actual = _sut.DecodeNested(buffer, TypeValue.Boolean);
 
             // Assert
-            Assert.AreEqual(false, actual.Value.ValueOf());
+            Assert.IsTrue((actual.Value.ValueOf() as BooleanValue).IsFalse());
         }
     }
 }

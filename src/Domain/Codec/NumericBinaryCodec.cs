@@ -6,9 +6,23 @@ using dotnetstandard_bip32;
 
 namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class NumericBinaryCodec : IBinaryCodec<NumericValue>
+    public class NumericBinaryCodec : IBinaryCodec
     {
-        public (NumericValue Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null)
+        public IEnumerable<TypeValue> Types => new[]
+        {
+            TypeValue.U8Type,
+            TypeValue.U16Type,
+            TypeValue.U32Type,
+            TypeValue.U64Type,
+            TypeValue.BigUintType,
+            TypeValue.I8Type,
+            TypeValue.I16Type,
+            TypeValue.I32Type,
+            TypeValue.I64Type,
+            TypeValue.BigIntType,
+        };
+
+        public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             if (type.HasFixedSize())
             {
@@ -22,10 +36,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
             else
             {
-                var sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, 4));
+                var sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, 4));
                 if (BitConverter.IsLittleEndian)
                 {
-                    sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, 4).Reverse().ToArray());
+                    sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, 4).Reverse().ToArray());
                 }
 
                 var payload = data.Skip(4).ToArray();
@@ -34,7 +48,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
         }
 
-        public NumericValue DecodeTopLevel(byte[] data, TypeValue type = null)
+        public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
             if (data.Length == 0)
             {
@@ -45,20 +59,20 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return new NumericValue(type, bigNumber);
         }
 
-        public byte[] EncodeNested(NumericValue value)
+        public byte[] EncodeNested(IBinaryType value)
         {
+            var numericValue = value.ValueOf() as NumericValue;
             if (value.Type.HasFixedSize())
             {
                 var sizeInBytes = value.Type.SizeInBytes();
-                var number = value.ValueOf();
+                var number = numericValue.Number;
                 var fullArray = Enumerable.Repeat((byte) 0x00, sizeInBytes).ToArray();
                 if (number.IsZero)
                 {
                     return fullArray;
                 }
 
-                var bigNumber = value.ValueOf();
-                var payload = bigNumber.ToByteArray(!value.Type.HasSign(), true);
+                var payload = number.ToByteArray(!value.Type.HasSign(), true);
                 var payloadLength = payload.Length;
 
                 var buffer = new List<byte>();
@@ -84,17 +98,17 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
         }
 
-        public byte[] EncodeTopLevel(NumericValue value)
+        public byte[] EncodeTopLevel(IBinaryType value)
         {
+            var numericValue = value.ValueOf() as NumericValue;
             // Nothing or Zero:
-            if (value.ValueOf().IsZero)
+            if (numericValue.Number.IsZero)
             {
                 return new byte[0];
             }
 
-            var bigNumber = value.ValueOf();
             var isUnsigned = !value.Type.HasSign();
-            var buffer = bigNumber.ToByteArray(isUnsigned, isBigEndian: true);
+            var buffer = numericValue.Number.ToByteArray(isUnsigned, isBigEndian: true);
 
             return buffer;
         }

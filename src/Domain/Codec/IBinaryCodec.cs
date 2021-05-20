@@ -1,11 +1,17 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Codec
-{
-    interface IBinaryCodec<T> where T : PrimitiveValue
-    {
-        (T Value, int BytesLength) DecodeNested(byte[] data, TypeValue type = null);
-        T DecodeTopLevel(byte[] data, TypeValue type = null);
+﻿using System.Collections.Generic;
 
-        byte[] EncodeNested(T value);
-        byte[] EncodeTopLevel(T value);
+namespace Elrond.Dotnet.Sdk.Domain.Codec
+{
+    internal interface IBinaryCodec
+    {
+        IEnumerable<TypeValue> Types { get; }
+
+        (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type);
+
+        IBinaryType DecodeTopLevel(byte[] data, TypeValue type);
+
+        byte[] EncodeNested(IBinaryType value);
+
+        byte[] EncodeTopLevel(IBinaryType value);
     }
 }

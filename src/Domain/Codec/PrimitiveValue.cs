@@ -1,6 +1,9 @@
 ﻿namespace Elrond.Dotnet.Sdk.Domain.Codec
 {
-    public class PrimitiveValue
+    public interface IBinaryType
     {
+        TypeValue Type { get; }
+
+        IBinaryType ValueOf();
     }
 }
