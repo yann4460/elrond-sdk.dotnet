@@ -90,7 +90,15 @@ namespace Elrond.Dotnet.Sdk.Domain
             return AddressValue.FromBech32(erdAddress);
         }
 
-
+        /// <summary>
+        /// Query a smart contract 
+        /// </summary>
+        /// <param name="smartContractAddress"></param>
+        /// <param name="endpoint"></param>
+        /// <param name="args"></param>
+        /// <param name="abiDefinition"></param>
+        /// <param name="provider"></param>
+        /// <returns></returns>
         public static async Task<List<IBinaryType>> QuerySmartContract(
             AddressValue smartContractAddress,
             string endpoint,
@@ -99,7 +107,8 @@ namespace Elrond.Dotnet.Sdk.Domain
             IElrondProvider provider)
         {
             var binaryCodec = new BinaryCodec();
-            var arguments = args.Select(typeValue => binaryCodec.EncodeTopLevel(typeValue)).Select(Convert.ToHexString)
+            var arguments = args
+                .Select(typeValue => Convert.ToHexString(binaryCodec.EncodeTopLevel(typeValue)))
                 .ToArray();
             var query = new QueryVmRequestDto()
             {
