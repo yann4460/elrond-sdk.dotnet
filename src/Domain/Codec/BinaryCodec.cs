@@ -47,21 +47,21 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return decode;
         }
 
-        public byte[] EncodeNested(IBinaryType value, TypeValue type)
+        public byte[] EncodeNested(IBinaryType value)
         {
-            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
+            var codec = _codecs.SingleOrDefault(c => c.Type == value.Type.BinaryType);
             if (codec == null)
-                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+                throw new BinaryCodecException($"No codec found for {value.Type.BinaryType}");
            
             var encode = codec.EncodeNested(value);
             return encode;
         }
 
-        public byte[] EncodeTopLevel(IBinaryType value, TypeValue type)
+        public byte[] EncodeTopLevel(IBinaryType value)
         {
-            var codec = _codecs.SingleOrDefault(c => c.Type == type.BinaryType);
+            var codec = _codecs.SingleOrDefault(c => c.Type == value.Type.BinaryType);
             if (codec == null)
-                throw new BinaryCodecException($"No codec found for {type.BinaryType}");
+                throw new BinaryCodecException($"No codec found for {value.Type.BinaryType}");
             
             var encode = codec.EncodeTopLevel(value);
             return encode;

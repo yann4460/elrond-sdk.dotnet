@@ -1,0 +1,315 @@
+{
+  "name": "Auction",
+  "constructor": {
+    "inputs": [
+      {
+        "name": "bid_cut_percentage",
+        "type": "u64"
+      }
+    ],
+    "outputs": []
+  },
+  "endpoints": [
+    {
+      "name": "setCutPercentage",
+      "inputs": [
+        {
+          "name": "new_cut_percentage",
+          "type": "u64"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "auctionToken",
+      "payableInTokens": [
+        "*"
+      ],
+      "inputs": [
+        {
+          "name": "min_bid",
+          "type": "BigUint"
+        },
+        {
+          "name": "max_bid",
+          "type": "BigUint"
+        },
+        {
+          "name": "deadline",
+          "type": "u64"
+        },
+        {
+          "name": "accepted_payment_token",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "opt_accepted_payment_token_nonce",
+          "type": "optional<u64>",
+          "multi_arg": true
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "bid",
+      "payableInTokens": [
+        "*"
+      ],
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "endAuction",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "withdraw",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "isAlreadyUpForAuction",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "getPaymentTokenForAuctionedNft",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<multi<TokenIdentifier,u64>>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getMinMaxBid",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<multi<BigUint,BigUint>>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getDeadline",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<u64>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getOriginalOwner",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<Address>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getCurrentWinningBid",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<BigUint>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getCurrentWinner",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<Address>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getFullAuctionData",
+      "inputs": [
+        {
+          "name": "nft_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nft_nonce",
+          "type": "u64"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "optional<Auction>",
+          "multi_result": true
+        }
+      ]
+    },
+    {
+      "name": "getMarketplaceCutPercentage",
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "BigUint"
+        }
+      ]
+    }
+  ],
+  "types": {
+    "Auction": {
+      "type": "struct",
+      "fields": [
+        {
+          "name": "payment_token",
+          "type": "EsdtToken"
+        },
+        {
+          "name": "min_bid",
+          "type": "BigUint"
+        },
+        {
+          "name": "max_bid",
+          "type": "BigUint"
+        },
+        {
+          "name": "deadline",
+          "type": "u64"
+        },
+        {
+          "name": "original_owner",
+          "type": "Address"
+        },
+        {
+          "name": "current_bid",
+          "type": "BigUint"
+        },
+        {
+          "name": "current_winner",
+          "type": "Address"
+        },
+        {
+          "name": "marketplace_cut_percentage",
+          "type": "BigUint"
+        },
+        {
+          "name": "creator_royalties_percentage",
+          "type": "BigUint"
+        }
+      ]
+    },
+    "EsdtToken": {
+      "type": "struct",
+      "fields": [
+        {
+          "name": "token_type",
+          "type": "TokenIdentifier"
+        },
+        {
+          "name": "nonce",
+          "type": "u64"
+        }
+      ]
+    }
+  }
+}

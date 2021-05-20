@@ -53,7 +53,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             var optionValue = value.ValueOf<OptionValue>();
             if (optionValue.IsSet())
             {
-                var encoded = _binaryCodec.EncodeNested(optionValue.Value, optionValue.InnerType);
+                var encoded = _binaryCodec.EncodeNested(optionValue.Value);
                 var payload = new List<byte> { 0x01 };
                 payload.AddRange(encoded);
                 return payload.ToArray();

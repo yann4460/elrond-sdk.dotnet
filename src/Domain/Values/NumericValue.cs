@@ -17,9 +17,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         }
 
         public BigInteger Number { get; }
-
         public TypeValue Type { get; }
-
 
         public static NumericValue U8Value(byte value) =>
             new NumericValue(TypeValue.U8TypeValue, new BigInteger(value));

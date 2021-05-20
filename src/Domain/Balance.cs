@@ -50,6 +50,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// Creates a balance object from an eGLD value (denomination will be applied).
         /// </summary>
         /// <param rustType="value"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static Balance EGLD(string value)
         {

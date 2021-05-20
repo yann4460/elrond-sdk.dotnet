@@ -1,17 +1,18 @@
 ﻿using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Account
     {
-        public Address Address { get; }
+        public AddressValue Address { get; }
         public Balance Balance { get; private set; }
         public int Nonce { get; private set; }
         public string Code { get; private set; }
         public string UserName { get; private set; }
 
-        public Account(Address address)
+        public Account(AddressValue address)
         {
             Address = address;
             Nonce = 0;

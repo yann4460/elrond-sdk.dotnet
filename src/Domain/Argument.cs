@@ -21,9 +21,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             var arg = split[index];
 
 
-            if (typeof(T) == typeof(Address))
+            if (typeof(T) == typeof(AddressValue))
             {
-                return (T) Convert.ChangeType(Address.FromHex(arg), typeof(Address));
+                return (T) Convert.ChangeType(AddressValue.FromHex(arg), typeof(AddressValue));
             }
 
             var type = Type.GetTypeCode(typeof(T));
@@ -139,7 +139,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 : CreateArgumentFromBigInteger(new BigInteger(value));
         }
 
-        public static Argument CreateArgumentFromAddress(Address address)
+        public static Argument CreateArgumentFromAddress(AddressValue address)
         {
             return CreateArgumentFromHex(address.Hex);
         }
@@ -161,7 +161,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static Argument FromTypeValue(IBinaryType binaryType)
         {
             var codec = new BinaryCodec();
-            var encoded = codec.EncodeTopLevel(binaryType, binaryType.Type);
+            var encoded = codec.EncodeTopLevel(binaryType);
             return new Argument(Convert.ToHexString(encoded));
         }
 

@@ -62,12 +62,8 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actual = _sut.EncodeNested(structValue);
             var hexEncode = Convert.ToHexString(actual);
 
-            var decode = _sut.DecodeTopLevel(actual, type);
-
             // Assert
-            Assert.That(hexEncode,
-                Is.EqualTo(
-                    "000000088AC7230489E8000000000000000000005FC2B9DBFFFFFFFF0000000164000025000000000A140EC80FA7EE88000000"));
+            Assert.That(hexEncode, Is.EqualTo("000000088AC7230489E8000000000000000000005FC2B9DBFFFFFFFF0000000164000025000000000A140EC80FA7EE88000000"));
         }
 
         [Test]
@@ -125,7 +121,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             Assert.That(structValue.GetStructField("original_owner"), Is.Not.Null);
             var original_owner = structValue.GetStructField("original_owner").Value;
-            Assert.That(original_owner.ValueOf<Address>().Bech32, Is.EqualTo("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq"));
+            Assert.That(original_owner.ValueOf<AddressValue>().Bech32, Is.EqualTo("erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq"));
 
             Assert.That(structValue.GetStructField("current_bid"), Is.Not.Null);
             var current_bid = structValue.GetStructField("current_bid").Value;
@@ -133,7 +129,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             Assert.That(structValue.GetStructField("current_winner"), Is.Not.Null);
             var current_winner = structValue.GetStructField("current_winner").Value;
-            Assert.That(current_winner.ValueOf<Address>().Bech32, Is.EqualTo(Address.Zero().Bech32));
+            Assert.That(current_winner.ValueOf<AddressValue>().Bech32, Is.EqualTo(AddressValue.Zero().Bech32));
 
             Assert.That(structValue.GetStructField("marketplace_cut_percentage"), Is.Not.Null);
             var marketplace_cut_percentage = structValue.GetStructField("marketplace_cut_percentage").Value;

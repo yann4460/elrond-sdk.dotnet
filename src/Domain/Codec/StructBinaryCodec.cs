@@ -48,7 +48,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
             foreach (var field in fields)
             {
-                var fieldBuffer = _binaryCodec.EncodeNested(field.Value, field.Value.Type);
+                var fieldBuffer = _binaryCodec.EncodeNested(field.Value);
                 buffers.Add(fieldBuffer);
             }
 

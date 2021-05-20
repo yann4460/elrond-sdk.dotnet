@@ -12,12 +12,5 @@
             Description = description;
             Type = type;
         }
-
-        //public static FieldDefinition FromJson(string json)
-        //{
-        //    var dynamic = JsonSerializer.Deserialize<dynamic>(json);
-
-        //    return new FieldDefinition("", "", "");
-        //}
     }
 }

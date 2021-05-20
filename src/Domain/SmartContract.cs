@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Cryptography;
+using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
+using Elrond.Dotnet.Sdk.Provider;
+using Elrond.Dotnet.Sdk.Provider.Dtos;
 using Org.BouncyCastle.Crypto.Digests;
 
 namespace Elrond.Dotnet.Sdk.Domain
@@ -29,14 +34,15 @@ namespace Elrond.Dotnet.Sdk.Domain
             return transaction;
         }
 
-        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(Constants constants, Account account, Address smartContractAddress)
+        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(Constants constants,
+            Account account, AddressValue smartContractAddress)
         {
             var transaction = TransactionRequest.CreateTransaction(account, constants);
             return transaction;
         }
 
         public static TransactionRequest CreateCallSmartContractTransactionRequest(Constants constants, Account account,
-            Address smartContractAddress,
+            AddressValue smartContractAddress,
             string functionName,
             Balance value,
             Argument[] args = null)
@@ -57,10 +63,10 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// Computes the address of a Smart Contract.
         /// The address is computed deterministically, from the address of the owner and the nonce of the deployment transaction.
         /// </summary>
-        /// <param rustType="ownerAddress">The owner of the Smart Contract</param>
-        /// <param rustType="nonce">The owner nonce used for the deployment transaction</param>
+        /// <param name="ownerAddress">The owner of the Smart Contract</param>
+        /// <param name="nonce">The owner nonce used for the deployment transaction</param>
         /// <returns>The smart contract address</returns>
-        public static Address ComputeAddress(Address ownerAddress, long nonce)
+        public static AddressValue ComputeAddress(AddressValue ownerAddress, long nonce)
         {
             var ownerPubKey = Convert.FromHexString(ownerAddress.Hex);
             var initialPadding = new byte[8];
@@ -81,7 +87,41 @@ namespace Elrond.Dotnet.Sdk.Domain
                 shardSelector);
 
             var erdAddress = Bech32Engine.Encode("erd", addressBytes);
-            return Address.FromBech32(erdAddress);
+            return AddressValue.FromBech32(erdAddress);
+        }
+
+
+        public static async Task<List<IBinaryType>> QuerySmartContract(
+            AddressValue smartContractAddress,
+            string endpoint,
+            IBinaryType[] args,
+            AbiDefinition abiDefinition,
+            IElrondProvider provider)
+        {
+            var binaryCodec = new BinaryCodec();
+            var arguments = args.Select(typeValue => binaryCodec.EncodeTopLevel(typeValue)).Select(Convert.ToHexString)
+                .ToArray();
+            var query = new QueryVmRequestDto()
+            {
+                FuncName = endpoint,
+                Args = arguments,
+                ScAddress = smartContractAddress.Bech32
+            };
+
+            var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
+            var response = await provider.QueryVm(query);
+            var data = response.Data.Data;
+            var decodedResponses = new List<IBinaryType>();
+            for (var i = 0; i < endpointDefinition.Output.Length; i++)
+            {
+                var output = endpointDefinition.Output[i];
+                var responseBytes = Convert.FromBase64String(data.ReturnData[i]);
+
+                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, output.Type);
+                decodedResponses.Add(decodedResponse);
+            }
+
+            return decodedResponses;
         }
 
         private static byte[] ConcatByteArrays(params byte[][] arrays)

@@ -1,42 +1,42 @@
 ﻿using System;
 using Elrond.Dotnet.Sdk.Cryptography;
-using Elrond.Dotnet.Sdk.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
-    public class Address : IBinaryType
+    public class AddressValue : IBinaryType
     {
         public byte[] Buffer { get; }
         public string Bech32 { get; }
         public string Hex { get; }
-
         private const string Hrp = "erd";
 
-        private Address(string hex, string bech32)
+        public TypeValue Type => TypeValue.AddressValue;
+
+        private AddressValue(string hex, string bech32)
         {
             Bech32 = bech32.ToLowerInvariant();
             Hex = hex.ToLowerInvariant();
             Buffer = Convert.FromHexString(hex);
         }
 
-        public static Address FromBytes(byte[] data)
+        public static AddressValue FromBytes(byte[] data)
         {
             var hex = Convert.ToHexString(data);
             var bech32 = Bech32Engine.Encode(Hrp, data);
-            return new Address(hex, bech32);
+            return new AddressValue(hex, bech32);
         }
 
-        public static Address FromHex(string hex)
+        public static AddressValue FromHex(string hex)
         {
             var bech32 = Bech32Engine.Encode(Hrp, Convert.FromHexString(hex));
-            return new Address(hex, bech32);
+            return new AddressValue(hex, bech32);
         }
 
-        public static Address FromBech32(string bech32)
+        public static AddressValue FromBech32(string bech32)
         {
             Bech32Engine.Decode(bech32, out _, out var data);
             var hex = Convert.ToHexString(data);
-            return new Address(hex, bech32);
+            return new AddressValue(hex, bech32);
         }
 
         public byte[] PublicKey()
@@ -48,7 +48,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// Smart contract deployment address
         /// </summary>
         /// <returns></returns>
-        public static Address Zero()
+        public static AddressValue Zero()
         {
             var hex = "0000000000000000000000000000000000000000000000000000000000000000";
             return FromHex(hex);
@@ -58,7 +58,5 @@ namespace Elrond.Dotnet.Sdk.Domain
         {
             return Bech32;
         }
-
-        public TypeValue Type => TypeValue.AddressValue;
     }
 }

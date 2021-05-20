@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Provider;
-using Elrond.Dotnet.Sdk.Provider.Dtos;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {

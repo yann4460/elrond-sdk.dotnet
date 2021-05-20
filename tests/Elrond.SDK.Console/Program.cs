@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Codec;
@@ -52,24 +53,40 @@ namespace Elrond.SDK.Console
                 new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
             });
 
-            var optionAuction = TypeValue.OptionValue(auction);
-
             var response = await provider.QueryVm(query);
 
             var data = Convert.FromBase64String(response.Data.Data.ReturnData[0]);
 
             var codec = new BinaryCodec();
-            var decoded = codec.DecodeTopLevel(data, optionAuction);
-
+            var decoded = codec.DecodeTopLevel(data, auction);
             var wallet = new Wallet(testPrivateKey);
+
+            await TestAbi(provider);
             //await DeployAdderSmartContractAndQuery(provider, wallet);
+        }
+
+        private static async Task TestAbi(IElrondProvider provider)
+        {
+            var fileBytes = await File.ReadAllBytesAsync("SmartContracts/auction/auction.abi.json");
+            var json = Encoding.UTF8.GetString(fileBytes);
+            var jsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
+            var abiDefinition = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
+            var response = await SmartContract.QuerySmartContract(
+                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"),
+                "getFullAuctionData",
+                new IBinaryType[]
+                {
+                    TokenIdentifierValue.From("TSTKR-209ea0"),
+                    NumericValue.U64Value(3),
+                },
+                abiDefinition, provider);
         }
 
         private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Wallet wallet)
         {
             var constants = await Constants.GetFromNetwork(provider);
             var kf = wallet.BuildKeyFile(string.Empty);
-            var account = new Account(Address.FromBech32(kf.Bech32));
+            var account = new Account(AddressValue.FromBech32(kf.Bech32));
 
             var smartContractAddress =
                 await DeploySmartContract(provider, constants, wallet, account, "SmartContracts/adder/adder.wasm");
@@ -97,7 +114,7 @@ namespace Elrond.SDK.Console
             var sum = Argument.GetValue<long>(sumHex, 0); //Should be 17 !
         }
 
-        private static async Task<Address> DeploySmartContract(
+        private static async Task<AddressValue> DeploySmartContract(
             IElrondProvider provider,
             Constants constants,
             Wallet wallet,

@@ -148,7 +148,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                     return TokenIdentifierValue;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(rustType));
+                    return null;
             }
         }
 

@@ -12,7 +12,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             // We don't check the size of the buffer, we just read 32 bytes.
             var addressBytes = data.Take(32).ToArray();
-            var value = Address.FromBytes(addressBytes);
+            var value = AddressValue.FromBytes(addressBytes);
             return (value, addressBytes.Length);
         }
 
@@ -34,9 +34,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return address.PublicKey();
         }
 
-        private static Address Get(IBinaryType value)
+        private static AddressValue Get(IBinaryType value)
         {
-            if (value is Address address)
+            if (value is AddressValue address)
             {
                 return address;
             }
