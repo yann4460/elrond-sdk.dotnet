@@ -36,7 +36,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             // Arrange
             var buffer = Convert.FromHexString("45474C44");
 
-            var value = new BytesValue(buffer);
+            var value = new BytesValue(buffer, TypeValue.BytesValue);
 
             // Act
             var actual = _sut.EncodeNested(value);
@@ -52,7 +52,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         {
             // Arrange
             var buffer = Convert.FromHexString("FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42");
-            var value = new BytesValue(buffer);
+            var value = new BytesValue(buffer, TypeValue.BytesValue);
 
             // Act
             var encoded = _sut.EncodeNested(value);

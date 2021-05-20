@@ -1,14 +1,16 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Codec;
+﻿using System;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class BooleanValue : IBinaryType
     {
         private readonly bool _value;
+        public byte[] Buffer { get; }
 
         public BooleanValue(bool value)
         {
             _value = value;
+            Buffer = BitConverter.GetBytes(value);
         }
 
         public bool IsTrue()

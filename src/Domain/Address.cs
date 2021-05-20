@@ -1,20 +1,22 @@
 ﻿using System;
 using Elrond.Dotnet.Sdk.Cryptography;
-using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
     public class Address : IBinaryType
     {
+        public byte[] Buffer { get; }
         public string Bech32 { get; }
         public string Hex { get; }
+
         private const string Hrp = "erd";
 
         private Address(string hex, string bech32)
         {
             Bech32 = bech32.ToLowerInvariant();
             Hex = hex.ToLowerInvariant();
+            Buffer = Convert.FromHexString(hex);
         }
 
         public static Address FromBytes(byte[] data)
@@ -58,15 +60,5 @@ namespace Elrond.Dotnet.Sdk.Domain
         }
 
         public TypeValue Type => TypeValue.AddressValue;
-
-        public IBinaryType ValueOf()
-        {
-            return this;
-        }
-
-        public T ValueOf<T>() where T : IBinaryType
-        {
-            throw new NotImplementedException();
-        }
     }
 }

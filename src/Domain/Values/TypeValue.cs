@@ -74,7 +74,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             public const string Address = "Address";
             public const string H256 = "H256";
             public const string TokenIdentifier = "TokenIdentifier";
-            public const string EsdtToken = "EsdtToken";
         }
 
         public static TypeValue U8TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.u8, 1, false);
@@ -134,6 +133,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                     return BooleanValue;
                 case RustTypes.Address:
                     return AddressValue;
+                case RustTypes.TokenIdentifier:
+                    return TokenIdentifierValue;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(rustType));
             }

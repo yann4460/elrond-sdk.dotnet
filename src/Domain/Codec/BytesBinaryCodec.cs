@@ -14,7 +14,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
-            var sizeInBytes = BitConverter.ToUInt32(data);
+            var sizeInBytes = BitConverter.ToUInt32(data.Take(BytesSizeOfU32).ToArray());
             if (BitConverter.IsLittleEndian)
             {
                 sizeInBytes = BitConverter.ToUInt32(BitConverter.GetBytes(sizeInBytes).Reverse().ToArray());
@@ -22,12 +22,12 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
             var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + (int) sizeInBytes);
 
-            return (new BytesValue(payload), payload.Length);
+            return (new BytesValue(payload, type), payload.Length);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
-            return new BytesValue(data);
+            return new BytesValue(data, type);
         }
 
         public byte[] EncodeNested(IBinaryType value)

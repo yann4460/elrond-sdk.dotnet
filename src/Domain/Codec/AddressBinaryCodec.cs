@@ -12,9 +12,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             // We don't check the size of the buffer, we just read 32 bytes.
-            var addressBytes = data.Take(4).ToArray();
+            var addressBytes = data.Take(32).ToArray();
             var value = Address.FromBytes(addressBytes);
-
             return (value, addressBytes.Length);
         }
 

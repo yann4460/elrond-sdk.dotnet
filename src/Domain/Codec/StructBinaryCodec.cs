@@ -26,8 +26,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 var fieldType = TypeValue.FromRustType(fieldDefinition.RustType);
                 var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), fieldType);
                 fields.Add(new StructField(value, fieldDefinition.Name));
+
+                var hex = Convert.ToHexString(buffer.ToArray());
+
                 offset += bytesLength;
-                buffer = data.Skip(offset).ToList();
+                buffer = buffer.Skip(bytesLength).ToList();
             }
 
             var structObject = new StructValue(type, fields.ToArray());
@@ -37,18 +40,30 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
-            var decoded = this.DecodeNested(data, type);
+            var decoded = DecodeNested(data, type);
             return decoded.Value;
         }
 
         public byte[] EncodeNested(IBinaryType value)
         {
-            throw new NotImplementedException();
+            var structValue = value.ValueOf<StructValue>();
+            var buffers = new List<byte[]>();
+            var fields = structValue.Fields;
+
+            foreach (var field in fields)
+            {
+                var fieldBuffer = _binaryCodec.EncodeNested(field.Value, field.Value.Type);
+                buffers.Add(fieldBuffer);
+            }
+
+            var data = buffers.SelectMany(s => s);
+
+            return data.ToArray();
         }
 
         public byte[] EncodeTopLevel(IBinaryType value)
         {
-            throw new NotImplementedException();
+            return EncodeNested(value);
         }
     }
 }

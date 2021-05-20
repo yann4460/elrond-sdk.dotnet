@@ -25,15 +25,16 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
             else
             {
-                var sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, 4));
+                const int offset = 4;
+                var sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, offset));
                 if (BitConverter.IsLittleEndian)
                 {
-                    sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, 4).Reverse().ToArray());
+                    sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, offset).Reverse().ToArray());
                 }
 
-                var payload = data.Skip(4).ToArray();
+                var payload = data.Skip(offset).Take(sizeInBytes).ToArray();
                 var bigNumber = new BigInteger(payload, !type.HasSign(), isBigEndian: true);
-                return (new NumericValue(type, bigNumber), sizeInBytes);
+                return (new NumericValue(type, bigNumber), sizeInBytes + offset);
             }
         }
 

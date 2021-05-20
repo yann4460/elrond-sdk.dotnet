@@ -5,26 +5,30 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
     public class StructValue : IBinaryType
     {
         public TypeValue Type { get; }
-        private readonly StructField[] _fields;
+
+        public byte[] Buffer => throw new System.NotImplementedException();
+
+        public StructField[] Fields { get; }
 
         public StructValue(TypeValue structType, StructField[] fields)
         {
             Type = structType;
-            _fields = fields;
+            Fields = fields;
             CheckTyping();
         }
+
 
         private void CheckTyping()
         {
             var definitions = Type.GetFieldDefinitions();
-            if (_fields.Length != definitions.Length)
+            if (Fields.Length != definitions.Length)
             {
                 throw new BinaryCodecException("fields length vs. field definitions length");
             }
 
-            for (var i = 0; i < _fields.Length; i++)
+            for (var i = 0; i < Fields.Length; i++)
             {
-                var field = _fields[i];
+                var field = Fields[i];
                 var definition = definitions[i];
                 var fieldType = field.Value.Type;
 
