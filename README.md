@@ -22,7 +22,8 @@ async Task SynchronizingNetworkParameter()
     System.Console.WriteLine("ChainId {0}", constants.ChainId);
     System.Console.WriteLine("GasPerDataByte {0}", constants.GasPerDataByte);
 }
-```, 
+```
+
 ## Synchronizing an account object
 ```csharp
 async Task SynchronizingAnAccountObject(IElrondProvider provider)
@@ -35,6 +36,7 @@ async Task SynchronizingAnAccountObject(IElrondProvider provider)
     System.Console.WriteLine("Nonce {0}", account.Nonce);
 }
 ```
+
 ## Creating value-transfer transactions
 ```csharp
 async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants, Wallet wallet)
@@ -52,8 +54,8 @@ async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants
     System.Console.WriteLine("TxHash {0}", transactionResult.TxHash);
 }
 ```
+
 ## Smart Contract transactions
-Deploy a smart contract using a wasm file
 #### Deploy a smart contract
 Deploy a smart contract from a WASM file.
 ```csharp
@@ -105,6 +107,7 @@ Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wa
     var numericResult = result[0].ValueOf<NumericValue>().Number;
 }
 ```
+
 #### Query a smart contract with ABI Definition.
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 ```csharp
@@ -142,6 +145,7 @@ async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAd
     }
 }
 ```
+
 #### Query a smart contract without ABI Definition
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 You need to manually define the TypeValue definition that will be use by the codec.
