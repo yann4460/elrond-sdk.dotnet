@@ -13,7 +13,7 @@ This is the .Net integration library for Elrond, simplifying the access and smar
 # Quick documentations
 ## Synchronizing detwork parameters
 ```csharp
-async Task SynchronizingNetworkParameter()
+Task SynchronizingNetworkParameter()
 {
     var client = new HttpClient { BaseAddress = new Uri("https://testnet-gateway.elrond.com") };
     var provider = new ElrondProvider(client);
@@ -26,7 +26,7 @@ async Task SynchronizingNetworkParameter()
 
 ## Synchronizing an account object
 ```csharp
-async Task SynchronizingAnAccountObject(IElrondProvider provider)
+Task SynchronizingAnAccountObject(IElrondProvider provider)
 {
     var address = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     var account = new Account(address);
@@ -39,7 +39,7 @@ async Task SynchronizingAnAccountObject(IElrondProvider provider)
 
 ## Creating value-transfer transactions
 ```csharp
-async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants, Wallet wallet)
+Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants, Wallet wallet)
 {
     var sender = wallet.GetAccount();
     var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -59,7 +59,7 @@ async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants
 #### Deploy a smart contract
 Deploy a smart contract from a WASM file.
 ```csharp
- async Task<AddressValue> DeploySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
+ Task<AddressValue> DeploySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
     Account account, string filePath)
 {
     await account.Sync(provider);
@@ -111,7 +111,7 @@ Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wa
 #### Query a smart contract with ABI Definition.
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 ```csharp
-async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
+Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
 {
     var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
     var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getFullAuctionData",
@@ -150,7 +150,7 @@ async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAd
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 You need to manually define the TypeValue definition that will be use by the codec.
 ```csharp
-async Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddress)
+Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddress)
 {
     var esdtToken = TypeValue.StructValue("EsdtToken", new[]
     {
@@ -193,6 +193,7 @@ All notable changes will be documented in this file.
 
 ## [1.0.9] - 21.05.2021
 -   Allow to query smart contract values with or without ABI definition.
+-   Update documentation to add call examples.
 
 ## [1.0.8] - 21.05.2021
 -   [Add smart contract query option.](https://github.com/yann4460/elrond-sdk.dotnet/pull/9) 
@@ -203,7 +204,7 @@ All notable changes will be documented in this file.
 
 ### [1.0.6] - 20.05.2021
 -   Remove Argument class. Prefer the use of IBinaryType
--   Ex : `Argument.CreateArgumentFromInt64(12)` is ow obsolete. Use : `NumericValue.BigIntValue(12)` instead.
+-   Ex : `Argument.CreateArgumentFromInt64(12)` is now obsolete. Use : `NumericValue.BigIntValue(12)` instead.
     - Build a balance argument : `NumericValue.BigUintValue(Balance.EGLD("10").Value)`
     - Build from a byte array : `BytesValue.FromBuffer(new byte[] {0x00});`
 
