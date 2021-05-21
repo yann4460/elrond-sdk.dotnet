@@ -39,7 +39,7 @@ This is the .Net integration library for Elrond, simplifying the access and smar
 All notable changes will be documented in this file.
 
 ## [1.0.8] - 21.05.2021
--   [Add  GetSmartContractResult method.](https://github.com/yann4460/elrond-sdk.dotnet/pull/8) 
+-   [Add smart contract query option.](https://github.com/yann4460/elrond-sdk.dotnet/pull/9) 
 
 ## [1.0.7] - 20.05.2021
 -   [Add  GetSmartContractResult method.](https://github.com/yann4460/elrond-sdk.dotnet/pull/8) 
