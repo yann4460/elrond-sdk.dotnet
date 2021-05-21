@@ -1,4 +1,6 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿using System.Text;
+
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class BytesValue : IBinaryType
     {
@@ -11,6 +13,11 @@
         public int GetLength()
         {
             return Buffer.Length;
+        }
+
+        public static BytesValue FromUtf8(string utf8String)
+        {
+            return new BytesValue(Encoding.UTF8.GetBytes(utf8String), TypeValue.BytesValue);
         }
 
         public static BytesValue FromBuffer(byte[] data)

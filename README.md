@@ -8,6 +8,11 @@ Elrond SDK for .NET Core.
 
 All notable changes will be documented in this file.
 
+## [1.0.8] - 22.05.2021
+
+-   Add `BytesValue.FromUtf8()` helper method
+
+
 ## [1.0.7] - 21.05.2021
 
 -   [Add  GetSmartContractResult method.](https://github.com/yann4460/elrond-sdk.dotnet/pull/8) 
