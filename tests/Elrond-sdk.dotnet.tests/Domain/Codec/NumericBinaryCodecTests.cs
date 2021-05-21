@@ -39,8 +39,6 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             Check(number.ToString(), actual, actualHexEncoded, hexEncoded);
         }
 
-
-
         [TestCase(sbyte.MinValue, "80")]
         [TestCase((sbyte) 0, "")]
         [TestCase((sbyte) 1, "01")]
@@ -354,7 +352,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
+            Check(number, actual.Value, actualHexEncoded, hexEncoded);
         }
 
         [TestCase("-1844674407370955161576567687", "0000000CFA0A1F000000000001658C79")]
@@ -372,7 +370,22 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             var actualHexEncoded = Convert.ToHexString(encoded);
 
             // Assert
-            Check(number.ToString(), actual.Value, actualHexEncoded, hexEncoded);
+            Check(number, actual.Value, actualHexEncoded, hexEncoded);
+        }
+
+        [Test]
+        public void EncodeNested_DecodeNested_BalanceValue()
+        {
+            // Arrange
+            var value = BalanceValue.EGLD("12.876564");
+
+            // Act
+            var encoded = _sut.EncodeNested(value);
+            var actual = _sut.DecodeNested(encoded, value.Type);
+
+            // Assert
+            var balance = actual.Value.ValueOf<NumericValue>();
+            Assert.That(balance.Number, Is.EqualTo(value.Number));
         }
     }
 }

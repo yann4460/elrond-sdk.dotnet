@@ -49,7 +49,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             });
             var structValue = new StructValue(type, new[]
             {
-                new StructField(NumericValue.BigUintValue(Balance.EGLD("10").Value), "ticket_price"),
+                new StructField(NumericValue.BigUintValue(BalanceValue.EGLD("10").Number), "ticket_price"),
                 new StructField(NumericValue.U32Value(0), "tickets_left"),
                 new StructField(NumericValue.U64Value(0x000000005fc2b9db), "deadline"),
                 new StructField(NumericValue.U32Value(0xffffffff), "max_entries_per_user"),

@@ -20,6 +20,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new TokenIdentifierValue(data, TypeValue.TokenIdentifierValue);
         }
 
+        public static TokenIdentifierValue EGLD()
+        {
+            return new TokenIdentifierValue(new byte[0], TypeValue.TokenIdentifierValue);
+        }
+
         public static TokenIdentifierValue From(string data)
         {
             var bytes = Encoding.UTF8.GetBytes(data);

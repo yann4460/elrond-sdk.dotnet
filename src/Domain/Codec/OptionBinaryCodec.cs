@@ -20,7 +20,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             if (data[0] == 0x00)
             {
-                return (OptionValue.NewMissing(type.InnerType), 1);
+                return (OptionValue.NewMissing(), 1);
             }
 
             if (data[0] != 0x01)
@@ -36,7 +36,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             if (data.Length == 0)
             {
-                return OptionValue.NewMissing(type.InnerType);
+                return OptionValue.NewMissing();
             }
 
             var decoded = _binaryCodec.DecodeTopLevel(data, type.InnerType);

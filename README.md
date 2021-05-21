@@ -3,6 +3,7 @@ Elronford SDK for .NET Core.
 
 ## How to install ? 
 Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
+
 `Install-Package elrond-sdk.dotnet -Version 1.0.9`
 
 # What is Elrond SDK for .NET Core  ?
@@ -194,6 +195,9 @@ Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddre
 
 # Change Log
 All notable changes will be documented in this file.
+
+## [1.0.10] - 21.05.2021
+-   Allow to create a Option value with a null inner Type
 
 ## [1.0.9] - 21.05.2021
 -   Allow to query smart contract values with or without ABI definition.

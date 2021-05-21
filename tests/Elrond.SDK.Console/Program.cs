@@ -53,7 +53,7 @@ namespace Elrond.SDK.Console
             var account = new Account(address);
             await account.Sync(provider);
 
-            System.Console.WriteLine("Balance {0}", account.Balance);
+            System.Console.WriteLine("BalanceValue {0}", account.BalanceValue);
             System.Console.WriteLine("Nonce {0}", account.Nonce);
         }
 
@@ -63,7 +63,7 @@ namespace Elrond.SDK.Console
             var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
             await sender.Sync(provider);
 
-            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("2.15"));
+            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, BalanceValue.EGLD("2.15"));
 
             transaction.SetData("Hello world !");
             transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
@@ -80,7 +80,7 @@ namespace Elrond.SDK.Console
             var queryTransaction = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
                 scAddress,
                 "getSum",
-                Balance.Zero());
+                BalanceValue.Zero());
 
             queryTransaction.SetGasLimit(await GasLimit.ForTransaction(queryTransaction, provider));
 
@@ -175,7 +175,7 @@ namespace Elrond.SDK.Console
 
             //2. Call 'add' method
             var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "add", Balance.Zero(),
+                scAddress, "add", BalanceValue.Zero(),
                 new IBinaryType[]
                 {
                     NumericValue.BigIntValue(12)
@@ -198,7 +198,7 @@ namespace Elrond.SDK.Console
             //4. Ex query smart contract 
 
             var getSum = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "getSum", Balance.Zero(), new IBinaryType[0]);
+                scAddress, "getSum", BalanceValue.Zero(), new IBinaryType[0]);
 
             getSum.SetGasLimit(new GasLimit(60000000));
             var getSumTransaction = await getSum.Send(wallet, provider);

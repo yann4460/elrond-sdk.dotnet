@@ -6,11 +6,6 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 {
     public class BinaryCodecTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void DecodeNested_False()
         {

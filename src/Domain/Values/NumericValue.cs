@@ -5,13 +5,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class NumericValue : IBinaryType
     {
-        public byte[] Buffer { get; }
-
         public NumericValue(TypeValue type, BigInteger number)
         {
             Type = type;
             Number = number;
-            Buffer = number.ToByteArray(!type.HasSign(), true);
             if (number.Sign == -1 && !type.HasSign())
                 throw new BinaryCodecException("negative, but binaryType is unsigned");
         }

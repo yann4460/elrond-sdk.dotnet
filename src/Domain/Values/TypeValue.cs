@@ -5,8 +5,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
     public class TypeValue
     {
         public string BinaryType { get; }
-        public TypeValue? InnerType { get; }
         public string RustType { get; }
+        public TypeValue? InnerType { get; }
+
+
         private readonly int? _sizeInBytes;
         private readonly bool? _withSign;
         private readonly FieldDefinition[] _fieldDefinitions;
@@ -26,7 +28,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             _fieldDefinitions = fieldDefinitions;
         }
 
-        public TypeValue(string binaryType, TypeValue innerType)
+        public TypeValue(string binaryType, TypeValue innerType = null)
         {
             BinaryType = binaryType;
             InnerType = innerType;
@@ -65,16 +67,16 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public static class RustTypes
         {
-            public const string u8 = "u8";
-            public const string u16 = "u16";
-            public const string u32 = "u32";
-            public const string u64 = "u64";
+            public const string U8 = "u8";
+            public const string U16 = "u16";
+            public const string U32 = "u32";
+            public const string U64 = "u64";
             public const string BigUint = "BigUint";
 
-            public const string i8 = "i8";
-            public const string i16 = "i16";
-            public const string i32 = "i32";
-            public const string i64 = "i64";
+            public const string I8 = "i8";
+            public const string I16 = "i16";
+            public const string I32 = "i32";
+            public const string I64 = "i64";
             public const string Bigint = "BigInt";
 
             public const string Bool = "bool";
@@ -84,17 +86,17 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             public const string TokenIdentifier = "TokenIdentifier";
         }
 
-        public static TypeValue U8TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.u8, 1, false);
-        public static TypeValue I8TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.i8, 1, true);
+        public static TypeValue U8TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.U8, 1, false);
+        public static TypeValue I8TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.I8, 1, true);
 
-        public static TypeValue U16TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.u16, 2, false);
-        public static TypeValue I16TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.i16, 2, true);
+        public static TypeValue U16TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.U16, 2, false);
+        public static TypeValue I16TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.I16, 2, true);
 
-        public static TypeValue U32TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.u32, 4, false);
-        public static TypeValue I32TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.i32, 4, true);
+        public static TypeValue U32TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.U32, 4, false);
+        public static TypeValue I32TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.I32, 4, true);
 
-        public static TypeValue U64TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.u64, 8, false);
-        public static TypeValue I64TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.i64, 8, true);
+        public static TypeValue U64TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.U64, 8, false);
+        public static TypeValue I64TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.I64, 8, true);
 
         public static TypeValue BigUintTypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.BigUint, null, false);
         public static TypeValue BigIntTypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.Bigint, null, true);
@@ -107,7 +109,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
         public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
-        public static TypeValue OptionValue(TypeValue innerType) => new TypeValue(BinaryTypes.Option, innerType);
+
+        public static TypeValue OptionValue(TypeValue innerType = null) =>
+            new TypeValue(BinaryTypes.Option, innerType);
 
         public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) =>
             new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);
@@ -116,24 +120,24 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         {
             switch (rustType)
             {
-                case RustTypes.u8:
+                case RustTypes.U8:
                     return U8TypeValue;
-                case RustTypes.u16:
+                case RustTypes.U16:
                     return U16TypeValue;
-                case RustTypes.u32:
+                case RustTypes.U32:
                     return U32TypeValue;
-                case RustTypes.u64:
+                case RustTypes.U64:
                     return U64TypeValue;
                 case RustTypes.BigUint:
                     return BigUintTypeValue;
 
-                case RustTypes.i8:
+                case RustTypes.I8:
                     return I8TypeValue;
-                case RustTypes.i16:
+                case RustTypes.I16:
                     return I16TypeValue;
-                case RustTypes.i32:
+                case RustTypes.I32:
                     return I32TypeValue;
-                case RustTypes.i64:
+                case RustTypes.I64:
                     return I64TypeValue;
                 case RustTypes.Bigint:
                     return BigIntTypeValue;
