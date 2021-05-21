@@ -19,7 +19,5 @@ namespace Elrond_sdk.dotnet.tests.Domain
             // Assert
             Assert.AreEqual("erd1qqqqqqqqqqqqqpgqfflfuh2wd78r4xgcusl4xtmj354aem0nrdpqc68c4h", smartContractAddress.Bech32);
         }
-
-
     }
 }

@@ -29,6 +29,27 @@ namespace Elrond.SDK.Console
             //await QuerySmartContractWithAbi(provider);
         }
 
+
+        private static async Task SynchronizingNetworkParameter()
+        {
+            var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
+            var provider = new ElrondProvider(client);
+            var constants = await Constants.GetFromNetwork(provider);
+            System.Console.WriteLine("MinGasPrice {0}", constants.MinGasPrice);
+            System.Console.WriteLine("ChainId {0}", constants.ChainId);
+            System.Console.WriteLine("GasPerDataByte {0}", constants.GasPerDataByte);
+        }
+
+        private static async Task SynchronizingAnAccountObject(IElrondProvider provider)
+        {
+            var address = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+            var account = new Account(address);
+            await account.Sync(provider);
+
+            System.Console.WriteLine("Balance {0}", account.Balance);
+            System.Console.WriteLine("Nonce {0}", account.Nonce);
+        }
+
         private static async Task QuerySmartContractWithoutAbi(IElrondProvider provider, Constants constants,
             Wallet wallet)
         {

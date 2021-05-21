@@ -90,6 +90,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 WriteIndented = false,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
+
             var json = JsonSerializer.Serialize(transactionRequestDto, serializeOptions);
             var message = Encoding.UTF8.GetBytes(json);
 
