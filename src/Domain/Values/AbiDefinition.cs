@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
@@ -17,22 +21,50 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             if (data == null)
                 throw new Exception("Endpoint is not define in ABI");
 
-            var inputs = data.Inputs.Select(i =>
-                new FieldDefinition(i.Name, "", TypeValue.FromRustType(i.Type) ?? GetFromAbiTypes(i.Type)));
-            var outputs = data.Outputs.Select(i =>
-                new FieldDefinition("", "", TypeValue.FromRustType(i.Type) ?? GetFromAbiTypes(i.Type)));
+            var inputs = data.Inputs.Select(i => new FieldDefinition(i.Name, "", GetTypeValue(i.Type))).ToList();
+            var outputs = data.Outputs.Select(i => new FieldDefinition("", "", GetTypeValue(i.Type))).ToList();
             return new EndpointDefinition(endpoint, inputs.ToArray(), outputs.ToArray());
         }
 
-        private TypeValue GetFromAbiTypes(string name)
+        private TypeValue GetTypeValue(string rustType)
         {
-            name = name.Replace("optional", "").Replace("<", "").Replace(">", "");
-            var type = Types[name];
+            if (rustType.StartsWith("optional"))
+            {
+                var innerType = rustType.Replace("optional", "").Replace("<", "").Replace(">", "");
+                var innerTypeValue = GetTypeValue(innerType);
+                return TypeValue.OptionValue(innerTypeValue);
+            }
 
-            return TypeValue.StructValue(type.Type,
-                type.Fields.ToList().Select(c =>
-                        new FieldDefinition(c.Name, "", TypeValue.FromRustType(c.Type) ?? GetFromAbiTypes(c.Type)))
-                    .ToArray());
+            var typeFromBaseRustType = TypeValue.FromRustType(rustType);
+            if (typeFromBaseRustType != null)
+                return typeFromBaseRustType;
+
+            if (Types.Keys.Contains(rustType))
+            {
+                var typeFromStruct = Types[rustType];
+                return TypeValue.StructValue(
+                    typeFromStruct.Type,
+                    typeFromStruct.Fields
+                        .ToList()
+                        .Select(c => new FieldDefinition(c.Name, "", GetTypeValue(c.Type)))
+                        .ToArray()
+                );
+            }
+
+            return null;
+        }
+
+        public static AbiDefinition FromJson(string json)
+        {
+            var jsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
+            return JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
+        }
+
+        public static async Task<AbiDefinition> FromJsonFilePath(string jsonFilePath)
+        {
+            var fileBytes = await File.ReadAllBytesAsync(jsonFilePath);
+            var json = Encoding.UTF8.GetString(fileBytes);
+            return FromJson(json);
         }
     }
 

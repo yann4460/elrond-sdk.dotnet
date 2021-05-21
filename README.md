@@ -13,28 +13,178 @@ This is the .Net integration library for Elrond, simplifying the access and smar
 # Quick documentations
 ## Synchronizing network parameters
 ```csharp
-        private static async Task SynchronizingNetworkParameter()
-        {
-            var client = new HttpClient { BaseAddress = new Uri("https://testnet-gateway.elrond.com") };
-            var provider = new ElrondProvider(client);
-            var constants = await Constants.GetFromNetwork(provider);
-            System.Console.WriteLine("MinGasPrice {0}", constants.MinGasPrice);
-            System.Console.WriteLine("ChainId {0}", constants.ChainId);
-            System.Console.WriteLine("GasPerDataByte {0}", constants.GasPerDataByte);
-        }
+async Task SynchronizingNetworkParameter()
+{
+    var client = new HttpClient { BaseAddress = new Uri("https://testnet-gateway.elrond.com") };
+    var provider = new ElrondProvider(client);
+    var constants = await Constants.GetFromNetwork(provider);
+    System.Console.WriteLine("MinGasPrice {0}", constants.MinGasPrice);
+    System.Console.WriteLine("ChainId {0}", constants.ChainId);
+    System.Console.WriteLine("GasPerDataByte {0}", constants.GasPerDataByte);
+}
 ```
 ## Synchronizing an account object
 ```csharp
-        private static async Task SynchronizingAnAccountObject(IElrondProvider provider)
-        {
-            var address = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-            var account = new Account(address);
-            await account.Sync(provider);
+async Task SynchronizingAnAccountObject(IElrondProvider provider)
+{
+    var address = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+    var account = new Account(address);
+    await account.Sync(provider);
 
-            System.Console.WriteLine("Balance {0}", account.Balance);
-            System.Console.WriteLine("Nonce {0}", account.Nonce);
-        }
+    System.Console.WriteLine("Balance {0}", account.Balance);
+    System.Console.WriteLine("Nonce {0}", account.Nonce);
+}
 ```
+## Creating value-transfer transactions
+```csharp
+async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants, Wallet wallet)
+{
+    var sender = wallet.GetAccount();
+    var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+    await sender.Sync(provider);
+
+    var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("2.15"));
+    
+    transaction.SetData("Hello world !");
+    transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
+
+    var transactionResult = await transaction.Send(wallet, provider);
+    System.Console.WriteLine("TxHash {0}", transactionResult.TxHash);
+}
+```
+### Smart Contract transactions
+Deploy a smart contract using a wasm file
+#### Deploy a smart contract
+```csharp
+ async Task<AddressValue> DeploySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
+    Account account, string filePath)
+{
+    await account.Sync(provider);
+    
+    var wasmFile = await Code.FromFilePath(filePath);
+    var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account, wasmFile,
+        new CodeMetadata(false, true, false),
+        new IBinaryType[]
+        {
+            NumericValue.BigIntValue(5)
+        });
+
+    deployRequest.SetGasLimit(new GasLimit(60000000));
+
+    // Get the deployed smart contract address based on account address and transaction nonce
+    var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce);
+    var deployTransaction = await deployRequest.Send(wallet, provider);
+
+    await deployTransaction.WaitForExecution(provider);
+    deployTransaction.EnsureTransactionSuccess();
+
+    return smartContractAddress;
+}
+```
+#### Querying Smart Contracts
+##### Create a query smart contract transaction. 
+This allows one to create a smart contract transaction call and get the result.
+```csharp
+Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wallet, AddressValue scAddress)
+{
+    var account = wallet.GetAccount();
+    await account.Sync(provider);
+
+    var queryTransaction = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
+        scAddress,
+        "getSum",
+        Balance.Zero());
+
+    queryTransaction.SetGasLimit(await GasLimit.ForTransaction(queryTransaction, provider));
+    
+    var transaction = await queryTransaction.Send(wallet, provider);
+    await transaction.WaitForExecution(provider);
+
+    // Set the type value according to the ABI description (BigInt)
+    var result = transaction.GetSmartContractResult(new[] {TypeValue.BigIntTypeValue});
+    var numericResult = result[0].ValueOf<NumericValue>().Number;
+}
+```
+##### Query a smart contract with ABI Definition.
+This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
+```csharp
+async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
+{
+    var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
+    var getFullAuctionData = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
+        new IBinaryType[]
+        {
+            TokenIdentifierValue.From("TSTKR-209ea0"),
+            NumericValue.U64Value(3),
+        },
+        abiDefinition, provider);
+
+    // Need to use the value define in the ABI file (Here it's a StructValue)
+    var optFullAuctionData = getFullAuctionData[0].ValueOf<OptionValue>();
+    if (optFullAuctionData.IsSet())
+    {
+        var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
+    }
+
+    var getDeadline = await SmartContract.QuerySmartContract(scAddress, "getDeadline",
+        new IBinaryType[]
+        {
+            TokenIdentifierValue.From("TSTKR-209ea0"),
+            NumericValue.U64Value(3),
+        },
+        abiDefinition, provider);
+
+    // Need to use the value define in the ABI file (Here it's a StructValue)
+    var optDeadline = getDeadline[0].ValueOf<OptionValue>();
+    if (optDeadline.IsSet())
+    {
+        var deadline = optDeadline.Value.ValueOf<NumericValue>().Number;
+    }
+}
+```
+##### Query a smart contract without ABI Definition
+This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
+You need to manually define the TypeValue definition that will be use by the codec.
+```csharp
+async Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddress)
+{
+    var esdtToken = TypeValue.StructValue("EsdtToken", new[]
+    {
+        new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+        new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+    });
+
+    var auction = TypeValue.StructValue("Auction", new[]
+    {
+        new FieldDefinition("payment_token", "", esdtToken),
+        new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
+        new FieldDefinition("max_bid", "", TypeValue.BigUintTypeValue),
+        new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+        new FieldDefinition("original_owner", "", TypeValue.AddressValue),
+        new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
+        new FieldDefinition("current_winner", "", TypeValue.AddressValue),
+        new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
+        new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
+    });
+    var option = TypeValue.OptionValue(auction);
+    
+    var results = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
+        new IBinaryType[]
+        {
+            TokenIdentifierValue.From("TSTKR-209ea0"),
+            NumericValue.U64Value(3),
+        },
+        new []{ option }, provider);
+
+    var optFullAuctionData = results[0].ValueOf<OptionValue>();
+    if (optFullAuctionData.IsSet())
+    {
+        var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
+    }
+}
+```
+
+
 # Change Log
 All notable changes will be documented in this file.
 

@@ -20,7 +20,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             if (data[0] == 0x00)
             {
-                return (OptionValue.NewMissing(type), 1);
+                return (OptionValue.NewMissing(type.InnerType), 1);
             }
 
             if (data[0] != 0x01)
@@ -28,24 +28,19 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 throw new BinaryCodecException("invalid buffer for optional value");
             }
 
-            var (value, bytesLength) = _binaryCodec.DecodeNested(data.Slice(1), type);
-            return (OptionValue.NewProvided(type, value), bytesLength + 1);
+            var (value, bytesLength) = _binaryCodec.DecodeNested(data.Slice(1), type.InnerType);
+            return (OptionValue.NewProvided(type.InnerType, value), bytesLength + 1);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
         {
             if (data.Length == 0)
             {
-                return OptionValue.NewMissing(type);
+                return OptionValue.NewMissing(type.InnerType);
             }
 
-            if (data[0] != 0x01)
-            {
-                throw new BinaryCodecException("invalid buffer for optional value");
-            }
-
-            var (value, _) = _binaryCodec.DecodeNested(data.Slice(1), type);
-            return OptionValue.NewProvided(type, value);
+            var decoded = _binaryCodec.DecodeTopLevel(data, type.InnerType);
+            return OptionValue.NewProvided(type.InnerType, decoded);
         }
 
         public byte[] EncodeNested(IBinaryType value)
@@ -54,7 +49,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             if (optionValue.IsSet())
             {
                 var encoded = _binaryCodec.EncodeNested(optionValue.Value);
-                var payload = new List<byte> { 0x01 };
+                var payload = new List<byte> {0x01};
                 payload.AddRange(encoded);
                 return payload.ToArray();
             }

@@ -26,7 +26,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new Transaction(createTransactionResponse.Data.TxHash);
         }
 
-        public List<IBinaryType> GetSmartContractResult(TypeValue[] typeValues)
+        public List<IBinaryType> GetSmartContractResult(TypeValue[] typeValues, int smartContractIndex = 0)
         {
             if (_smartContractResult == null || _smartContractResult.Length == 0)
                 throw new Exception("Empty smart contract results");
@@ -34,9 +34,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             var binaryCodec = new BinaryCodec();
 
             var decodedResponses = new List<IBinaryType>();
-            var firstScResult = _smartContractResult[0].Data;
+            var scResult = _smartContractResult[smartContractIndex].Data;
 
-            var resultFieldsHex = firstScResult.Split('@', StringSplitOptions.RemoveEmptyEntries).Skip(1).ToArray();
+            var resultFieldsHex = scResult.Split('@', StringSplitOptions.RemoveEmptyEntries).Skip(1).ToArray();
             for (var i = 0; i < typeValues.Length; i++)
             {
                 var outputType = typeValues[i];
@@ -122,6 +122,24 @@ namespace Elrond.Dotnet.Sdk.Domain
             var transaction = detail.Data.Transaction;
             _smartContractResult = transaction.SmartContractResults;
             Status = transaction.Status;
+        }
+
+        public void EnsureTransactionSuccess()
+        {
+            if (!IsSuccessful())
+                throw new Exception($"Transaction status is {Status}");
+        }
+
+        public async Task WaitForExecution(IElrondProvider provider)
+        {
+            const int maxIteration = 30;
+            var currentIteration = 0;
+            do
+            {
+                await Task.Delay(1000);
+                await Sync(provider);
+                currentIteration++;
+            } while (IsPending() && currentIteration < maxIteration);
         }
     }
 }

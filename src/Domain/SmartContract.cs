@@ -105,11 +105,24 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="abiDefinition"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        public static async Task<List<IBinaryType>> QuerySmartContract(
+        public static Task<List<IBinaryType>> QuerySmartContract(
             AddressValue smartContractAddress,
             string endpoint,
             IBinaryType[] args,
             AbiDefinition abiDefinition,
+            IElrondProvider provider)
+        {
+            var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
+
+            var outputs = endpointDefinition.Output.Select(o => o.Type).ToArray();
+            return QuerySmartContract(smartContractAddress, endpoint, args, outputs, provider);
+        }
+
+        public static async Task<List<IBinaryType>> QuerySmartContract(
+            AddressValue smartContractAddress,
+            string endpoint,
+            IBinaryType[] args,
+            TypeValue[] outputTypeValue,
             IElrondProvider provider)
         {
             var binaryCodec = new BinaryCodec();
@@ -124,16 +137,15 @@ namespace Elrond.Dotnet.Sdk.Domain
                 ScAddress = smartContractAddress.Bech32
             };
 
-            var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
             var response = await provider.QueryVm(query);
             var data = response.Data.Data;
             var decodedResponses = new List<IBinaryType>();
-            for (var i = 0; i < endpointDefinition.Output.Length; i++)
+            for (var i = 0; i < outputTypeValue.Length; i++)
             {
-                var output = endpointDefinition.Output[i];
+                var output = outputTypeValue[i];
                 var responseBytes = Convert.FromBase64String(data.ReturnData[i]);
 
-                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, output.Type);
+                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, output);
                 decodedResponses.Add(decodedResponse);
             }
 

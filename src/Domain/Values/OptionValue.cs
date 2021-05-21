@@ -13,14 +13,14 @@
             Value = value;
         }
 
-        public static OptionValue NewMissing(TypeValue type)
+        public static OptionValue NewMissing(TypeValue innerType)
         {
-            return new OptionValue(TypeValue.OptionValue(type), type);
+            return new OptionValue(TypeValue.OptionValue(innerType), innerType);
         }
 
-        public static OptionValue NewProvided(TypeValue type, IBinaryType value)
+        public static OptionValue NewProvided(TypeValue innerType, IBinaryType value)
         {
-            return new OptionValue(TypeValue.OptionValue(type), type, value);
+            return new OptionValue(TypeValue.OptionValue(innerType), innerType, value);
         }
 
         public bool IsSet()
