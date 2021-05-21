@@ -26,6 +26,29 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new Transaction(createTransactionResponse.Data.TxHash);
         }
 
+        public List<IBinaryType> GetSmartContractResult(TypeValue[] typeValues)
+        {
+            if (_smartContractResult == null || _smartContractResult.Length == 0)
+                throw new Exception("Empty smart contract results");
+
+            var binaryCodec = new BinaryCodec();
+
+            var decodedResponses = new List<IBinaryType>();
+            var firstScResult = _smartContractResult[0].Data;
+
+            var resultFieldsHex = firstScResult.Split('@', StringSplitOptions.RemoveEmptyEntries).Skip(1).ToArray();
+            for (var i = 0; i < typeValues.Length; i++)
+            {
+                var outputType = typeValues[i];
+                var responseBytes = Convert.FromHexString(resultFieldsHex[i]);
+                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, outputType);
+                decodedResponses.Add(decodedResponse);
+            }
+
+            return decodedResponses;
+        }
+
+
         public List<IBinaryType> GetSmartContractResult(string endpoint, AbiDefinition abiDefinition)
         {
             if (_smartContractResult == null || _smartContractResult.Length == 0)
