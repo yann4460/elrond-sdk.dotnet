@@ -44,6 +44,12 @@ namespace Elrond.SDK.Console
 
         private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Wallet wallet)
         {
+            var fileBytes = await File.ReadAllBytesAsync("SmartContracts/adder/adder.abi.json");
+            var json = Encoding.UTF8.GetString(fileBytes);
+            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var abi = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
+
+
             var constants = await Constants.GetFromNetwork(provider);
             var kf = wallet.BuildKeyFile(string.Empty);
             var account = new Account(AddressValue.FromBech32(kf.Bech32));
@@ -72,7 +78,19 @@ namespace Elrond.SDK.Console
             var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
             var sumHex = Convert.ToHexString(sumBytes);
 
-            Debug.Assert(sumHex.Equals("11"));
+
+            //4. Ex query smart contract 
+
+            var getSum = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
+                smartContractAddress, "getSum", Balance.Zero(), new IBinaryType[0]);
+
+            getSum.SetGasLimit(new GasLimit(60000000));
+            var getSumTransaction = await getSum.Send(wallet, provider);
+            await WaitForTransactionExecution("getSum", getSumTransaction, provider);
+
+            var getSumResult = getSumTransaction.GetSmartContractResult("getSum", abi);
+            var sum = getSumResult[0].ValueOf<NumericValue>().Number;
+            Debug.Assert(sum.ToString().Equals("17"));
         }
 
         private static async Task<AddressValue> DeploySmartContract(

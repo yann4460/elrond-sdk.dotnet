@@ -35,11 +35,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             return transaction;
         }
 
-        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(Constants constants,
-            Account account, AddressValue smartContractAddress)
+        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(Constants constants, Account account, AddressValue smartContractAddress)
         {
-            var transaction = TransactionRequest.CreateTransaction(account, constants);
-            return transaction;
+            throw new NotImplementedException();
         }
 
         public static TransactionRequest CreateCallSmartContractTransactionRequest(Constants constants, Account account,

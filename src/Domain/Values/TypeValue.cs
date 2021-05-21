@@ -75,7 +75,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             public const string i16 = "i16";
             public const string i32 = "i32";
             public const string i64 = "i64";
-            public const string Bigint = "Bigint";
+            public const string Bigint = "BigInt";
 
             public const string Bool = "bool";
             public const string Bytes = "bytes";
