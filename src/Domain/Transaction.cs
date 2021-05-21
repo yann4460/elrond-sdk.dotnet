@@ -1,4 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk.Domain.Codec;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
@@ -20,6 +25,28 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static Transaction From(CreateTransactionResponseDto createTransactionResponse)
         {
             return new Transaction(createTransactionResponse.Data.TxHash);
+        }
+
+        public List<IBinaryType> GetSmartContractResult(string endpoint, AbiDefinition abiDefinition)
+        {
+            if (_smartContractResult == null || _smartContractResult.Length == 0)
+                throw new Exception("Empty smart contract results");
+
+            var binaryCodec = new BinaryCodec();
+            var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
+
+            var decodedResponses = new List<IBinaryType>();
+            var firstScResult = _smartContractResult[0].Data;
+            var resultFieldsHex = firstScResult.Split('@', StringSplitOptions.RemoveEmptyEntries).Skip(1).ToArray();
+            for (var i = 0; i < endpointDefinition.Output.Length; i++)
+            {
+                var output = endpointDefinition.Output[i];
+                var responseBytes = Convert.FromHexString(resultFieldsHex[i]);
+                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, output.Type);
+                decodedResponses.Add(decodedResponse);
+            }
+
+            return decodedResponses;
         }
 
         /// <summary>
