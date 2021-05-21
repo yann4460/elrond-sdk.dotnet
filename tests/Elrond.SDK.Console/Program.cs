@@ -47,7 +47,7 @@ namespace Elrond.SDK.Console
             var fileBytes = await File.ReadAllBytesAsync("SmartContracts/adder/adder.abi.json");
             var json = Encoding.UTF8.GetString(fileBytes);
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            var abiDefinition = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
+            var abi = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
 
 
             var constants = await Constants.GetFromNetwork(provider);
@@ -88,7 +88,7 @@ namespace Elrond.SDK.Console
             var getSumTransaction = await getSum.Send(wallet, provider);
             await WaitForTransactionExecution("getSum", getSumTransaction, provider);
 
-            var getSumResult = getSumTransaction.GetSmartContractResult("getSum", abiDefinition);
+            var getSumResult = getSumTransaction.GetSmartContractResult("getSum", abi);
             var sum = getSumResult[0].ValueOf<NumericValue>().Number;
             Debug.Assert(sum.ToString().Equals("17"));
         }

@@ -14,7 +14,6 @@ namespace Elrond.Dotnet.Sdk.Domain
         public string Status { get; private set; }
         public string TxHash { get; }
 
-        //TODO : Check smart contract result to compute status
         private SmartContractResultDto[] _smartContractResult;
 
         public Transaction(string hash)
