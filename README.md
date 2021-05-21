@@ -9,7 +9,7 @@ Elrond SDK for .NET Core.
 All notable changes will be documented in this file.
 
 ## [1.0.7] - 21.05.2021
--   Add  GetSmartContractResult méthod. 
+-   Add  GetSmartContractResult method. 
     - `var getSumResult = getSumTransaction.GetSmartContractResult("getSum", abi);`
 
 ## [1.0.6] - 21.05.2021
