@@ -19,7 +19,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void EncodeTopLevel_NewMissing()
         {
             // Arrange
-            var optionValue = OptionValue.NewMissing(TypeValue.I32TypeValue);
+            var optionValue = OptionValue.NewMissing();
 
             // Act
             var actual = _sut.EncodeTopLevel(optionValue);
@@ -33,7 +33,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void EncodeNested_NewMissing()
         {
             // Arrange
-            var optionValue = OptionValue.NewMissing(TypeValue.I32TypeValue);
+            var optionValue = OptionValue.NewMissing();
 
             // Act
             var actual = _sut.EncodeNested(optionValue);

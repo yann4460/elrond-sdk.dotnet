@@ -18,7 +18,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public AddressValue Sender { get; }
         public long Nonce { get; }
         public long GasPrice { get; }
-        public Balance Value { get; private set; }
+        public BalanceValue Value { get; private set; }
         public AddressValue Receiver { get; private set; }
         public GasLimit GasLimit { get; private set; }
         public string Data { get; private set; }
@@ -28,7 +28,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             _account = account;
             Sender = account.Address;
             Receiver = AddressValue.Zero();
-            Value = new Balance(0);
+            Value = new BalanceValue(0);
             Nonce = account.Nonce;
             GasLimit = new GasLimit(constants.MinGasLimit);
             GasPrice = constants.MinGasPrice;
@@ -41,7 +41,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         }
 
         public static TransactionRequest CreateTransaction(Account account, Constants constants, AddressValue receiver,
-            Balance value)
+            BalanceValue value)
         {
             return new TransactionRequest(account, constants)
             {

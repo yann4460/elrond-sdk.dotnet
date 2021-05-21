@@ -2,21 +2,23 @@
 using System.Numerics;
 using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
-namespace Elrond.Dotnet.Sdk.Domain
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
-    public class Balance
+    public class BalanceValue : IBinaryType
     {
+        public TypeValue Type => TypeValue.BigUintTypeValue;
+
         const long OneEgld = 1000000000000000000;
         private const int Denomination = 18;
 
         public BigInteger Value { get; }
 
-        public Balance(long value)
+        public BalanceValue(long value)
         {
             Value = new BigInteger(value);
         }
 
-        public Balance(string value)
+        public BalanceValue(string value)
         {
             Value = BigInteger.Parse(value);
             if (Value.Sign == -1)
@@ -51,22 +53,23 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Balance EGLD(string value)
+        public static BalanceValue EGLD(string value)
         {
             var decimalValue = decimal.Parse(value, CultureInfo.InvariantCulture);
             var p = decimalValue * OneEgld;
             var bigGold = new BigInteger(p);
 
-            return new Balance(bigGold.ToString());
+            return new BalanceValue(bigGold.ToString());
         }
-        public static Balance Zero()
+        public static BalanceValue Zero()
         {
-            return new Balance(0);
+            return new BalanceValue(0);
         }
 
         public override string ToString()
         {
             return Value.ToString();
         }
+
     }
 }
