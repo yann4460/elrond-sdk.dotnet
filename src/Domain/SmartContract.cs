@@ -27,7 +27,8 @@ namespace Elrond.Dotnet.Sdk.Domain
             var data = $"{code.Value}@{ArwenVirtualMachine}@{codeMetadata.Value}";
             if (args != null)
             {
-                data = args?.Aggregate(data, (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
+                data = args?.Aggregate(data,
+                    (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
             }
 
             transaction.SetData(data);
@@ -35,12 +36,17 @@ namespace Elrond.Dotnet.Sdk.Domain
             return transaction;
         }
 
-        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(Constants constants, Account account, AddressValue smartContractAddress)
+        public static TransactionRequest CreateUpdateSmartContractTransactionRequest(
+            Constants constants,
+            Account account,
+            AddressValue smartContractAddress)
         {
             throw new NotImplementedException();
         }
 
-        public static TransactionRequest CreateCallSmartContractTransactionRequest(Constants constants, Account account,
+        public static TransactionRequest CreateCallSmartContractTransactionRequest(
+            Constants constants,
+            Account account,
             AddressValue smartContractAddress,
             string functionName,
             Balance value,
@@ -72,7 +78,6 @@ namespace Elrond.Dotnet.Sdk.Domain
             var ownerPubKey = Convert.FromHexString(ownerAddress.Hex);
             var initialPadding = new byte[8];
             var shardSelector = ownerPubKey.Skip(30).Take(2).ToArray();
-
 
             var bigNonceBuffer = BitConverter.GetBytes(nonce);
 
@@ -111,6 +116,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             var arguments = args
                 .Select(typeValue => Convert.ToHexString(binaryCodec.EncodeTopLevel(typeValue)))
                 .ToArray();
+
             var query = new QueryVmRequestDto()
             {
                 FuncName = endpoint,

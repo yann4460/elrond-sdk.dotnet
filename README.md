@@ -21,7 +21,7 @@ All notable changes will be documented in this file.
 ## [1.0.6] - 21.05.2021
 
 -   [Remove Argument class. Prefer the use of IBinaryType](https://github.com/yann4460/elrond-sdk.dotnet/pull/7)
--   Ex : `Argument.CreateArgumentFromInt64(12)` is ow obsolete. Use : `NumericValue.BigIntValue(12)` instead.
+-   Ex : `Argument.CreateArgumentFromInt64(12)` is now obsolete. Use : `NumericValue.BigIntValue(12)` instead.
     - Build a balance argument : `NumericValue.BigUintValue(Balance.EGLD("10").Value)`
     - Build from a byte array : `BytesValue.FromBuffer(new byte[] {0x00});`
 

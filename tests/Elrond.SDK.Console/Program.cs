@@ -22,7 +22,52 @@ namespace Elrond.SDK.Console
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
             var wallet = new Wallet(testPrivateKey);
-            await DeployAdderSmartContractAndQuery(provider, wallet);
+            var constants = await Constants.GetFromNetwork(provider);
+
+            await DeployAdderSmartContractAndQuery(provider, constants, wallet);
+            //await QuerySmartContractWithoutAbi(provider, wallet);
+            //await QuerySmartContractWithAbi(provider);
+        }
+
+        private static async Task QuerySmartContractWithoutAbi(IElrondProvider provider, Constants constants,
+            Wallet wallet)
+        {
+            var account = wallet.GetAccount();
+            await account.Sync(provider);
+            var scAddress = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+
+            var queryTransaction = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
+                scAddress, "getFullAuctionData",
+                Balance.Zero(),
+                new IBinaryType[]
+                {
+                    TokenIdentifierValue.From("TSTKR-209ea0"),
+                    NumericValue.U64Value(3),
+                });
+            queryTransaction.SetGasLimit(new GasLimit(60000000));
+            var transaction = await queryTransaction.Send(wallet, provider);
+            await WaitForTransactionExecution("getFullAuctionData", transaction, provider);
+
+            // Arrange
+            var esdtToken = TypeValue.StructValue("EsdtToken", new[]
+            {
+                new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+                new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+            });
+
+            var auction = TypeValue.StructValue("Auction", new[]
+            {
+                new FieldDefinition("payment_token", "", esdtToken),
+                new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("max_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+                new FieldDefinition("original_owner", "", TypeValue.AddressValue),
+                new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("current_winner", "", TypeValue.AddressValue),
+                new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
+                new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
+            });
+            var scResult = transaction.GetSmartContractResult(new[] {auction});
         }
 
         private static async Task QuerySmartContractWithAbi(IElrondProvider provider)
@@ -42,17 +87,16 @@ namespace Elrond.SDK.Console
                 abiDefinition, provider);
         }
 
-        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Wallet wallet)
+        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider,
+            Constants constants,
+            Wallet wallet)
         {
             var fileBytes = await File.ReadAllBytesAsync("SmartContracts/adder/adder.abi.json");
             var json = Encoding.UTF8.GetString(fileBytes);
-            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var jsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
             var abi = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
 
-
-            var constants = await Constants.GetFromNetwork(provider);
-            var kf = wallet.BuildKeyFile(string.Empty);
-            var account = new Account(AddressValue.FromBech32(kf.Bech32));
+            var account = wallet.GetAccount();
 
             var smartContractAddress =
                 await DeploySmartContract(provider, constants, wallet, account, "SmartContracts/adder/adder.wasm");

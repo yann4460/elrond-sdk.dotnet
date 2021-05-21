@@ -5,6 +5,7 @@ using System.Text;
 using dotnetstandard_bip32;
 using dotnetstandard_bip39;
 using Elrond.Dotnet.Sdk.Cryptography;
+using Elrond.Dotnet.Sdk.Domain.Values;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
@@ -21,6 +22,11 @@ namespace Elrond.Dotnet.Sdk.Domain
         public Wallet(string privateKeyHex)
             : this(Convert.FromHexString(privateKeyHex))
         {
+        }
+
+        public Account GetAccount()
+        {
+            return new Account(AddressValue.FromBytes(_publicKey));
         }
 
         public Wallet(byte[] privateKey)
