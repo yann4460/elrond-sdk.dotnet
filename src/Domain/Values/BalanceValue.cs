@@ -4,24 +4,20 @@ using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
-    public class BalanceValue : IBinaryType
+    public class BalanceValue : NumericValue
     {
-        public TypeValue Type => TypeValue.BigUintTypeValue;
-
         const long OneEgld = 1000000000000000000;
         private const int Denomination = 18;
 
-        public BigInteger Value { get; }
-
         public BalanceValue(long value)
+            : base(TypeValue.BigUintTypeValue, new BigInteger(value))
         {
-            Value = new BigInteger(value);
         }
 
         public BalanceValue(string value)
+            : base(TypeValue.BigUintTypeValue, BigInteger.Parse(value))
         {
-            Value = BigInteger.Parse(value);
-            if (Value.Sign == -1)
+            if (Number.Sign == -1)
                 throw new InvalidBalanceException(value);
         }
 
@@ -37,7 +33,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public string ToDenominated()
         {
-            var padded = Value.ToString().PadLeft(Denomination, '0');
+            var padded = Number.ToString().PadLeft(Denomination, '0');
 
             var start = (padded.Length - Denomination);
             start = start < 0 ? 0 : start;
@@ -61,6 +57,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
             return new BalanceValue(bigGold.ToString());
         }
+
         public static BalanceValue Zero()
         {
             return new BalanceValue(0);
@@ -68,8 +65,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public override string ToString()
         {
-            return Value.ToString();
+            return Number.ToString();
         }
-
     }
 }
