@@ -4,14 +4,14 @@ Elronford SDK for .NET Core.
 # What is Elrond SDK for .NET Core  ?
 This is the .Net integration library for Elrond, simplifying the access and smart contract interaction with Elrond blockchain. It is developed targeting net5.0 only for now.
 
-### Under development, stay tuned!
-
 # Features
 * Transaction construction, signing, broadcasting and querying.
 * Smart Contracts deployment and interaction (execution and querying).
+* Wallet creation, derive wallet from mnemonic
+* Query values stored within Smart Contracts.
 
 # Quick documentations
-## Synchronizing network parameters
+## Synchronizing detwork parameters
 ```csharp
 async Task SynchronizingNetworkParameter()
 {
@@ -22,7 +22,7 @@ async Task SynchronizingNetworkParameter()
     System.Console.WriteLine("ChainId {0}", constants.ChainId);
     System.Console.WriteLine("GasPerDataByte {0}", constants.GasPerDataByte);
 }
-```
+```, 
 ## Synchronizing an account object
 ```csharp
 async Task SynchronizingAnAccountObject(IElrondProvider provider)
@@ -52,9 +52,10 @@ async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants
     System.Console.WriteLine("TxHash {0}", transactionResult.TxHash);
 }
 ```
-### Smart Contract transactions
+## Smart Contract transactions
 Deploy a smart contract using a wasm file
 #### Deploy a smart contract
+Deploy a smart contract from a WASM file.
 ```csharp
  async Task<AddressValue> DeploySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
     Account account, string filePath)
@@ -81,8 +82,7 @@ Deploy a smart contract using a wasm file
     return smartContractAddress;
 }
 ```
-#### Querying Smart Contracts
-##### Create a query smart contract transaction. 
+#### Create a query smart contract transaction. 
 This allows one to create a smart contract transaction call and get the result.
 ```csharp
 Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wallet, AddressValue scAddress)
@@ -105,13 +105,13 @@ Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wa
     var numericResult = result[0].ValueOf<NumericValue>().Number;
 }
 ```
-##### Query a smart contract with ABI Definition.
+#### Query a smart contract with ABI Definition.
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 ```csharp
 async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
 {
     var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
-    var getFullAuctionData = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
+    var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getFullAuctionData",
         new IBinaryType[]
         {
             TokenIdentifierValue.From("TSTKR-209ea0"),
@@ -126,7 +126,7 @@ async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAd
         var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
     }
 
-    var getDeadline = await SmartContract.QuerySmartContract(scAddress, "getDeadline",
+    var getDeadline = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getDeadline",
         new IBinaryType[]
         {
             TokenIdentifierValue.From("TSTKR-209ea0"),
@@ -142,7 +142,7 @@ async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAd
     }
 }
 ```
-##### Query a smart contract without ABI Definition
+#### Query a smart contract without ABI Definition
 This allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
 You need to manually define the TypeValue definition that will be use by the codec.
 ```csharp
@@ -184,9 +184,11 @@ async Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue s
 }
 ```
 
-
 # Change Log
 All notable changes will be documented in this file.
+
+## [1.0.9] - 21.05.2021
+-   [TBD](https://github.com/yann4460/elrond-sdk.dotnet/pull/10) 
 
 ## [1.0.8] - 21.05.2021
 -   [Add smart contract query option.](https://github.com/yann4460/elrond-sdk.dotnet/pull/9) 

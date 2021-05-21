@@ -105,7 +105,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="abiDefinition"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        public static Task<List<IBinaryType>> QuerySmartContract(
+        public static Task<List<IBinaryType>> QuerySmartContractWithAbiDefinition(
             AddressValue smartContractAddress,
             string endpoint,
             IBinaryType[] args,
@@ -118,6 +118,15 @@ namespace Elrond.Dotnet.Sdk.Domain
             return QuerySmartContract(smartContractAddress, endpoint, args, outputs, provider);
         }
 
+        /// <summary>
+        /// QuerySmartContract
+        /// </summary>
+        /// <param name="smartContractAddress"></param>
+        /// <param name="endpoint"></param>
+        /// <param name="args"></param>
+        /// <param name="outputTypeValue"></param>
+        /// <param name="provider"></param>
+        /// <returns></returns>
         public static async Task<List<IBinaryType>> QuerySmartContract(
             AddressValue smartContractAddress,
             string endpoint,

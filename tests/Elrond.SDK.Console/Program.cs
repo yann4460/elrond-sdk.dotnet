@@ -24,14 +24,17 @@ namespace Elrond.SDK.Console
             var wallet = new Wallet(testPrivateKey);
             var constants = await Constants.GetFromNetwork(provider);
 
+            // Remove comment to execute the action of your choice
+
             //await CreatingValueTransferTransactions(provider, constants, wallet);
             //await DeployAdderSmartContractAndQuery(provider, constants, wallet);
             //await QuerySmartContractWithoutAbi(provider, wallet);
             //await QuerySmartContractWithAbi(provider);
-            await QuerySmartContractWithoutAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
-            await QuerySmartContractWithAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
-            var scAddress = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-            await QuerySmartContract(provider, constants, wallet, scAddress);
+            //await QuerySmartContractWithoutAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
+            //await QuerySmartContractWithAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
+         
+            //var scAddress = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
+            //await QuerySmartContract(provider, constants, wallet, scAddress);
         }
 
         private static async Task SynchronizingNetworkParameter()
@@ -129,7 +132,7 @@ namespace Elrond.SDK.Console
         private static async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
         {
             var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
-            var getFullAuctionData = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
+            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getFullAuctionData",
                 new IBinaryType[]
                 {
                     TokenIdentifierValue.From("TSTKR-209ea0"),
@@ -144,7 +147,7 @@ namespace Elrond.SDK.Console
                 var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
             }
 
-            var getDeadline = await SmartContract.QuerySmartContract(scAddress, "getDeadline",
+            var getDeadline = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getDeadline",
                 new IBinaryType[]
                 {
                     TokenIdentifierValue.From("TSTKR-209ea0"),
