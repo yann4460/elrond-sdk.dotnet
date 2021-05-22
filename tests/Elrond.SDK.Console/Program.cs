@@ -24,17 +24,20 @@ namespace Elrond.SDK.Console
             var wallet = new Wallet(testPrivateKey);
             var constants = await Constants.GetFromNetwork(provider);
 
-            // Remove comment to execute the action of your choice
+            await SynchronizingNetworkParameter();
+            await SynchronizingAnAccountObject(provider);
 
-            //await CreatingValueTransferTransactions(provider, constants, wallet);
-            //await DeployAdderSmartContractAndQuery(provider, constants, wallet);
-            //await QuerySmartContractWithAbi(provider);
-            await QuerySmartContractWithoutAbi(provider,
-                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
-            //await QuerySmartContractWithAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
+            await CreatingValueTransferTransactions(provider, constants, wallet);
 
-            //var scAddress = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-            //await QuerySmartContract(provider, constants, wallet, scAddress);
+            var auctionScAddress =
+                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+            await QueryAuctionSmartContractWithoutAbi(provider, auctionScAddress);
+            await QueryAuctionSmartContractWithAbi(provider, auctionScAddress);
+
+            var adderScAddress =
+                await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
+            await QueryAdderSmartContract(provider, constants, wallet, adderScAddress);
+            await CallAdderSmartContract(provider, constants, wallet, adderScAddress);
         }
 
         private static async Task SynchronizingNetworkParameter()
@@ -73,7 +76,7 @@ namespace Elrond.SDK.Console
             System.Console.WriteLine("TxHash {0}", transactionResult.TxHash);
         }
 
-        private static async Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
+        private static async Task QueryAdderSmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
             AddressValue scAddress)
         {
             var account = wallet.GetAccount();
@@ -88,12 +91,14 @@ namespace Elrond.SDK.Console
 
             var transaction = await queryTransaction.Send(wallet, provider);
             await transaction.WaitForExecution(provider);
+            transaction.EnsureTransactionSuccess();
+
             // Set the type value according to the ABI description (BigInt)
             var result = transaction.GetSmartContractResult(new[] {TypeValue.BigIntTypeValue});
             var numericResult = result[0].ValueOf<NumericValue>().Number;
         }
 
-        private static async Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddress)
+        private static async Task QueryAuctionSmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddress)
         {
             var esdtToken = TypeValue.StructValue("EsdtToken", new[]
             {
@@ -113,16 +118,13 @@ namespace Elrond.SDK.Console
                 new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
                 new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
             });
-
             var option = TypeValue.OptionValue(auction);
 
-            var results = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
-                new IBinaryType[]
-                {
-                    TokenIdentifierValue.From("TSTKR-209ea0"),
-                    NumericValue.U64Value(3),
-                },
-                outputTypeValue: new[] {option}, provider);
+            var results = await SmartContract.QuerySmartContract(
+                provider,
+                scAddress,
+                new[] {option},
+                "getFullAuctionData", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
             var fullAuctionData = results[0].ToObject<FullAuctionData>();
             System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.payment_token.token_type);
@@ -130,17 +132,14 @@ namespace Elrond.SDK.Console
             System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
         }
 
-        private static async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
+        private static async Task QueryAuctionSmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
         {
             var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
-            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress,
-                "getFullAuctionData",
-                new IBinaryType[]
-                {
-                    TokenIdentifierValue.From("TSTKR-209ea0"),
-                    NumericValue.U64Value(3),
-                },
-                abiDefinition, provider);
+            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                scAddress,
+                abiDefinition,
+                "getFullAuctionData", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
             // Need to use the value define in the ABI file (Here it's a StructValue)
             var optFullAuctionData = getFullAuctionData[0].ValueOf<OptionValue>();
@@ -149,13 +148,11 @@ namespace Elrond.SDK.Console
                 var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
             }
 
-            var getDeadline = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getDeadline",
-                new IBinaryType[]
-                {
-                    TokenIdentifierValue.From("TSTKR-209ea0"),
-                    NumericValue.U64Value(3),
-                },
-                abiDefinition, provider);
+            var getDeadline = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                scAddress,
+                abiDefinition,
+                "getDeadline", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
             // Need to use the value define in the ABI file (Here it's a StructValue)
             var optDeadline = getDeadline[0].ValueOf<OptionValue>();
@@ -165,30 +162,28 @@ namespace Elrond.SDK.Console
             }
         }
 
-        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Constants constants,
-            Wallet wallet)
+        private static async Task CallAdderSmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
+            AddressValue scAddress)
         {
-            var fileBytes = await File.ReadAllBytesAsync("SmartContracts/adder/adder.abi.json");
-            var json = Encoding.UTF8.GetString(fileBytes);
-            var jsonSerializerOptions = new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
-            var abi = JsonSerializer.Deserialize<AbiDefinition>(json, jsonSerializerOptions);
             var account = wallet.GetAccount();
-
-            var scAddress = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-
-            //2. Call 'add' method
-            var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "add", Balance.Zero(),
-                new IBinaryType[]
-                {
-                    NumericValue.BigIntValue(12)
-                });
+            await account.Sync(provider);
+            
+            // Call 'add' method
+            var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(
+                constants,
+                account,
+                scAddress,
+                "add",
+                Balance.Zero(),
+                NumericValue.BigIntValue(12)
+            );
 
             addRequest.SetGasLimit(new GasLimit(60000000));
             var addRequestTransaction = await addRequest.Send(wallet, provider);
             await addRequestTransaction.WaitForExecution(provider);
+            addRequestTransaction.EnsureTransactionSuccess();
 
-            //3. Query VM
+            // Query VM
             var result = await provider.QueryVm(new QueryVmRequestDto
             {
                 FuncName = "getSum",
@@ -197,18 +192,6 @@ namespace Elrond.SDK.Console
 
             var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
             var sumHex = Convert.ToHexString(sumBytes);
-
-            //4. Ex query smart contract 
-
-            var getSum = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "getSum", Balance.Zero(), new IBinaryType[0]);
-
-            getSum.SetGasLimit(new GasLimit(60000000));
-            var getSumTransaction = await getSum.Send(wallet, provider);
-            await getSumTransaction.WaitForExecution(provider);
-            var getSumResult = getSumTransaction.GetSmartContractResult("getSum", abi);
-            var sum = getSumResult[0].ValueOf<NumericValue>().Number;
-            Debug.Assert(sum.ToString().Equals("17"));
         }
 
         private static async Task<AddressValue> DeploySmartContract(
@@ -221,13 +204,12 @@ namespace Elrond.SDK.Console
             await account.Sync(provider);
 
             var wasmFile = await Code.FromFilePath(filePath);
-            var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(constants, account,
+            var deployRequest = SmartContract.CreateDeploySmartContractTransactionRequest(
+                constants,
+                account,
                 wasmFile,
                 new CodeMetadata(false, true, false),
-                new IBinaryType[]
-                {
-                    NumericValue.BigIntValue(5)
-                });
+                NumericValue.BigIntValue(5));
 
             deployRequest.SetGasLimit(new GasLimit(60000000));
 

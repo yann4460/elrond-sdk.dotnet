@@ -20,15 +20,14 @@ namespace Elrond.Dotnet.Sdk.Domain
             Account account,
             Code code,
             CodeMetadata codeMetadata,
-            IBinaryType[] args = null)
+            params IBinaryType[] args)
         {
             var binaryCoder = new BinaryCodec();
             var transaction = TransactionRequest.CreateTransaction(account, constants);
             var data = $"{code.Value}@{ArwenVirtualMachine}@{codeMetadata.Value}";
-            if (args != null)
+            if (args.Any())
             {
-                data = args?.Aggregate(data,
-                    (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
+                data = args.Aggregate(data, (c, arg) => c + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(arg))}");
             }
 
             transaction.SetData(data);
@@ -50,12 +49,12 @@ namespace Elrond.Dotnet.Sdk.Domain
             AddressValue smartContractAddress,
             string functionName,
             Balance value,
-            IBinaryType[] args = null)
+            params IBinaryType[] args)
         {
             var binaryCoder = new BinaryCodec();
             var transaction = TransactionRequest.CreateTransaction(account, constants, smartContractAddress, value);
             var data = $"{functionName}";
-            if (args != null)
+            if (args.Any())
             {
                 data = args.Aggregate(data,
                     (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
@@ -99,40 +98,40 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <summary>
         /// Query a smart contract 
         /// </summary>
-        /// <param name="smartContractAddress"></param>
+        /// <param name="address"></param>
         /// <param name="endpoint"></param>
         /// <param name="args"></param>
         /// <param name="abiDefinition"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
         public static Task<List<IBinaryType>> QuerySmartContractWithAbiDefinition(
-            AddressValue smartContractAddress,
-            string endpoint,
-            IBinaryType[] args,
+            IElrondProvider provider,
+            AddressValue address,
             AbiDefinition abiDefinition,
-            IElrondProvider provider)
+            string endpoint,
+            params IBinaryType[] args)
         {
             var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
-
             var outputs = endpointDefinition.Output.Select(o => o.Type).ToArray();
-            return QuerySmartContract(smartContractAddress, endpoint, args, outputs, provider);
+
+            return QuerySmartContract(provider, address, outputs, endpoint, args);
         }
 
         /// <summary>
         /// QuerySmartContract
         /// </summary>
-        /// <param name="smartContractAddress"></param>
+        /// <param name="address"></param>
         /// <param name="endpoint"></param>
         /// <param name="args"></param>
         /// <param name="outputTypeValue"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
         public static async Task<List<IBinaryType>> QuerySmartContract(
-            AddressValue smartContractAddress,
-            string endpoint,
-            IBinaryType[] args,
+            IElrondProvider provider,
+            AddressValue address,
             TypeValue[] outputTypeValue,
-            IElrondProvider provider)
+            string endpoint,
+            params IBinaryType[] args)
         {
             var binaryCodec = new BinaryCodec();
             var arguments = args
@@ -143,7 +142,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             {
                 FuncName = endpoint,
                 Args = arguments,
-                ScAddress = smartContractAddress.Bech32
+                ScAddress = address.Bech32
             };
 
             var response = await provider.QueryVm(query);
