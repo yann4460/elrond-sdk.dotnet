@@ -1,10 +1,11 @@
-# elrond-sdk.dotnet
-Elronford SDK for .NET Core.
+# Elronford SDK for .NET Core 
+[![Build status](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml/badge.svg)](httpshttps://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml)  
 
 ## How to install ? 
 Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
-
 `Install-Package elrond-sdk.dotnet`
+
+[![Package](https://img.shields.io/nuget/v/elrond-sdk.dotnet)](https://www.nuget.org/packages/elrond-sdk.dotnet/)
 
 # What is Elrond SDK for .NET Core  ?
 This is the .Net integration library for Elrond, simplifying the access and smart contract interaction with Elrond blockchain. It is developed targeting net5.0 only for now.
@@ -193,7 +194,7 @@ Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddre
 }
 ```
 
-#### Query a smart contract and get result in c# class
+#### Query a smart contract and get result in c# class or as a JSON string
 ```csharp
 var results = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
     new IBinaryType[]
@@ -204,10 +205,28 @@ var results = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionD
     outputTypeValue: new[] {option}, provider);
 
 //FullAuctionData is a standard C# class.
+var fullAuctionDataJSON = results[0].ToJSON();
 var fullAuctionData = results[0].ToObject<FullAuctionData>();
 System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.payment_token.token_type);
 System.Console.WriteLine("payment_token.nonce {0}", fullAuctionData.payment_token.nonce);
 System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
+}
+```
+The result of `.ToJSON()` is a plain JSON object: 
+```json
+{
+  "payment_token": {
+    "token_type": "EGLD",
+    "nonce": "0"
+  },
+  "min_bid": "100000000000000000",
+  "max_bid": "10000000000000000000",
+  "deadline": "1621378452",
+  "original_owner": "erd1lkeja8knfjhkqzvrf3d9hmefxzt75wtf3vlg9m7ccugc8jmnrdpqy7yjeq",
+  "current_bid": "0",
+  "current_winner": "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu",
+  "marketplace_cut_percentage": "500",
+  "creator_royalties_percentage": "0"
 }
 ```
 
