@@ -5,7 +5,7 @@
         public TypeValue Type => TypeValue.BooleanValue;
 
         private readonly bool _value;
-        public byte[] Buffer { get; }
+
         public BooleanValue(bool value)
         {
             _value = value;
@@ -26,5 +26,9 @@
             return _value == false;
         }
 
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
     }
 }

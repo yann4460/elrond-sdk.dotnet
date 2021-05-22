@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class AbiDefinition
     {

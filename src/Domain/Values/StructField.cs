@@ -5,10 +5,15 @@
         public IBinaryType Value { get; }
         public string Name { get; }
 
-        public StructField(IBinaryType value, string name = "")
+        public StructField(string name, IBinaryType value)
         {
             Value = value;
             Name = name;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 }

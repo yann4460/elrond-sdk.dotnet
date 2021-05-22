@@ -11,7 +11,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         private const string Hrp = "erd";
 
         public TypeValue Type => TypeValue.AddressValue;
-
+   
         private AddressValue(string hex, string bech32)
         {
             Bech32 = bech32.ToLowerInvariant();

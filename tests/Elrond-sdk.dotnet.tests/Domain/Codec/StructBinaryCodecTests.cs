@@ -22,7 +22,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         {
             // Arrange
             var fieldDefinition = new FieldDefinition("azeazeaze", "", TypeValue.U16TypeValue);
-            var structField = new StructField(NumericValue.U16Value(12), "azeazeaze");
+            var structField = new StructField("azeazeaze", NumericValue.U16Value(12));
             var type = TypeValue.StructValue("azeae", new[] {fieldDefinition});
 
             // Act
@@ -49,13 +49,13 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
             });
             var structValue = new StructValue(type, new[]
             {
-                new StructField(NumericValue.BigUintValue(BalanceValue.EGLD("10").Number), "ticket_price"),
-                new StructField(NumericValue.U32Value(0), "tickets_left"),
-                new StructField(NumericValue.U64Value(0x000000005fc2b9db), "deadline"),
-                new StructField(NumericValue.U32Value(0xffffffff), "max_entries_per_user"),
-                new StructField(BytesValue.FromBuffer(new byte[] {0x64}), "prize_distribution"),
-                new StructField(NumericValue.U32Value(9472), "current_ticket_number"),
-                new StructField(NumericValue.BigUintValue(BigInteger.Parse("94720000000000000000000")), "prize_pool"),
+                new StructField("ticket_price", NumericValue.Balance(Balance.EGLD("10"))),
+                new StructField("tickets_left", NumericValue.U32Value(0)),
+                new StructField("deadline", NumericValue.U64Value(0x000000005fc2b9db)),
+                new StructField("max_entries_per_user", NumericValue.U32Value(0xffffffff)),
+                new StructField("prize_distribution", BytesValue.FromBuffer(new byte[] {0x64})),
+                new StructField("current_ticket_number", NumericValue.U32Value(9472)),
+                new StructField("prize_pool", NumericValue.BigUintValue(BigInteger.Parse("94720000000000000000000"))),
             });
 
             // Act

@@ -7,7 +7,7 @@ namespace Elrond.Dotnet.Sdk.Domain
     public class Account
     {
         public AddressValue Address { get; }
-        public BalanceValue BalanceValue { get; private set; }
+        public Balance Balance { get; private set; }
         public int Nonce { get; private set; }
         public string Code { get; private set; }
         public string UserName { get; private set; }
@@ -26,7 +26,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public async Task Sync(IElrondProvider provider)
         {
             var accountDto = await provider.GetAccount(Address.Bech32);
-            BalanceValue = new BalanceValue(accountDto.Data.Account.Balance);
+            Balance = new Balance(accountDto.Data.Account.Balance);
             Nonce = accountDto.Data.Account.Nonce;
             Code = accountDto.Code;
             UserName = accountDto.Data.Account.Username;

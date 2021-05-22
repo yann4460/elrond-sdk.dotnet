@@ -4,7 +4,7 @@ Elronford SDK for .NET Core.
 ## How to install ? 
 Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
 
-`Install-Package elrond-sdk.dotnet -Version 1.0.9`
+`Install-Package elrond-sdk.dotnet`
 
 # What is Elrond SDK for .NET Core  ?
 This is the .Net integration library for Elrond, simplifying the access and smart contract interaction with Elrond blockchain. It is developed targeting net5.0 only for now.

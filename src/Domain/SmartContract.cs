@@ -49,7 +49,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             Account account,
             AddressValue smartContractAddress,
             string functionName,
-            BalanceValue value,
+            Balance value,
             IBinaryType[] args = null)
         {
             var binaryCoder = new BinaryCodec();

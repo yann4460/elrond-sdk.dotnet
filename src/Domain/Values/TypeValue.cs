@@ -110,11 +110,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
         public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
 
-        public static TypeValue OptionValue(TypeValue innerType = null) =>
-            new TypeValue(BinaryTypes.Option, innerType);
+        public static TypeValue OptionValue(TypeValue innerType = null) => new TypeValue(BinaryTypes.Option, innerType);
 
-        public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) =>
-            new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);
+        public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) => new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);
 
         public static TypeValue FromRustType(string rustType)
         {

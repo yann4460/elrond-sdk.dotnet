@@ -4,19 +4,21 @@ using Elrond.Dotnet.Sdk.Domain.Exceptions;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
-    public class BalanceValue : NumericValue
+    public class Balance
     {
         const long OneEgld = 1000000000000000000;
         private const int Denomination = 18;
 
-        public BalanceValue(long value)
-            : base(TypeValue.BigUintTypeValue, new BigInteger(value))
+        public BigInteger Number { get; }
+
+        public Balance(long value)
         {
+            Number = new BigInteger(value);
         }
 
-        public BalanceValue(string value)
-            : base(TypeValue.BigUintTypeValue, BigInteger.Parse(value))
+        public Balance(string value)
         {
+            Number = BigInteger.Parse(value);
             if (Number.Sign == -1)
                 throw new InvalidBalanceException(value);
         }
@@ -49,18 +51,18 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static BalanceValue EGLD(string value)
+        public static Balance EGLD(string value)
         {
             var decimalValue = decimal.Parse(value, CultureInfo.InvariantCulture);
             var p = decimalValue * OneEgld;
             var bigGold = new BigInteger(p);
 
-            return new BalanceValue(bigGold.ToString());
+            return new Balance(bigGold.ToString());
         }
 
-        public static BalanceValue Zero()
+        public static Balance Zero()
         {
-            return new BalanceValue(0);
+            return new Balance(0);
         }
 
         public override string ToString()
