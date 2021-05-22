@@ -30,5 +30,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             var bytes = Encoding.UTF8.GetBytes(data);
             return new TokenIdentifierValue(bytes, TypeValue.TokenIdentifierValue);
         }
+
+        public override string ToString()
+        {
+            return TokenName;
+        }
     }
 }

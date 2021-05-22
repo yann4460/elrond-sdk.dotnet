@@ -377,7 +377,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void EncodeNested_DecodeNested_BalanceValue()
         {
             // Arrange
-            var value = BalanceValue.EGLD("12.876564");
+            var value = NumericValue.Balance(Balance.EGLD("12.876564"));
 
             // Act
             var encoded = _sut.EncodeNested(value);

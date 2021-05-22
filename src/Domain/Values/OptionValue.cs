@@ -1,12 +1,14 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿using System.Text.Json;
+
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class OptionValue : IBinaryType
     {
         public TypeValue Type { get; }
-        public TypeValue? InnerType { get; }
+        public TypeValue InnerType { get; }
         public IBinaryType Value { get; }
 
-        private OptionValue(TypeValue type, TypeValue? innerType = null, IBinaryType value = null)
+        private OptionValue(TypeValue type, TypeValue innerType = null, IBinaryType value = null)
         {
             Type = type;
             InnerType = innerType;
@@ -26,6 +28,23 @@
         public bool IsSet()
         {
             return Value != null;
+        }
+
+
+        public override string ToString()
+        {
+            return IsSet() ? Value.ToString() : "";
+        }
+
+        public T ToObject<T>()
+        {
+            var json = ToJSON();
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        string ToJSON()
+        {
+            return IsSet() ? Value.ToJSON() : "{}";
         }
     }
 }

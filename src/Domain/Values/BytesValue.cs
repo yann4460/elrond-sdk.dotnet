@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Elrond.Dotnet.Sdk.Domain.Values
 {
@@ -20,6 +21,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new BytesValue(Encoding.UTF8.GetBytes(utf8String), TypeValue.BytesValue);
         }
 
+        public static BytesValue FromHex(string hexString)
+        {
+            return new BytesValue(Convert.FromHexString(hexString), TypeValue.BytesValue);
+        }
+
         public static BytesValue FromBuffer(byte[] data)
         {
             return new BytesValue(data, TypeValue.BytesValue);
@@ -28,5 +34,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public TypeValue Type { get; }
 
         public byte[] Buffer { get; }
+
+        public override string ToString()
+        {
+            return Convert.ToHexString(Buffer);
+        }
     }
 }

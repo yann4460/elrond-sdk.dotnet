@@ -28,11 +28,11 @@ namespace Elrond.SDK.Console
 
             //await CreatingValueTransferTransactions(provider, constants, wallet);
             //await DeployAdderSmartContractAndQuery(provider, constants, wallet);
-            //await QuerySmartContractWithoutAbi(provider, wallet);
             //await QuerySmartContractWithAbi(provider);
-            //await QuerySmartContractWithoutAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
+            await QuerySmartContractWithoutAbi(provider,
+                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
             //await QuerySmartContractWithAbi(provider, AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy"));
-         
+
             //var scAddress = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
             //await QuerySmartContract(provider, constants, wallet, scAddress);
         }
@@ -53,17 +53,18 @@ namespace Elrond.SDK.Console
             var account = new Account(address);
             await account.Sync(provider);
 
-            System.Console.WriteLine("BalanceValue {0}", account.BalanceValue);
+            System.Console.WriteLine("Balance {0}", account.Balance);
             System.Console.WriteLine("Nonce {0}", account.Nonce);
         }
 
-        private static async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants, Wallet wallet)
+        private static async Task CreatingValueTransferTransactions(IElrondProvider provider, Constants constants,
+            Wallet wallet)
         {
             var sender = wallet.GetAccount();
             var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
             await sender.Sync(provider);
 
-            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, BalanceValue.EGLD("2.15"));
+            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("2.15"));
 
             transaction.SetData("Hello world !");
             transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
@@ -72,7 +73,8 @@ namespace Elrond.SDK.Console
             System.Console.WriteLine("TxHash {0}", transactionResult.TxHash);
         }
 
-        private static async Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wallet, AddressValue scAddress)
+        private static async Task QuerySmartContract(IElrondProvider provider, Constants constants, Wallet wallet,
+            AddressValue scAddress)
         {
             var account = wallet.GetAccount();
             await account.Sync(provider);
@@ -80,7 +82,7 @@ namespace Elrond.SDK.Console
             var queryTransaction = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
                 scAddress,
                 "getSum",
-                BalanceValue.Zero());
+                Balance.Zero());
 
             queryTransaction.SetGasLimit(await GasLimit.ForTransaction(queryTransaction, provider));
 
@@ -120,19 +122,19 @@ namespace Elrond.SDK.Console
                     TokenIdentifierValue.From("TSTKR-209ea0"),
                     NumericValue.U64Value(3),
                 },
-                new []{ option }, provider);
+                outputTypeValue: new[] {option}, provider);
 
-            var optFullAuctionData = results[0].ValueOf<OptionValue>();
-            if (optFullAuctionData.IsSet())
-            {
-                var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
-            }
+            var fullAuctionData = results[0].ToObject<FullAuctionData>();
+            System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.payment_token.token_type);
+            System.Console.WriteLine("payment_token.nonce {0}", fullAuctionData.payment_token.nonce);
+            System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
         }
 
         private static async Task QuerySmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
         {
             var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
-            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress, "getFullAuctionData",
+            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(scAddress,
+                "getFullAuctionData",
                 new IBinaryType[]
                 {
                     TokenIdentifierValue.From("TSTKR-209ea0"),
@@ -163,7 +165,8 @@ namespace Elrond.SDK.Console
             }
         }
 
-        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Constants constants, Wallet wallet)
+        private static async Task DeployAdderSmartContractAndQuery(IElrondProvider provider, Constants constants,
+            Wallet wallet)
         {
             var fileBytes = await File.ReadAllBytesAsync("SmartContracts/adder/adder.abi.json");
             var json = Encoding.UTF8.GetString(fileBytes);
@@ -175,7 +178,7 @@ namespace Elrond.SDK.Console
 
             //2. Call 'add' method
             var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "add", BalanceValue.Zero(),
+                scAddress, "add", Balance.Zero(),
                 new IBinaryType[]
                 {
                     NumericValue.BigIntValue(12)
@@ -198,7 +201,7 @@ namespace Elrond.SDK.Console
             //4. Ex query smart contract 
 
             var getSum = SmartContract.CreateCallSmartContractTransactionRequest(constants, account,
-                scAddress, "getSum", BalanceValue.Zero(), new IBinaryType[0]);
+                scAddress, "getSum", Balance.Zero(), new IBinaryType[0]);
 
             getSum.SetGasLimit(new GasLimit(60000000));
             var getSumTransaction = await getSum.Send(wallet, provider);

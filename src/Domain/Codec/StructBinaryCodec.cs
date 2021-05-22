@@ -23,7 +23,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             foreach (var fieldDefinition in fieldDefinitions)
             {
                 var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), fieldDefinition.Type);
-                fields.Add(new StructField(value, fieldDefinition.Name));
+                fields.Add(new StructField(fieldDefinition.Name, value));
 
                 offset += bytesLength;
                 buffer = buffer.Skip(bytesLength).ToList();
