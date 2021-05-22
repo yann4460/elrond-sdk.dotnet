@@ -215,7 +215,7 @@ System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
 All notable changes will be documented in this file.
 
 ## [1.0.11] - 22.05.2021
--   Directly map smartContract result to JSON Object
+-   Directly map smartContract result to JSON Object with `T ToObject<T>` method
 
 ## [1.0.10] - 21.05.2021
 -   Allow to create a Option value with a null inner Type
