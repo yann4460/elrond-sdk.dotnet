@@ -29,7 +29,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
 
             var (value, bytesLength) = _binaryCodec.DecodeNested(data.Slice(1), type.InnerType);
-            return (OptionValue.NewProvided(type.InnerType, value), bytesLength + 1);
+            return (OptionValue.NewProvided(value), bytesLength + 1);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
@@ -40,7 +40,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
 
             var decoded = _binaryCodec.DecodeTopLevel(data, type.InnerType);
-            return OptionValue.NewProvided(type.InnerType, decoded);
+            return OptionValue.NewProvided(decoded);
         }
 
         public byte[] EncodeNested(IBinaryType value)

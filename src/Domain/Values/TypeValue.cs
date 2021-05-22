@@ -9,6 +9,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public string BinaryType { get; }
         public string RustType { get; }
         public TypeValue? InnerType { get; }
+        public TypeValue[] MultiTypes { get; }
 
         private readonly int? _sizeInBytes;
         private readonly bool? _withSign;
@@ -33,6 +34,12 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         {
             BinaryType = binaryType;
             InnerType = innerType;
+        }
+
+        public TypeValue(string binaryType, TypeValue[] multiTypes)
+        {
+            BinaryType = binaryType;
+            MultiTypes = multiTypes;
         }
 
         public void SetName(string name) => Name = name;
@@ -66,6 +73,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             public const string Bytes = nameof(Bytes);
             public const string TokenIdentifier = nameof(TokenIdentifier);
             public const string Option = nameof(Option);
+            public const string Multi = nameof(Multi);
         }
 
         public static class RustTypes
@@ -114,6 +122,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
 
         public static TypeValue OptionValue(TypeValue innerType = null) => new TypeValue(BinaryTypes.Option, innerType);
+        public static TypeValue MultiValue(TypeValue[] multiTypes) => new TypeValue(BinaryTypes.Multi, multiTypes);
 
         public static TypeValue StructValue(string name, FieldDefinition[] fieldDefinitions) =>
             new TypeValue(BinaryTypes.Struct, name, fieldDefinitions);

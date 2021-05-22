@@ -47,7 +47,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void EncodeTopLevel_NewProvided()
         {
             // Arrange
-            var optionValue = OptionValue.NewProvided(TypeValue.I32TypeValue, NumericValue.I16Value(12));
+            var optionValue = OptionValue.NewProvided(NumericValue.I16Value(12));
 
             // Act
             var actual = _sut.EncodeTopLevel(optionValue);
@@ -61,7 +61,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
         public void EncodeNested_NewProvided()
         {
             // Arrange
-            var optionValue = OptionValue.NewProvided(TypeValue.I32TypeValue, NumericValue.I16Value(12));
+            var optionValue = OptionValue.NewProvided(NumericValue.I16Value(12));
 
             // Act
             var actual = _sut.EncodeNested(optionValue);

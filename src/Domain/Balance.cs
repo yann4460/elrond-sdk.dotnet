@@ -60,6 +60,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new Balance(bigGold.ToString());
         }
 
+        public static Balance From(string value)
+        {
+            return new Balance(value);
+        }
+
         public static Balance Zero()
         {
             return new Balance(0);

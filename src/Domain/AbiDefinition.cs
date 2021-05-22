@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain.Values;
 
@@ -29,11 +30,21 @@ namespace Elrond.Dotnet.Sdk.Domain
 
         private TypeValue GetTypeValue(string rustType)
         {
-            if (rustType.StartsWith("optional"))
+            var optional = new Regex("^optional<(.*)>$");
+            var multi = new Regex("^multi<(.*)>$");
+
+            if (optional.IsMatch(rustType))
             {
-                var innerType = rustType.Replace("optional", "").Replace("<", "").Replace(">", "");
+                var innerType = optional.Match(rustType).Groups[1].Value;
                 var innerTypeValue = GetTypeValue(innerType);
                 return TypeValue.OptionValue(innerTypeValue);
+            }
+            if (multi.IsMatch(rustType))
+            {
+                var innerTypes = multi.Match(rustType).Groups[1].Value.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+                var innerTypeValues = innerTypes.Select(GetTypeValue).ToArray();
+                return TypeValue.MultiValue(innerTypeValues);
             }
 
             var typeFromBaseRustType = TypeValue.FromRustType(rustType);

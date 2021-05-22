@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Values;
@@ -29,15 +25,14 @@ namespace Elrond.SDK.Console
 
             await CreatingValueTransferTransactions(provider, constants, wallet);
 
-            var auctionScAddress =
-                AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
-            await QueryAuctionSmartContractWithoutAbi(provider, auctionScAddress);
-            await QueryAuctionSmartContractWithAbi(provider, auctionScAddress);
+            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+            await QueryAuctionSmartContractWithoutAbi(provider, auction);
+            await QueryAuctionSmartContractWithAbi(provider, auction);
+            await QueryAuctionSmartContractWithMultiResult(provider, auction);
 
-            var adderScAddress =
-                await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-            await QueryAdderSmartContract(provider, constants, wallet, adderScAddress);
-            await CallAdderSmartContract(provider, constants, wallet, adderScAddress);
+            var adder = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
+            await QueryAdderSmartContract(provider, constants, wallet, adder);
+            await CallAdderSmartContract(provider, constants, wallet, adder);
         }
 
         private static async Task SynchronizingNetworkParameter()
@@ -118,18 +113,48 @@ namespace Elrond.SDK.Console
                 new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
                 new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
             });
-            var option = TypeValue.OptionValue(auction);
+            var optionValue = TypeValue.OptionValue(auction);
 
             var results = await SmartContract.QuerySmartContract(
                 provider,
                 scAddress,
-                new[] {option},
+                optionValue,
                 "getFullAuctionData", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
-            var fullAuctionData = results[0].ToObject<FullAuctionData>();
-            System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.payment_token.token_type);
-            System.Console.WriteLine("payment_token.nonce {0}", fullAuctionData.payment_token.nonce);
-            System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
+            var fullAuctionData = results.ToObject<FullAuctionData>();
+            System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.PaymentToken.TokenType);
+            System.Console.WriteLine("payment_token.nonce {0}", fullAuctionData.PaymentToken.Nonce);
+            System.Console.WriteLine("min_bid {0}", fullAuctionData.MinBid);
+        }
+
+        private static async Task QueryAuctionSmartContractWithMultiResult(IElrondProvider provider, AddressValue scAddress)
+        {
+            var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
+            var getMinMaxBid = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                scAddress,
+                abiDefinition,
+                "getMinMaxBid", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
+
+            // Need to use the value define in the ABI file (Here it's a StructValue)
+            var opt = getMinMaxBid.ValueOf<OptionValue>();
+            if (opt.IsSet())
+            {
+                var values = opt.Value.ToJSON();
+            }
+
+            var getDeadline = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                scAddress,
+                abiDefinition,
+                "getDeadline", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
+
+            // Need to use the value define in the ABI file (Here it's a StructValue)
+            var optDeadline = getDeadline.ValueOf<OptionValue>();
+            if (optDeadline.IsSet())
+            {
+                var deadline = optDeadline.Value.ValueOf<NumericValue>().Number;
+            }
         }
 
         private static async Task QueryAuctionSmartContractWithAbi(IElrondProvider provider, AddressValue scAddress)
@@ -142,7 +167,7 @@ namespace Elrond.SDK.Console
                 "getFullAuctionData", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
             // Need to use the value define in the ABI file (Here it's a StructValue)
-            var optFullAuctionData = getFullAuctionData[0].ValueOf<OptionValue>();
+            var optFullAuctionData = getFullAuctionData.ValueOf<OptionValue>();
             if (optFullAuctionData.IsSet())
             {
                 var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
@@ -155,7 +180,7 @@ namespace Elrond.SDK.Console
                 "getDeadline", TokenIdentifierValue.From("TSTKR-209ea0"), NumericValue.U64Value(3));
 
             // Need to use the value define in the ABI file (Here it's a StructValue)
-            var optDeadline = getDeadline[0].ValueOf<OptionValue>();
+            var optDeadline = getDeadline.ValueOf<OptionValue>();
             if (optDeadline.IsSet())
             {
                 var deadline = optDeadline.Value.ValueOf<NumericValue>().Number;
@@ -167,7 +192,7 @@ namespace Elrond.SDK.Console
         {
             var account = wallet.GetAccount();
             await account.Sync(provider);
-            
+
             // Call 'add' method
             var addRequest = SmartContract.CreateCallSmartContractTransactionRequest(
                 constants,
