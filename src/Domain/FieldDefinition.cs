@@ -13,6 +13,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             Name = name;
             Description = description;
             Type = type;
+            Type.SetName(name);
         }
     }
 }

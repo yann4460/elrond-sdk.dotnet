@@ -12,10 +12,34 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return (T) this;
         }
 
+        public T ToObject<T>()
+        {
+            var json = ToJSON();
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
         string ToJSON()
         {
-            var kv = new KeyValuePair<string, string>(Type.Name, ToString());
-            return JsonSerializer.Serialize(kv);
+            var option = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
+            };
+            if (string.IsNullOrEmpty(Type.Name))
+            {
+                var kv = new KeyValuePair<string, string>(Type.Name ?? "", ToString());
+                var json = JsonSerializer.Serialize(kv, option);
+                return json;
+            }
+            else
+            {
+                var kv = new Dictionary<string, string>
+                {
+                    {Type.Name, ToString()}
+                };
+                var json = JsonSerializer.Serialize(kv, option);
+                return json;
+            }
         }
     }
 }

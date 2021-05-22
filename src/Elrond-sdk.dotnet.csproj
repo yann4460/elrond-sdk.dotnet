@@ -14,7 +14,7 @@
     <RepositoryType>Github</RepositoryType>
     <Company />
     <Description>Elrond SDK for .NET Core</Description>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <RootNamespace>Elrond.Dotnet.Sdk</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

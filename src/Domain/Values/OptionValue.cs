@@ -1,4 +1,6 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿using System.Text.Json;
+
+namespace Elrond.Dotnet.Sdk.Domain.Values
 {
     public class OptionValue : IBinaryType
     {
@@ -32,6 +34,17 @@
         public override string ToString()
         {
             return IsSet() ? Value.ToString() : "";
+        }
+
+        public T ToObject<T>()
+        {
+            var json = ToJSON();
+            return JsonSerializer.Deserialize<T>(json);
+        }
+
+        string ToJSON()
+        {
+            return IsSet() ? Value.ToJSON() : "{}";
         }
     }
 }

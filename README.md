@@ -193,8 +193,29 @@ Task QuerySmartContractWithoutAbi(IElrondProvider provider, AddressValue scAddre
 }
 ```
 
+#### Query a smart contract and get result in c# class
+```csharp
+var results = await SmartContract.QuerySmartContract(scAddress, "getFullAuctionData",
+    new IBinaryType[]
+    {
+        TokenIdentifierValue.From("TSTKR-209ea0"),
+        NumericValue.U64Value(3),
+    },
+    outputTypeValue: new[] {option}, provider);
+
+//FullAuctionData is a standard C# class.
+var fullAuctionData = results[0].ToObject<FullAuctionData>();
+System.Console.WriteLine("payment_token.token_type {0}", fullAuctionData.payment_token.token_type);
+System.Console.WriteLine("payment_token.nonce {0}", fullAuctionData.payment_token.nonce);
+System.Console.WriteLine("min_bid {0}", fullAuctionData.min_bid);
+}
+```
+
 # Change Log
 All notable changes will be documented in this file.
+
+## [1.0.11] - 22.05.2021
+-   Directly map smartContract result to JSON Object
 
 ## [1.0.10] - 21.05.2021
 -   Allow to create a Option value with a null inner Type
