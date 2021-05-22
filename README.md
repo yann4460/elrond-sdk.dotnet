@@ -234,7 +234,7 @@ The result of `.ToJSON()` is a plain JSON object:
 All notable changes will be documented in this file.
 
 ## [1.0.11] - 22.05.2021
--   Directly map smartContract result to JSON Object with `T ToObject<T>` method
+-   [Directly map smartContract result to JSON Object with `T ToObject<T>` method](https://github.com/yann4460/elrond-sdk.dotnet/pull/11)
 
 ## [1.0.10] - 21.05.2021
 -   Allow to create a Option value with a null inner Type
