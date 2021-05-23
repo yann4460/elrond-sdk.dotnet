@@ -54,7 +54,7 @@ namespace Elrond.Dotnet.Sdk.Provider
             return await response.Content.ReadFromJsonAsync<AccountResponseDto>();
         }
 
-        public async Task<IReadOnlyCollection<ESDTTokenResponseDto>> GetESDTTokens(string address)
+        public async Task<ESDTTokenResponseDto> GetESDTTokens(string address)
         {
             var response = await _httpClient.GetAsync($"address/{address}/esdt");
             if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -65,8 +65,8 @@ namespace Elrond.Dotnet.Sdk.Provider
 
             response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<ESDTTokenResponseDto[]>();
-            return new List<ESDTTokenResponseDto>(result);
+            var result = await response.Content.ReadFromJsonAsync<ESDTTokenResponseDto>();
+            return result;
         }
 
         public async Task<CreateTransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto)

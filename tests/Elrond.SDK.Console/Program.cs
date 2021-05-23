@@ -23,6 +23,8 @@ namespace Elrond.SDK.Console
             var provider = new ElrondProvider(client);
             var constants = await Constants.GetFromNetwork(provider);
 
+
+            var esdts = await provider.GetESDTTokens("erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5");
             //await CreateNFTToken(provider, wallet);
 
             await SynchronizingNetworkParameter();
@@ -75,7 +77,8 @@ namespace Elrond.SDK.Console
             var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
             await sender.Sync(provider);
 
-            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("0.0000054715"));
+            var transaction =
+                TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("0.0000054715"));
             transaction.SetData("Hello world !");
             transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
 
@@ -299,7 +302,8 @@ namespace Elrond.SDK.Console
 
             await manager.SetSpecialRole(tokenIdentifier, ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
 
-            var tokenId = await manager.CreateNFT(tokenIdentifier, "My random token name", 5000, new Dictionary<string, string>(),
+            var tokenId = await manager.CreateNFTToken(tokenIdentifier, "My random token name", 5000,
+                new Dictionary<string, string>(),
                 new[]
                 {
                     new Uri("https://www.google.fr")

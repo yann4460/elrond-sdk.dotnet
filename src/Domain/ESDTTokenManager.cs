@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
@@ -55,11 +54,11 @@ namespace Elrond.Dotnet.Sdk.Domain
             var transaction = await request.Send(_provider, _wallet);
 
             await transaction.WaitForExecution(_provider);
-            await Task.Delay(5000);
+            await Task.Delay(2000);
             transaction.EnsureTransactionSuccess();
         }
 
-        public async Task<ulong> CreateNFT(
+        public async Task<EstdToken> CreateNFTToken(
             string tokenIdentifier,
             string tokenName,
             ushort royalties,
@@ -85,27 +84,24 @@ namespace Elrond.Dotnet.Sdk.Domain
             transaction.EnsureTransactionSuccess();
 
             var tokenId = transaction.GetSmartContractResult(new[] {TypeValue.U64TypeValue}).Single();
-            return (ulong) tokenId.ValueOf<NumericValue>().Number;
+            var nonce = (ulong) tokenId.ValueOf<NumericValue>().Number;
+           
+            return new EstdToken
+            {
+                Name = tokenName,
+                TokenIdentifier = TokenIdentifierValue.From(tokenIdentifier),
+                Creator = _account.Address,
+                TokenId = nonce,
+                Royalties = royalties,
+                Attributes = attributes,
+                Hash = hash,
+                Uris = uris
+            };
         }
 
         private async Task<Constants> GetConstants()
         {
             return _constants ??= await Constants.GetFromNetwork(_provider);
         }
-    }
-
-    public class NFTToken
-    {
-        public string TokenIdentifier { get; set; }
-        public string Name { get; set; }
-        public ulong TokenId { get; set; }
-        public string Hash { get; set; }
-
-        public Dictionary<string, string> Attributes { get; set; }
-
-        public int Royalties { get; set; }
-
-        public string Creator { get; set; }
-        public string[] Uris { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace Elrond.Dotnet.Sdk.Provider
 
         Task<AccountResponseDto> GetAccount(string address);
 
-        Task<IReadOnlyCollection<ESDTTokenResponseDto>> GetESDTTokens(string address);
+        Task<ESDTTokenResponseDto> GetESDTTokens(string address);
 
         Task<CreateTransactionResponseDto> SendTransaction(TransactionRequestDto transactionRequestDto);
 
