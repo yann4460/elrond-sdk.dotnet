@@ -1,4 +1,7 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain
+﻿using System.IO;
+using System.Text.Json;
+
+namespace Elrond.Dotnet.Sdk.Domain
 {
     public class KeyFile
     {
@@ -7,6 +10,15 @@
         public string Address { get; set; }
         public string Bech32 { get; set; }
         public Crypto Crypto { get; set; }
+
+        public static KeyFile FromFilePath(string filePath)
+        {
+            var json = File.ReadAllText(filePath);
+            return JsonSerializer.Deserialize<KeyFile>(json, new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+        }
     }
 
     public class Crypto

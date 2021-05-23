@@ -19,6 +19,9 @@
     <None Update="SmartContracts\auction\auction.abi.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Wallets\erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
