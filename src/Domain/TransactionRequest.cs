@@ -116,26 +116,14 @@ namespace Elrond.Dotnet.Sdk.Domain
             return Transaction.From(result);
         }
 
-        public void ComputeGasLimitForTransfer(Constants constants)
-        {
-            var gasLimit = GasLimit.ForTransfer(constants, this);
-            SetGasLimit(gasLimit);
-        }
-
-        public async Task ComputeGasLimit(IElrondProvider provider)
-        {
-            var gasLimit = await GasLimit.ForTransaction(this, provider);
-            SetGasLimit(gasLimit);
-        }
-
         public void AddArgument(IBinaryType[] args)
         {
             if (!args.Any())
                 return;
 
             var binaryCodec = new BinaryCodec();
-            var data = args.Aggregate(GetDecodedData(),
-                (c, arg) => c + $"@{Convert.ToHexString(binaryCodec.EncodeTopLevel(arg))}");
+            var decodedData = GetDecodedData();
+            var data = args.Aggregate(decodedData, (c, arg) => c + $"@{Convert.ToHexString(binaryCodec.EncodeTopLevel(arg))}");
             SetData(data);
         }
     }

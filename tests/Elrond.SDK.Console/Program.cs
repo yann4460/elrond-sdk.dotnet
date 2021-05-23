@@ -75,8 +75,7 @@ namespace Elrond.SDK.Console
             var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
             await sender.Sync(provider);
 
-            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("2.15"));
-
+            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("0.0000054715"));
             transaction.SetData("Hello world !");
             transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
 
