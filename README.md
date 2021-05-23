@@ -246,7 +246,7 @@ System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
 All notable changes will be documented in this file.
 
 ## [1.0.13] - 23.05.2021
--   [Add ESDTNFT Token operations](https://github.com/yann4460/elrond-sdk.dotnet/pull/13)
+-   Add ESDTNFT Token operations
     - IssueESDTTransactionRequest
     - SetSpecialRoleTransactionRequest
     - IssueNonFungibleTokenTransactionRequest
