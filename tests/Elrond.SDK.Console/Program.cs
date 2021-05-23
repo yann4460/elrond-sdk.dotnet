@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,14 +17,13 @@ namespace Elrond.SDK.Console
             var password = "&KEiHn!rdBTRCPtaF9Bf";
             var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
             var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
-
             var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
 
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
             var constants = await Constants.GetFromNetwork(provider);
 
-            await CreateNFT(provider, constants, wallet);
+            //await CreateNFTToken(provider, wallet);
 
             await SynchronizingNetworkParameter();
             await SynchronizingAnAccountObject(provider);
@@ -100,8 +100,6 @@ namespace Elrond.SDK.Console
                 scAddress,
                 "getSum",
                 Balance.Zero());
-
-            queryTransaction.SetGasLimit(await GasLimit.ForTransaction(queryTransaction, provider));
 
             var transaction = await queryTransaction.Send(provider, wallet);
             await transaction.WaitForExecution(provider);
@@ -243,7 +241,6 @@ namespace Elrond.SDK.Console
                 NumericValue.BigIntValue(12)
             );
 
-            addRequest.SetGasLimit(new GasLimit(60000000));
             var addRequestTransaction = await addRequest.Send(provider, wallet);
             await addRequestTransaction.WaitForExecution(provider);
             addRequestTransaction.EnsureTransactionSuccess();
@@ -279,8 +276,6 @@ namespace Elrond.SDK.Console
                 new CodeMetadata(false, true, false),
                 NumericValue.BigIntValue(5));
 
-            deployRequest.SetGasLimit(new GasLimit(60000000));
-
             // Get the deployed smart contract address based on account address and transaction nonce
             var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce);
             var deployTransaction = await deployRequest.Send(provider, wallet);
@@ -294,18 +289,23 @@ namespace Elrond.SDK.Console
         }
 
 
-        private static async Task CreateNFT(IElrondProvider provider, Constants constants, Wallet wallet)
+        private static async Task CreateNFTToken(IElrondProvider provider, Wallet wallet)
         {
-            System.Console.WriteLine("CreateNFT");
+            System.Console.WriteLine("CreateNFTToken");
 
-            var manager = new ESDTTokenManager(provider, constants, wallet);
+            var manager = new EsdtTokenManager(provider, wallet);
 
-            var tokenIdentifier = await manager.IssueNonFungibleToken("MyToken1", "MTKN");
+            var tokenIdentifier = await manager.IssueNonFungibleToken("MyToken2", "MTKN2");
             System.Console.WriteLine($"Issue token : {tokenIdentifier}");
 
             await manager.SetSpecialRole(tokenIdentifier, ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
 
-            var tokenId = await manager.CreateNFT(tokenIdentifier, "My token name can be a longer one");
+            var tokenId = await manager.CreateNFT(tokenIdentifier, "My random token name", 5000, new Dictionary<string, string>(),
+                new[]
+                {
+                    new Uri("https://www.google.fr")
+                });
+
             System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
 
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);

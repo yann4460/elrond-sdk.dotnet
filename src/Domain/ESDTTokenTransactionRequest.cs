@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
@@ -237,12 +239,11 @@ namespace Elrond.Dotnet.Sdk.Domain
         }
 
         /// <summary>
-        /// 
+        /// Create a NFT token
         /// </summary>
         /// <param name="constants"></param>
         /// <param name="account">Account with ESDTRoleNFTCreate role</param>
         /// <param name="tokenIdentifier">The token identifier</param>
-        /// <param name="initialQuantity">The quantity of the token. If NFT, it must be 1</param>
         /// <param name="name">The name of the NFT or SFT</param>
         /// <param name="royalties">Allows the creator to receive royalties for any transaction involving their NFT (Base format is a numeric value between 0 an 10000 (0 meaning 0% and 10000 meaning 100%)</param>
         /// <param name="hash">Arbitrary field that should contain the hash of the NFT metadata.</param>
@@ -253,15 +254,24 @@ namespace Elrond.Dotnet.Sdk.Domain
             Constants constants,
             Account account,
             string tokenIdentifier,
-            BigInteger initialQuantity,
             string name,
             ushort royalties,
             string hash,
             Dictionary<string, string> attributes,
-            string[] uris)
+            Uri[] uris)
         {
+            if (royalties > 10000)
+                throw new ArgumentException("Value should be between 0 an 10000 (0 meaning 0% and 10000 meaning 100%",
+                    nameof(royalties));
+
+            if (!string.IsNullOrEmpty(hash) && Encoding.UTF8.GetBytes(hash).Length != 32)
+                throw new ArgumentException("Hash should be a 32 bytes length H256", nameof(hash));
+
+            if (uris.Length == 0)
+                throw new ArgumentException("At least one URI should be provided", nameof(uris));
+
             var attributeValue = string.Join(";", attributes.Select(x => x.Key + ":" + x.Value).ToArray());
-            var urisValue = uris.Select(u => (IBinaryType) BytesValue.FromUtf8(u)).ToArray();
+            var urisValue = uris.Select(u => (IBinaryType) BytesValue.FromUtf8(u.AbsoluteUri)).ToArray();
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(
                 constants,
                 account,
@@ -269,11 +279,15 @@ namespace Elrond.Dotnet.Sdk.Domain
                 ESDTNFTCreate,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
-                NumericValue.BigUintValue(initialQuantity),
+                NumericValue.BigUintValue(1),
                 BytesValue.FromUtf8(name),
-                NumericValue.U64Value(royalties),
-                BytesValue.FromUtf8(hash),
-                BytesValue.FromUtf8(attributeValue));
+                NumericValue.U16Value(royalties),
+                string.IsNullOrEmpty(hash)
+                    ? OptionValue.NewMissing()
+                    : OptionValue.NewProvided(BytesValue.FromUtf8(hash)),
+                string.IsNullOrEmpty(attributeValue)
+                    ? OptionValue.NewMissing()
+                    : OptionValue.NewProvided(BytesValue.FromUtf8(attributeValue)));
 
             transaction.AddArgument(urisValue);
 
@@ -281,7 +295,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             // Transaction payload cost: Data field length * 1500 (GasPerDataByte = 1500)
             var transactionCost = Convert.FromBase64String(transaction.Data).Length * constants.GasPerDataByte;
             // Storage cost: Size of NFT data * 50000 (StorePerByte = 50000)
-            var storageCost = storePerByte * BytesValue.FromUtf8(attributeValue).GetLength() +
+            var storageCost = (string.IsNullOrEmpty(attributeValue)
+                                  ? 0
+                                  : storePerByte * BytesValue.FromUtf8(attributeValue).GetLength()) +
                               storePerByte * urisValue.Sum(u => u.ValueOf<BytesValue>().GetLength());
             transaction.SetGasLimit(new GasLimit(6000000 + transactionCost + storageCost));
 

@@ -8,26 +8,26 @@ using Elrond.Dotnet.Sdk.Provider;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class ESDTTokenManager
+    public class EsdtTokenManager
     {
         private readonly IElrondProvider _provider;
-        private readonly Constants _constants;
+        private Constants _constants;
         private readonly Wallet _wallet;
         private readonly Account _account;
 
-        public ESDTTokenManager(IElrondProvider provider, Constants constants, Wallet wallet)
+        public EsdtTokenManager(IElrondProvider provider, Wallet wallet)
         {
             _provider = provider;
-            _constants = constants;
             _wallet = wallet;
             _account = wallet.GetAccount();
         }
 
         public async Task<string> IssueNonFungibleToken(string tokenName, string tokenTicker)
         {
+            var constants = await GetConstants();
             await _account.Sync(_provider);
             var request = ESDTTokenTransactionRequest.IssueNonFungibleTokenTransactionRequest(
-                _constants,
+                constants,
                 _account,
                 tokenName,
                 tokenTicker);
@@ -43,9 +43,10 @@ namespace Elrond.Dotnet.Sdk.Domain
 
         public async Task SetSpecialRole(string tokenIdentifier, params string[] roles)
         {
+            var constants = await GetConstants();
             await _account.Sync(_provider);
             var request = ESDTTokenTransactionRequest.SetSpecialRoleTransactionRequest(
-                _constants,
+                constants,
                 _account,
                 _account.Address,
                 tokenIdentifier,
@@ -58,30 +59,25 @@ namespace Elrond.Dotnet.Sdk.Domain
             transaction.EnsureTransactionSuccess();
         }
 
-        public async Task<ulong> CreateNFT(string tokenIdentifier, string tokenName)
+        public async Task<ulong> CreateNFT(
+            string tokenIdentifier,
+            string tokenName,
+            ushort royalties,
+            Dictionary<string, string> attributes,
+            Uri[] uris,
+            string hash = null)
         {
+            var constants = await GetConstants();
             await _account.Sync(_provider);
             var request = ESDTTokenTransactionRequest.CreateESDTNFTTokenTransactionRequest(
-                _constants,
+                constants,
                 _account,
                 tokenIdentifier,
-                BigInteger.One,
                 tokenName,
-                100,
-                "",
-                new Dictionary<string, string>
-                {
-                    {"Origin", "My custom origin"},
-                    {"Origin1", "My custom origin"},
-                    {"Origin2", "My custom origin"},
-                    {"Origin3", "My custom origin"}
-                },
-                new[]
-                {
-                    "https://www.google.fr",
-                    "https://www.google.fr",
-                    "https://www.google.fr",
-                }
+                royalties,
+                hash,
+                attributes,
+                uris
             );
 
             var transaction = await request.Send(_provider, _wallet);
@@ -91,5 +87,25 @@ namespace Elrond.Dotnet.Sdk.Domain
             var tokenId = transaction.GetSmartContractResult(new[] {TypeValue.U64TypeValue}).Single();
             return (ulong) tokenId.ValueOf<NumericValue>().Number;
         }
+
+        private async Task<Constants> GetConstants()
+        {
+            return _constants ??= await Constants.GetFromNetwork(_provider);
+        }
+    }
+
+    public class NFTToken
+    {
+        public string TokenIdentifier { get; set; }
+        public string Name { get; set; }
+        public ulong TokenId { get; set; }
+        public string Hash { get; set; }
+
+        public Dictionary<string, string> Attributes { get; set; }
+
+        public int Royalties { get; set; }
+
+        public string Creator { get; set; }
+        public string[] Uris { get; set; }
     }
 }

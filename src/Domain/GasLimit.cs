@@ -23,6 +23,18 @@ namespace Elrond.Dotnet.Sdk.Domain
             return new GasLimit(value);
         }
 
+        public static GasLimit ForSmartContractCall(Constants constants, TransactionRequest transaction)
+        {
+            var value = constants.MinGasLimit + 6000000;
+            if (string.IsNullOrEmpty(transaction.Data))
+                return new GasLimit(value);
+            
+            var bytes = Convert.FromBase64String(transaction.Data);
+            value += constants.GasPerDataByte * bytes.Length;
+
+            return new GasLimit(value);
+        }
+
         public static async Task<GasLimit> ForTransaction(TransactionRequest transactionRequest,
             IElrondProvider provider)
         {

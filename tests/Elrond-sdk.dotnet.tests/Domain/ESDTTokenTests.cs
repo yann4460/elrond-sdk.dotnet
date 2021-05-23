@@ -200,7 +200,6 @@ namespace Elrond_sdk.dotnet.tests.Domain
                 _constants,
                 _account,
                 tokenIdentifier,
-                BigInteger.One,
                 "Beautiful song",
                 7500,
                 "",
@@ -209,7 +208,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
                     {"Artist", "Famous artist"},
                     {"Duration", "03.17"},
                 },
-                new[] {"URL_to_decentralized_storage/song.mp3"});
+                new[] {new Uri("https://wwww.to_decentralized_storage/song.mp3")});
 
             // Assert
             Assert.That(transaction, Is.Not.Null);
@@ -218,7 +217,8 @@ namespace Elrond_sdk.dotnet.tests.Domain
 
             var hex = Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data));
             Assert.That(hex,
-                Is.EqualTo($"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@4172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@55524C5F746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
+                Is.EqualTo(
+                    $"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@4172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@55524C5F746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
             Assert.That(transaction.GasLimit.Value, Is.EqualTo(9927000));
             Assert.That(transaction.Value.Number.ToString(), Is.EqualTo(0.ToString()));
         }

@@ -31,7 +31,8 @@ namespace Elrond.Dotnet.Sdk.Domain
             }
 
             transaction.SetData(data);
-
+            transaction.SetGasLimit(GasLimit.ForSmartContractCall(constants, transaction));
+            
             return transaction;
         }
 
@@ -59,6 +60,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             }
 
             transaction.SetData(data);
+            transaction.SetGasLimit(GasLimit.ForSmartContractCall(constants, transaction));
             return transaction;
         }
 

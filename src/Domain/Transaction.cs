@@ -152,14 +152,16 @@ namespace Elrond.Dotnet.Sdk.Domain
             if (IsInvalid())
                 throw new Exception($"Transaction '{TxHash}' is invalid");
 
-            if (_smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
+            if (_smartContractResult != null && _smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
             {
-                var message = string.Join(Environment.NewLine, _smartContractResult.Select(x => x.ReturnMessage).ToArray());
+                var returnMessages = _smartContractResult.Select(x => x.ReturnMessage).ToArray();
+                var message = string.Join(Environment.NewLine, returnMessages);
                 throw new Exception($"Smart contract error : {message}");
             }
 
             if (!IsExecuted())
-                throw new Exception($"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
+                throw new Exception(
+                    $"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
         }
     }
 }
