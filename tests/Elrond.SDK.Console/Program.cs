@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
@@ -12,12 +13,14 @@ namespace Elrond.SDK.Console
     {
         public static async Task Main(string[] args)
         {
-            var testPrivateKey =
-                "C5A89BFA5E8FFFA4BAA732D8D8EE9503FAFA538599C3DDEE28D21F64DFFDBF00FDB32E9ED34CAF6009834C5A5BEF293097EA39698B3E82EFD8C71183CB731B42";
+            var password = "&KEiHn!rdBTRCPtaF9Bf";
+            var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
+            var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
+
+            var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
 
             var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
             var provider = new ElrondProvider(client);
-            var wallet = new Wallet(testPrivateKey);
             var constants = await Constants.GetFromNetwork(provider);
 
             await CreateNFT(provider, constants, wallet);
