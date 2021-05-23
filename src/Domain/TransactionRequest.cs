@@ -28,13 +28,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         private TransactionRequest(Account account, Constants constants)
         {
             _account = account;
+            _chainId = constants.ChainId;
             Sender = account.Address;
             Receiver = AddressValue.Zero();
             Value = new Balance(0);
             Nonce = account.Nonce;
             GasLimit = new GasLimit(constants.MinGasLimit);
             GasPrice = constants.MinGasPrice;
-            _chainId = constants.ChainId;
         }
 
         public static TransactionRequest CreateTransaction(Account account, Constants constants)
