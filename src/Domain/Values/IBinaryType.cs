@@ -20,15 +20,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         string ToJSON()
         {
-            var option = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            };
             if (string.IsNullOrEmpty(Type.Name))
             {
                 var kv = new KeyValuePair<string, string>(Type.Name ?? "", ToString());
-                var json = JsonSerializer.Serialize(kv, option);
+                var json = JsonSerializer.Serialize(kv);
                 return json;
             }
             else
@@ -37,7 +32,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                 {
                     {Type.Name, ToString()}
                 };
-                var json = JsonSerializer.Serialize(kv, option);
+                var json = JsonSerializer.Serialize(kv);
                 return json;
             }
         }

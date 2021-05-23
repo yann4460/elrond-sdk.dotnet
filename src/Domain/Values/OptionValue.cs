@@ -20,9 +20,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new OptionValue(TypeValue.OptionValue());
         }
 
-        public static OptionValue NewProvided(TypeValue innerType, IBinaryType value)
+        public static OptionValue NewProvided(IBinaryType value)
         {
-            return new OptionValue(TypeValue.OptionValue(innerType), innerType, value);
+            return new OptionValue(TypeValue.OptionValue(value.Type), value.Type, value);
         }
 
         public bool IsSet()

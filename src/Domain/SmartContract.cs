@@ -14,21 +14,20 @@ namespace Elrond.Dotnet.Sdk.Domain
     public class SmartContract
     {
         private const string ArwenVirtualMachine = "0500";
+        private static readonly BinaryCodec BinaryCoder = new BinaryCodec();
 
         public static TransactionRequest CreateDeploySmartContractTransactionRequest(
             Constants constants,
             Account account,
             Code code,
             CodeMetadata codeMetadata,
-            IBinaryType[] args = null)
+            params IBinaryType[] args)
         {
-            var binaryCoder = new BinaryCodec();
             var transaction = TransactionRequest.CreateTransaction(account, constants);
             var data = $"{code.Value}@{ArwenVirtualMachine}@{codeMetadata.Value}";
-            if (args != null)
+            if (args.Any())
             {
-                data = args?.Aggregate(data,
-                    (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
+                data = args.Aggregate(data, (c, arg) => c + $"@{Convert.ToHexString(BinaryCoder.EncodeTopLevel(arg))}");
             }
 
             transaction.SetData(data);
@@ -39,7 +38,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static TransactionRequest CreateUpdateSmartContractTransactionRequest(
             Constants constants,
             Account account,
-            AddressValue smartContractAddress)
+            AddressValue address)
         {
             throw new NotImplementedException();
         }
@@ -47,22 +46,19 @@ namespace Elrond.Dotnet.Sdk.Domain
         public static TransactionRequest CreateCallSmartContractTransactionRequest(
             Constants constants,
             Account account,
-            AddressValue smartContractAddress,
+            AddressValue address,
             string functionName,
             Balance value,
-            IBinaryType[] args = null)
+            params IBinaryType[] args)
         {
-            var binaryCoder = new BinaryCodec();
-            var transaction = TransactionRequest.CreateTransaction(account, constants, smartContractAddress, value);
+            var transaction = TransactionRequest.CreateTransaction(account, constants, address, value);
             var data = $"{functionName}";
-            if (args != null)
+            if (args.Any())
             {
-                data = args.Aggregate(data,
-                    (current, argument) => current + $"@{Convert.ToHexString(binaryCoder.EncodeTopLevel(argument))}");
+                data = args.Aggregate(data, (c, arg) => c + $"@{Convert.ToHexString(BinaryCoder.EncodeTopLevel(arg))}");
             }
 
             transaction.SetData(data);
-
             return transaction;
         }
 
@@ -97,68 +93,91 @@ namespace Elrond.Dotnet.Sdk.Domain
         }
 
         /// <summary>
-        /// Query a smart contract 
+        /// Allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
         /// </summary>
-        /// <param name="smartContractAddress"></param>
-        /// <param name="endpoint"></param>
-        /// <param name="args"></param>
-        /// <param name="abiDefinition"></param>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public static Task<List<IBinaryType>> QuerySmartContractWithAbiDefinition(
-            AddressValue smartContractAddress,
-            string endpoint,
-            IBinaryType[] args,
+        /// <param name="provider">The elrond provider</param>
+        /// <param name="address">he Address of the Smart Contract.</param>
+        /// <param name="abiDefinition">The smart contract ABI Definition</param>
+        /// <param name="endpoint">The name of the Pure Function to execute.</param>
+        /// <param name="args">The arguments of the Pure Function. Can be empty</param>
+        /// <returns>The response</returns>
+        public static Task<IBinaryType> QuerySmartContractWithAbiDefinition(
+            IElrondProvider provider,
+            AddressValue address,
             AbiDefinition abiDefinition,
-            IElrondProvider provider)
+            string endpoint,
+            params IBinaryType[] args)
         {
             var endpointDefinition = abiDefinition.GetEndpointDefinition(endpoint);
-
             var outputs = endpointDefinition.Output.Select(o => o.Type).ToArray();
-            return QuerySmartContract(smartContractAddress, endpoint, args, outputs, provider);
+            if (outputs.Length != 1)
+                throw new Exception("Bad output quantities in ABI definition. Should only be one.");
+
+            return QuerySmartContract(provider, address, outputs[0], endpoint, args);
         }
 
         /// <summary>
-        /// QuerySmartContract
+        /// Allows one to execute - with no side-effects - a pure function of a Smart Contract and retrieve the execution results (the Virtual Machine Output).
         /// </summary>
-        /// <param name="smartContractAddress"></param>
-        /// <param name="endpoint"></param>
-        /// <param name="args"></param>
-        /// <param name="outputTypeValue"></param>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public static async Task<List<IBinaryType>> QuerySmartContract(
-            AddressValue smartContractAddress,
+        /// <param name="provider">The elrond provider</param>
+        /// <param name="address">he Address of the Smart Contract.</param>
+        /// <param name="outputTypeValue">Output value type of the response</param>
+        /// <param name="endpoint">The name of the Pure Function to execute.</param>
+        /// <param name="args">The arguments of the Pure Function. Can be empty</param>
+        /// <returns>The response</returns>
+        public static async Task<IBinaryType> QuerySmartContract(
+            IElrondProvider provider,
+            AddressValue address,
+            TypeValue outputTypeValue,
             string endpoint,
-            IBinaryType[] args,
-            TypeValue[] outputTypeValue,
-            IElrondProvider provider)
+            params IBinaryType[] args)
         {
-            var binaryCodec = new BinaryCodec();
             var arguments = args
-                .Select(typeValue => Convert.ToHexString(binaryCodec.EncodeTopLevel(typeValue)))
+                .Select(typeValue => Convert.ToHexString(BinaryCoder.EncodeTopLevel(typeValue)))
                 .ToArray();
 
-            var query = new QueryVmRequestDto()
+            var query = new QueryVmRequestDto
             {
                 FuncName = endpoint,
                 Args = arguments,
-                ScAddress = smartContractAddress.Bech32
+                ScAddress = address.Bech32
             };
 
             var response = await provider.QueryVm(query);
             var data = response.Data.Data;
-            var decodedResponses = new List<IBinaryType>();
-            for (var i = 0; i < outputTypeValue.Length; i++)
+            if (data.ReturnData.Length > 1)
             {
-                var output = outputTypeValue[i];
-                var responseBytes = Convert.FromBase64String(data.ReturnData[i]);
+                var multiTypes = outputTypeValue.MultiTypes;
+                var optional = false;
+                if (outputTypeValue.BinaryType == TypeValue.BinaryTypes.Option)
+                {
+                    optional = true;
+                    multiTypes = outputTypeValue.InnerType?.MultiTypes;
+                }
 
-                var decodedResponse = binaryCodec.DecodeTopLevel(responseBytes, output);
-                decodedResponses.Add(decodedResponse);
+                if (multiTypes == null || !multiTypes.Any())
+                    throw new Exception("Output type is not a multi type.");
+
+                var decodedValues = new List<IBinaryType>();
+                for (var i = 0; i < multiTypes.Length; i++)
+                {
+                    var decoded =
+                        BinaryCoder.DecodeTopLevel(Convert.FromBase64String(data.ReturnData[i]), multiTypes[i]);
+                    decodedValues.Add(decoded);
+                }
+
+                var multiValue = MultiValue.From(decodedValues.ToArray());
+                return optional ? OptionValue.NewProvided(multiValue) : (IBinaryType) multiValue;
             }
 
-            return decodedResponses;
+            if (data.ReturnData.Length == 0)
+            {
+                return BinaryCoder.DecodeTopLevel(new byte[0], outputTypeValue);
+            }
+
+            var returnData = Convert.FromBase64String(data.ReturnData[0]);
+            var decodedResponse = BinaryCoder.DecodeTopLevel(returnData, outputTypeValue);
+            return decodedResponse;
         }
 
         private static byte[] ConcatByteArrays(params byte[][] arrays)

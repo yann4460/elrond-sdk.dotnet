@@ -233,6 +233,9 @@ The result of `.ToJSON()` is a plain JSON object:
 # Change Log
 All notable changes will be documented in this file.
 
+## [1.0.12] - 23.05.2021
+-   [Add support for Multi<T> result in smartContract query](https://github.com/yann4460/elrond-sdk.dotnet/pull/12)
+
 ## [1.0.11] - 22.05.2021
 -   [Directly map smartContract result to JSON Object with `T ToObject<T>` method](https://github.com/yann4460/elrond-sdk.dotnet/pull/11)
 
