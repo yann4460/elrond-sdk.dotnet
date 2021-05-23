@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
@@ -130,16 +131,28 @@ namespace Elrond.Dotnet.Sdk.Domain
                 throw new Exception($"Transaction status is {Status}");
         }
 
-        public async Task WaitForExecution(IElrondProvider provider)
+        /// <summary>
+        /// Wait for the execution of the transaction
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public async Task WaitForExecution(IElrondProvider provider, TimeSpan? timeout = null)
         {
-            const int maxIteration = 30;
+            if (!timeout.HasValue)
+                timeout = TimeSpan.FromSeconds(30);
+
             var currentIteration = 0;
             do
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000); // 1 second
                 await Sync(provider);
                 currentIteration++;
-            } while (IsPending() && currentIteration < maxIteration);
+            } while (IsPending() && currentIteration < timeout.Value.TotalSeconds);
+
+            if (!IsExecuted())
+                throw new Exception(
+                    $"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
         }
     }
 }
