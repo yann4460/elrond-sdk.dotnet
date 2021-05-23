@@ -245,6 +245,9 @@ System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
 # Change Log
 All notable changes will be documented in this file.
 
+## [1.0.14] - 24.05.2021
+-   Add `EsdtToken` class
+
 ## [1.0.13] - 23.05.2021
 -   Add ESDTNFT Token operations
     - IssueESDTTransactionRequest
@@ -254,7 +257,7 @@ All notable changes will be documented in this file.
     - TransferESDTNFTTransactionRequest
     - TransferESDTTransactionRequest
     - CreateESDTNFTTokenTransactionRequest
--   Update console app to add utilisation example of `ESDTTokenManager`.
+-   Update console app to add usage example of `ESDTTokenManager`.
 
 ## [1.0.12] - 23.05.2021
 -   [Add support for Multi<T> result in smartContract query](https://github.com/yann4460/elrond-sdk.dotnet/pull/12)
