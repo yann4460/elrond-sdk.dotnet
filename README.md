@@ -230,8 +230,31 @@ The result of `.ToJSON()` is a plain JSON object:
 }
 ```
 
+#### ESDTTokenManager
+```csharp
+var manager = new ESDTTokenManager(provider, constants, wallet);
+
+var tokenIdentifier = await manager.IssueNonFungibleToken("MyToken1", "MTKN");
+System.Console.WriteLine($"Issue token : {tokenIdentifier}");
+
+await manager.SetSpecialRole(tokenIdentifier, ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+
+var tokenId = await manager.CreateNFT(tokenIdentifier, "My token name can be a longer one");
+System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
+```
 # Change Log
 All notable changes will be documented in this file.
+
+## [1.0.13] - 23.05.2021
+-   [Add ESDTNFT Token operations](https://github.com/yann4460/elrond-sdk.dotnet/pull/13)
+    - IssueESDTTransactionRequest
+    - SetSpecialRoleTransactionRequest
+    - IssueNonFungibleTokenTransactionRequest
+    - IssueSemiFungibleTokenTransactionRequest
+    - TransferESDTNFTTransactionRequest
+    - TransferESDTTransactionRequest
+    - CreateESDTNFTTokenTransactionRequest
+-   Update console app to add utilisation example of `ESDTTokenManager`.
 
 ## [1.0.12] - 23.05.2021
 -   [Add support for Multi<T> result in smartContract query](https://github.com/yann4460/elrond-sdk.dotnet/pull/12)

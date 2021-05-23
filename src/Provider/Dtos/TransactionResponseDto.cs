@@ -14,7 +14,6 @@
 
     public class TransactionDto
     {
-
         public string Type { get; set; }
         public long Nonce { get; set; }
         public long Round { get; set; }
@@ -50,6 +49,7 @@
         public string Receiver { get; set; }
         public string Sender { get; set; }
         public string Data { get; set; }
+        public string ReturnMessage { get; set; }
         public string PrevTxHash { get; set; }
         public string OriginalTxHash { get; set; }
         public long GasLimit { get; set; }

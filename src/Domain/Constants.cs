@@ -27,5 +27,10 @@ namespace Elrond.Dotnet.Sdk.Domain
                 MinTransactionVersion = constants.Data.Config.erd_min_transaction_version
             };
         }
+
+        public static Constants New()
+        {
+            return new Constants();
+        }
     }
 }

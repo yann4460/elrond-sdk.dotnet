@@ -8,10 +8,10 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         {
             Buffer = data;
             Type = type;
-            TokenName = Encoding.UTF8.GetString(data);
+            TokenIdentifier = Encoding.UTF8.GetString(data);
         }
 
-        public string TokenName { get; }
+        public string TokenIdentifier { get; }
         public TypeValue Type { get; }
         public byte[] Buffer { get; }
 
@@ -33,7 +33,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public override string ToString()
         {
-            return TokenName;
+            return TokenIdentifier;
         }
     }
 }

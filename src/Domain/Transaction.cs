@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
@@ -150,9 +149,17 @@ namespace Elrond.Dotnet.Sdk.Domain
                 currentIteration++;
             } while (IsPending() && currentIteration < timeout.Value.TotalSeconds);
 
+            if (IsInvalid())
+                throw new Exception($"Transaction '{TxHash}' is invalid");
+
+            if (_smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
+            {
+                var message = string.Join(Environment.NewLine, _smartContractResult.Select(x => x.ReturnMessage).ToArray());
+                throw new Exception($"Smart contract error : {message}");
+            }
+
             if (!IsExecuted())
-                throw new Exception(
-                    $"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
+                throw new Exception($"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
         }
     }
 }

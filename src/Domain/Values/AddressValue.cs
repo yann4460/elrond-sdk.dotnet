@@ -15,7 +15,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         private AddressValue(string hex, string bech32)
         {
             Bech32 = bech32.ToLowerInvariant();
-            Hex = hex.ToLowerInvariant();
+            Hex = hex.ToUpperInvariant();
             Buffer = Convert.FromHexString(hex);
         }
 

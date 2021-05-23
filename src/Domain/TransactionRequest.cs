@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
@@ -61,6 +63,11 @@ namespace Elrond.Dotnet.Sdk.Domain
             Data = Convert.ToBase64String(dataBytes);
         }
 
+        public string GetDecodedData()
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(Data));
+        }
+
         public TransactionRequestDto GetTransactionRequest()
         {
             var transactionRequestDto = new TransactionRequestDto
@@ -80,9 +87,17 @@ namespace Elrond.Dotnet.Sdk.Domain
             return transactionRequestDto;
         }
 
-        public async Task<Transaction> Send(Wallet wallet, IElrondProvider provider)
+        public async Task<Transaction> Send(IElrondProvider provider, Wallet wallet)
         {
             var transactionRequestDto = GetTransactionRequest();
+            var account = wallet.GetAccount();
+            await account.Sync(provider);
+
+            if (Value.Number > account.Balance.Number)
+                throw new Exception($"Insufficient funds, required : {Value} and got {account.Balance}");
+
+            if (Nonce != account.Nonce)
+                throw new Exception($"Incorrect nonce, account nonce is {account.Nonce}, not {Nonce}");
 
             var serializeOptions = new JsonSerializerOptions
             {
@@ -101,10 +116,27 @@ namespace Elrond.Dotnet.Sdk.Domain
             return Transaction.From(result);
         }
 
+        public void ComputeGasLimitForTransfer(Constants constants)
+        {
+            var gasLimit = GasLimit.ForTransfer(constants, this);
+            SetGasLimit(gasLimit);
+        }
+
         public async Task ComputeGasLimit(IElrondProvider provider)
         {
             var gasLimit = await GasLimit.ForTransaction(this, provider);
             SetGasLimit(gasLimit);
+        }
+
+        public void AddArgument(IBinaryType[] args)
+        {
+            if (!args.Any())
+                return;
+
+            var binaryCodec = new BinaryCodec();
+            var data = args.Aggregate(GetDecodedData(),
+                (c, arg) => c + $"@{Convert.ToHexString(binaryCodec.EncodeTopLevel(arg))}");
+            SetData(data);
         }
     }
 }

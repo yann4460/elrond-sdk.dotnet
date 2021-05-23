@@ -105,7 +105,7 @@ namespace Elrond_sdk.dotnet.tests.Domain.Codec
 
             var esdtTokenStructValue = payment_token.ValueOf<StructValue>();
             var token_type = esdtTokenStructValue.GetStructField("token_type").Value;
-            Assert.That(token_type.ValueOf<TokenIdentifierValue>().TokenName, Is.EqualTo("EGLD"));
+            Assert.That(token_type.ValueOf<TokenIdentifierValue>().TokenIdentifier, Is.EqualTo("EGLD"));
             var nonce = esdtTokenStructValue.GetStructField("nonce").Value;
             Assert.That(nonce.ValueOf<NumericValue>().Number.IsZero, Is.True);
 
