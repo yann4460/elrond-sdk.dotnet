@@ -150,18 +150,20 @@ namespace Elrond.Dotnet.Sdk.Domain
                 await Sync(provider);
                 currentIteration++;
             } while (IsPending() && currentIteration < timeout.Value.TotalSeconds);
+
             if (_smartContractResult != null && _smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
             {
                 var returnMessages = _smartContractResult.Select(x => x.ReturnMessage).ToArray();
                 var message = string.Join(Environment.NewLine, returnMessages);
-                throw new Exception($"Smart contract error : {message}");
+                throw new Exception($"Transaction '{TxHash}' has smart contract error : {message}");
             }
-            
+
             if (IsInvalid())
                 throw new Exception($"Transaction '{TxHash}' is invalid");
 
             if (!IsExecuted())
-                throw new Exception($"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
+                throw new Exception(
+                    $"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
         }
     }
 }

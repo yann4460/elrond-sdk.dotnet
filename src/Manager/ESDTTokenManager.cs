@@ -73,6 +73,7 @@ namespace Elrond.Dotnet.Sdk.Manager
             var transaction = await request.Send(_provider, wallet);
             await transaction.WaitForExecution(_provider);
             transaction.EnsureTransactionSuccess();
+            await Task.Delay(5000); // Hack to ensure that result is apply cross shard
         }
 
         public async Task<EsdtToken> CreateNftToken(

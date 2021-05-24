@@ -300,24 +300,32 @@ namespace Elrond.SDK.Console
 
         private static async Task<EsdtToken> CreateNFTTokenThenTransfer(IEsdtTokenManager tokenManager, Wallet wallet)
         {
-            System.Console.WriteLine("CreateNFTTokenThenTransfer");
-
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNFTTokenThenTransfer");
+            
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken");
             var tokenIdentifier = await tokenManager.IssueNonFungibleToken(wallet, "MyToken2", "MTKN2");
-            System.Console.WriteLine($"Issue token : {tokenIdentifier}");
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken - Result : {tokenIdentifier}");
 
+            
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole");
             await tokenManager.SetSpecialRole(wallet, tokenIdentifier, EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole - Result : Ok ");
             var roles = await tokenManager.GetSpecialRole(tokenIdentifier);
-
-
+            foreach (var role in roles)
+            {
+                System.Console.WriteLine($"[{DateTime.UtcNow:O}] Roles : " + role);
+            }
+            
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken");
             var token = await tokenManager.CreateNftToken(wallet, tokenIdentifier, "My random token name", 5000,
                 new Dictionary<string, string>(),
                 new[]
                 {
                     new Uri("https://www.google.fr")
                 });
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken - Result : {token.TokenId}");
 
 
-            System.Console.WriteLine($"Create token  '{tokenIdentifier}:{token.TokenId}'");
 
             var receiver = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
             await tokenManager.TransferNftToken(wallet, token, receiver);
