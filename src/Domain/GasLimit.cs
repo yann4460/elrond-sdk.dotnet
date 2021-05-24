@@ -39,10 +39,10 @@ namespace Elrond.Dotnet.Sdk.Domain
             IElrondProvider provider)
         {
             var cost = await provider.GetTransactionCost(transactionRequest.GetTransactionRequest());
-            if (cost.Data.TxGasUnits == 0)
-                throw new Exception($"Unable to get cost of transaction : {cost.Data.ReturnMessage}");
+            if (cost.TxGasUnits == 0)
+                throw new Exception($"Unable to get cost of transaction : {cost.ReturnMessage}");
 
-            return new GasLimit(cost.Data.TxGasUnits);
+            return new GasLimit(cost.TxGasUnits);
         }
     }
 }

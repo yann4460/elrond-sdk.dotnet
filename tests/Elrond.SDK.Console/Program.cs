@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Values;
+using Elrond.Dotnet.Sdk.Manager;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Elrond.SDK.Console
 {
@@ -14,32 +17,37 @@ namespace Elrond.SDK.Console
     {
         public static async Task Main(string[] args)
         {
-            var password = "&KEiHn!rdBTRCPtaF9Bf";
-            var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
-            var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
-            var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
+            var services = new ServiceCollection();
+            services.AddElrondProvider(Extension.Network.TestNet);
 
-            var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
-            var provider = new ElrondProvider(client);
-            var constants = await Constants.GetFromNetwork(provider);
+            var serviceProvider = services.BuildServiceProvider();
+
+            var provider = serviceProvider.GetRequiredService<IElrondProvider>();
+            {
+                var password = "&KEiHn!rdBTRCPtaF9Bf";
+                var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
+                var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
+                var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
+                var constants = await Constants.GetFromNetwork(provider);
+
+                await CreateNFTTokenThenTransfer(serviceProvider.GetRequiredService<IEsdtTokenManager>(), wallet);
 
 
-            var esdts = await provider.GetESDTTokens("erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5");
-            //await CreateNFTToken(provider, wallet);
+                await SynchronizingNetworkParameter();
+                await SynchronizingAnAccountObject(provider);
 
-            await SynchronizingNetworkParameter();
-            await SynchronizingAnAccountObject(provider);
+                await CreatingValueTransferTransactions(provider, constants, wallet);
 
-            await CreatingValueTransferTransactions(provider, constants, wallet);
+                // This sc is already deployed
+                var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+                await QueryAuctionSmartContractWithoutAbi(provider, auction);
+                await QueryAuctionSmartContractWithAbi(provider, auction);
+                await QueryAuctionSmartContractWithMultiResult(provider, auction);
 
-            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
-            await QueryAuctionSmartContractWithoutAbi(provider, auction);
-            await QueryAuctionSmartContractWithAbi(provider, auction);
-            await QueryAuctionSmartContractWithMultiResult(provider, auction);
-
-            var adder = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-            await QueryAdderSmartContract(provider, constants, wallet, adder);
-            await CallAdderSmartContract(provider, constants, wallet, adder);
+                var adder = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
+                await QueryAdderSmartContract(provider, constants, wallet, adder);
+                await CallAdderSmartContract(provider, constants, wallet, adder);
+            }
         }
 
         private static async Task SynchronizingNetworkParameter()
@@ -254,7 +262,7 @@ namespace Elrond.SDK.Console
                 ScAddress = scAddress.Bech32
             });
 
-            var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
+            var sumBytes = Convert.FromBase64String(result.Data.ReturnData[0]);
             var sumHex = Convert.ToHexString(sumBytes);
             System.Console.WriteLine($"sumHex : {sumHex}");
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
@@ -290,28 +298,35 @@ namespace Elrond.SDK.Console
             return smartContractAddress;
         }
 
-
-        private static async Task CreateNFTToken(IElrondProvider provider, Wallet wallet)
+        private static async Task<EsdtToken> CreateNFTTokenThenTransfer(IEsdtTokenManager tokenManager, Wallet wallet)
         {
-            System.Console.WriteLine("CreateNFTToken");
+            System.Console.WriteLine("CreateNFTTokenThenTransfer");
 
-            var manager = new EsdtTokenManager(provider, wallet);
-
-            var tokenIdentifier = await manager.IssueNonFungibleToken("MyToken2", "MTKN2");
+            var tokenIdentifier = await tokenManager.IssueNonFungibleToken(wallet, "MyToken2", "MTKN2");
             System.Console.WriteLine($"Issue token : {tokenIdentifier}");
 
-            await manager.SetSpecialRole(tokenIdentifier, ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            await tokenManager.SetSpecialRole(wallet, tokenIdentifier, EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            var roles = await tokenManager.GetSpecialRole(tokenIdentifier);
 
-            var tokenId = await manager.CreateNFTToken(tokenIdentifier, "My random token name", 5000,
+
+            var token = await tokenManager.CreateNftToken(wallet, tokenIdentifier, "My random token name", 5000,
                 new Dictionary<string, string>(),
                 new[]
                 {
                     new Uri("https://www.google.fr")
                 });
 
-            System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
+
+            System.Console.WriteLine($"Create token  '{tokenIdentifier}:{token.TokenId}'");
+
+            var receiver = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+            await tokenManager.TransferNftToken(wallet, token, receiver);
+
+            var transferredToken =
+                await tokenManager.GetNftToken(receiver, token.TokenIdentifier.TokenIdentifier, token.TokenId);
 
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
+            return token;
         }
     }
 }

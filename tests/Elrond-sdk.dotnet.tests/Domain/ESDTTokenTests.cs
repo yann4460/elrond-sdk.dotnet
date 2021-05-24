@@ -39,7 +39,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "TKN";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueNonFungibleTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueNonFungibleTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -64,7 +64,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "TKN";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueSemiFungibleTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueSemiFungibleTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -89,7 +89,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "ALC";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueESDTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueEsdtTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -115,7 +115,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.TransferESDTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.TransferEsdtTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
@@ -140,7 +140,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.TransferESDTNFTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.TransferEsdtNftTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
@@ -167,13 +167,13 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.SetSpecialRoleTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.SetSpecialRoleTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
                 tokenIdentifier,
-                ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate,
-                ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTBurn);
+                EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate,
+                EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTBurn);
 
             // Assert
             Assert.That(transaction, Is.Not.Null);
@@ -196,7 +196,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.CreateESDTNFTTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.CreateEsdtNftTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenIdentifier,

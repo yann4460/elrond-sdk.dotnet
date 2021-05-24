@@ -4,23 +4,20 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Elrond.Dotnet.Sdk.Domain.Values;
-using Elrond.Dotnet.Sdk.Provider.Dtos;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class ESDTTokenTransactionRequest
+    public class EsdtTokenTransactionRequest
     {
-        private static readonly AddressValue EsdtNftAddress =
-            AddressValue.FromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+        private static readonly AddressValue EsdtNftAddress = AddressValue.FromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
 
         private const string Issue = "issue";
         private const string SetSpecialRole = "setSpecialRole";
         private const string IssueSemiFungible = "issueSemiFungible";
         private const string IssueNonFungible = "issueNonFungible";
-        private const string EsdtnftTransfer = "ESDTNFTTransfer";
+        private const string EsdtNftTransfer = "ESDTNFTTransfer";
         private const string EsdtTransfer = "ESDTTransfer";
-        private const string ESDTNFTCreate = "ESDTNFTCreate";
+        private const string EsdtNftCreate = "ESDTNFTCreate";
 
         public static class NFTRoles
         {
@@ -63,7 +60,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="initialSupply">The initial supply</param>
         /// <param name="numberOfDecimals">Number of decimals, should be a numerical value between 0 and 18</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest IssueESDTTransactionRequest(
+        public static TransactionRequest IssueEsdtTransactionRequest(
             Constants constants,
             Account account,
             string tokenName,
@@ -112,7 +109,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 TokenIdentifierValue.From(tokenIdentifier),
                 receiver);
 
-            transaction.AddArgument(roles.Select(BytesValue.FromUtf8).ToArray());
+            transaction.AddArgument(roles.Select<string, IBinaryType>(BytesValue.FromUtf8).ToArray());
             transaction.SetGasLimit(new GasLimit(60000000));
 
             return transaction;
@@ -184,7 +181,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="tokenId">The nonce after the NFT creation</param>
         /// <param name="quantity">Should be 1 if NFT</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest TransferESDTNFTTransactionRequest(
+        public static TransactionRequest TransferEsdtNftTransactionRequest(
             Constants constants,
             Account account,
             AddressValue receiver,
@@ -195,7 +192,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(constants,
                 account,
                 account.Address,
-                EsdtnftTransfer,
+                EsdtNftTransfer,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
                 NumericValue.U64Value(tokenId),
@@ -203,7 +200,8 @@ namespace Elrond.Dotnet.Sdk.Domain
                 receiver
             );
 
-            transaction.SetGasLimit(new GasLimit(500000));
+            //GasLimit: 1000000 + length of Data field in bytes * 1500
+            transaction.SetGasLimit(new GasLimit(1000000));
 
             return transaction;
         }
@@ -217,7 +215,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="tokenIdentifier">The token identifier</param>
         /// <param name="quantity">Quantity to transfer</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest TransferESDTTransactionRequest(
+        public static TransactionRequest TransferEsdtTransactionRequest(
             Constants constants,
             Account account,
             AddressValue receiver,
@@ -250,7 +248,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="attributes">Arbitrary field that should contain a set of attributes in the format desired by the creator</param>
         /// <param name="uris">Minimum one field that should contain the Uniform Resource Identifier. Can be a URL to a media file or something similar.</param>
         /// <returns></returns>
-        public static TransactionRequest CreateESDTNFTTokenTransactionRequest(
+        public static TransactionRequest CreateEsdtNftTokenTransactionRequest(
             Constants constants,
             Account account,
             string tokenIdentifier,
@@ -276,7 +274,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 constants,
                 account,
                 account.Address,
-                ESDTNFTCreate,
+                EsdtNftCreate,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
                 NumericValue.BigUintValue(1),

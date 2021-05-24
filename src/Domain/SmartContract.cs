@@ -32,7 +32,7 @@ namespace Elrond.Dotnet.Sdk.Domain
 
             transaction.SetData(data);
             transaction.SetGasLimit(GasLimit.ForSmartContractCall(constants, transaction));
-            
+
             return transaction;
         }
 
@@ -146,7 +146,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             };
 
             var response = await provider.QueryVm(query);
-            var data = response.Data.Data;
+            var data = response.Data;
             if (data.ReturnData.Length > 1)
             {
                 var multiTypes = outputTypeValue.MultiTypes;

@@ -1,12 +1,5 @@
 ﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
-    public class AccountResponseDto
-    {
-        public AccountDataDto Data { get; set; }
-        public string Error { get; set; }
-        public string Code { get; set; }
-    }
-
     public class AccountDataDto
     {
         public AccountDto Account { get; set; }

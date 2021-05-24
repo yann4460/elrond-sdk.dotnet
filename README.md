@@ -3,9 +3,12 @@
 
 ## How to install ? 
 Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
+
 `Install-Package elrond-sdk.dotnet`
 
 [![Package](https://img.shields.io/nuget/v/elrond-sdk.dotnet)](https://www.nuget.org/packages/elrond-sdk.dotnet/)
+
+Register services : `services.AddElrondProvider(Extension.Network.TestNet)`
 
 # What is Elrond SDK for .NET Core  ?
 This is the .Net integration library for Elrond, simplifying the access and smart contract interaction with Elrond blockchain. It is developed targeting net5.0 only for now.
@@ -244,6 +247,9 @@ System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
 ```
 # Change Log
 All notable changes will be documented in this file.
+
+## [1.0.15] - 24.05.2021
+-   ServiceCollection support : Use `services.AddElrondProvider(Extension.Network.TestNet)` 
 
 ## [1.0.14] - 24.05.2021
 -   Add `EsdtToken` class

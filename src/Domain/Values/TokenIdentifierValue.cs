@@ -31,6 +31,17 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new TokenIdentifierValue(bytes, TypeValue.TokenIdentifierValue);
         }
 
+        public bool IsEGLD()
+        {
+            if (Buffer.Length == 0)
+                return true;
+
+            if (TokenIdentifier == "EGLD")
+                return true;
+
+            return false;
+        }
+
         public override string ToString()
         {
             return TokenIdentifier;

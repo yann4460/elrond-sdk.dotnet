@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Elrond.Dotnet.Sdk.Domain.Values;
-using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
 
 namespace Elrond.Dotnet.Sdk.Domain
@@ -11,7 +10,7 @@ namespace Elrond.Dotnet.Sdk.Domain
     /// <summary>
     /// Elrond Standard Digital Token (Including NFT / SFT)
     /// </summary>
-    public class EstdToken
+    public class EsdtToken
     {
         public TokenIdentifierValue TokenIdentifier { get; set; }
 
@@ -26,7 +25,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public AddressValue Creator { get; set; }
         public Uri[] Uris { get; set; }
 
-        public static EstdToken From(EsdtsItemDto esdt)
+        public static EsdtToken From(EsdtItemDto esdt)
         {
             var attributes = esdt.Attributes.Split(';', StringSplitOptions.RemoveEmptyEntries);
             var attributesDic = attributes.ToDictionary(
@@ -34,7 +33,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 v => v.Split(":", StringSplitOptions.RemoveEmptyEntries).Last());
 
             var uris = esdt.Uris.Select(u => new Uri(Encoding.UTF8.GetString(Convert.FromBase64String(u)))).ToArray();
-            return new EstdToken
+            return new EsdtToken
             {
                 Name = esdt.Name,
                 TokenIdentifier = TokenIdentifierValue.From(esdt.TokenIdentifier),
