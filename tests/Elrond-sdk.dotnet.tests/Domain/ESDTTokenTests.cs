@@ -153,10 +153,8 @@ namespace Elrond_sdk.dotnet.tests.Domain
             Assert.That(transaction.Receiver, Is.EqualTo(_account.Address));
             Assert.That(transaction.Sender, Is.EqualTo(_account.Address));
 
-            Assert.That(Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data)),
-                Is.EqualTo(
-                    "ESDTNFTTransfer@414C432D363235386432@0C@01@8049D639E5A6980D1CD2392ABCCE41029CDA74A1563523A202F09641CC2618F8"));
-            Assert.That(transaction.GasLimit.Value, Is.EqualTo(500000));
+            Assert.That(Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data)), Is.EqualTo("ESDTNFTTransfer@414C432D363235386432@0C@01@8049D639E5A6980D1CD2392ABCCE41029CDA74A1563523A202F09641CC2618F8"));
+            Assert.That(transaction.GasLimit.Value, Is.EqualTo(1000000));
             Assert.That(transaction.Value.Number.ToString(), Is.EqualTo(0.ToString()));
         }
 
@@ -202,7 +200,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
                 tokenIdentifier,
                 "Beautiful song",
                 7500,
-                "",
+                null,
                 new Dictionary<string, string>
                 {
                     {"Artist", "Famous artist"},
@@ -217,9 +215,8 @@ namespace Elrond_sdk.dotnet.tests.Domain
 
             var hex = Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data));
             Assert.That(hex,
-                Is.EqualTo(
-                    $"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@01000000234172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@68747470733A2F2F777777772E746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
-            Assert.That(transaction.GasLimit.Value, Is.EqualTo(10419000));
+                Is.EqualTo($"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@4172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@68747470733A2F2F777777772E746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
+            Assert.That(transaction.GasLimit.Value, Is.EqualTo(10404000));
             Assert.That(transaction.Value.Number.ToString(), Is.EqualTo(0.ToString()));
         }
     }

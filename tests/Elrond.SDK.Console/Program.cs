@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
+using System.Numerics;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk;
 using Elrond.Dotnet.Sdk.Domain;
@@ -30,7 +30,11 @@ namespace Elrond.SDK.Console
                 var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
                 var constants = await Constants.GetFromNetwork(provider);
 
-                await CreateNFTTokenThenTransfer(serviceProvider.GetRequiredService<IEsdtTokenManager>(), wallet);
+
+                await CreateNFTTokenThenTransfer(
+                    serviceProvider.GetRequiredService<IEsdtTokenManager>(),
+                    serviceProvider.GetRequiredService<IElrondProvider>(),
+                    wallet);
 
 
                 await SynchronizingNetworkParameter();
@@ -298,40 +302,83 @@ namespace Elrond.SDK.Console
             return smartContractAddress;
         }
 
-        private static async Task<EsdtToken> CreateNFTTokenThenTransfer(IEsdtTokenManager tokenManager, Wallet wallet)
+        private static async Task<EsdtToken> CreateNFTTokenThenTransfer(
+            IEsdtTokenManager tokenManager,
+            IElrondProvider provider,
+            Wallet wallet)
         {
             System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNFTTokenThenTransfer");
-            
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken");
-            var tokenIdentifier = await tokenManager.IssueNonFungibleToken(wallet, "MyToken2", "MTKN2");
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken - Result : {tokenIdentifier}");
 
-            
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole");
-            await tokenManager.SetSpecialRole(wallet, tokenIdentifier, EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole - Result : Ok ");
-            var roles = await tokenManager.GetSpecialRole(tokenIdentifier);
-            foreach (var role in roles)
-            {
-                System.Console.WriteLine($"[{DateTime.UtcNow:O}] Roles : " + role);
-            }
-            
+            var tokenIdentifier = "STR-94b1f5";
+            //{
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken");
+            //    var tokenIdentifier = await tokenManager.IssueNonFungibleToken(wallet, "MyToken2", "MTKN2");
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken - Result : {tokenIdentifier}");
+
+
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole");
+            //    await tokenManager.SetSpecialRole(wallet, tokenIdentifier,
+            //        EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole - Result : Ok ");
+            //    var roles = await tokenManager.GetSpecialRole(tokenIdentifier);
+            //    foreach (var role in roles)
+            //    {
+            //        System.Console.WriteLine($"[{DateTime.UtcNow:O}] Roles : " + role);
+            //    }
+            //}
+
             System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken");
-            var token = await tokenManager.CreateNftToken(wallet, tokenIdentifier, "My random token name", 5000,
-                new Dictionary<string, string>(),
+            var token = await tokenManager.CreateNftToken(wallet, tokenIdentifier, "My beautiful token xoxoxoxoxo", 500,
+                new Dictionary<string, string>()
+                {
+                    {"Artist", "Famous artist"},
+                    {"Duration", "03.17"}
+                },
                 new[]
                 {
                     new Uri("https://www.google.fr")
-                });
+                },Convert.FromHexString("5589558955895589558955895589"));
+
             System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken - Result : {token.TokenId}");
 
+            if (false)
+            {
+                System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken");
+                var receiver =
+                    AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+                await tokenManager.TransferEsdtToken(wallet, token, receiver, BigInteger.One);
+                System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken - Result : Ok");
+            }
 
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken");
-            var receiver = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-            await tokenManager.TransferNftToken(wallet, token, receiver);
-            System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken - Result : Ok");
+            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
 
-            var transferredToken = await tokenManager.GetNftToken(receiver, token.TokenIdentifier.TokenIdentifier, token.TokenId);
+            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(5)).ToUnixTimeSeconds();
+            await tokenManager.TransferEsdtTokenToSmartContract(
+                wallet,
+                token,
+                auction,
+                "auctionToken",
+                BigInteger.One,
+                NumericValue.Balance(Balance.EGLD("0.1")),
+                NumericValue.Balance(Balance.EGLD("2")),
+                NumericValue.U64Value(unixTime),
+                TokenIdentifierValue.EGLD());
+
+            var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
+            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                auction,
+                abiDefinition,
+                "getFullAuctionData",
+                token.TokenIdentifier,
+                NumericValue.U64Value(token.TokenId));
+
+            // Need to use the value define in the ABI file (Here it's a StructValue)
+            var optFullAuctionData = getFullAuctionData.ValueOf<OptionValue>();
+            if (optFullAuctionData.IsSet())
+            {
+                var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
+            }
 
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
             return token;

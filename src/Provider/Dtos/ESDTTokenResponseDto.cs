@@ -4,7 +4,7 @@ namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
     public class ESDTTokenDataDto
     {
-        public Dictionary<string, EsdtItemDto> Esdts { get; set; }
+        public Dictionary<string, EsdtNftItemDto> Esdts { get; set; }
     }
 
     public class EsdtDataDto
@@ -14,12 +14,12 @@ namespace Elrond.Dotnet.Sdk.Provider.Dtos
         public string TokenIdentifier { get; set; }
     }
 
-    public class EsdtTokenData
+    public class EsdtNftTokenData
     {
-        public EsdtItemDto TokenData { get; set; }
+        public EsdtNftItemDto TokenData { get; set; }
     }
 
-    public class EsdtItemDto
+    public class EsdtNftItemDto
     {
         //public string Attributes { get; set; }
         public string Balance { get; set; }

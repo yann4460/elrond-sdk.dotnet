@@ -55,13 +55,13 @@ namespace Elrond.Dotnet.Sdk.Provider
             return result.Data;
         }
 
-        public async Task<EsdtItemDto> GetEsdtNftToken(string address, string tokenIdentifier, ulong tokenId)
+        public async Task<EsdtNftItemDto> GetEsdtNftToken(string address, string tokenIdentifier, ulong tokenId)
         {
             //TODO : Use the API instead ?
             //https://testnet-api.elrond.com/accounts/erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx/tokens/MTKN2-089d29
 
             var response = await _httpClient.GetAsync($"address/{address}/nft/{tokenIdentifier}/nonce/{tokenId}");
-            var result = await response.Content.ReadFromJsonAsync<ElrondGatewayResponseDto<EsdtTokenData>>();
+            var result = await response.Content.ReadFromJsonAsync<ElrondGatewayResponseDto<EsdtNftTokenData>>();
             result.EnsureSuccessStatusCode();
 
             return result.Data.TokenData;

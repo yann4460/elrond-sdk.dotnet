@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
@@ -84,7 +85,7 @@ namespace Elrond.Dotnet.Sdk.Manager
             ushort royalties,
             Dictionary<string, string> attributes,
             Uri[] uris,
-            string hash = null)
+            byte[] hash = null)
         {
             var account = wallet.GetAccount();
             var constants = await GetConstants();
@@ -110,6 +111,7 @@ namespace Elrond.Dotnet.Sdk.Manager
             return new EsdtToken
             {
                 Name = tokenName,
+                TokenType = EsdtToken.EsdtTokenType.NFT,
                 TokenIdentifier = TokenIdentifierValue.From(tokenIdentifier),
                 Creator = account.Address,
                 TokenId = nonce,
@@ -126,19 +128,81 @@ namespace Elrond.Dotnet.Sdk.Manager
             return EsdtToken.From(esdtNftToken);
         }
 
-        public async Task TransferNftToken(Wallet wallet, EsdtToken token, AddressValue receiver)
+        public async Task TransferEsdtToken(Wallet wallet, EsdtToken token, AddressValue receiver, BigInteger quantity)
         {
             var account = wallet.GetAccount();
             var constants = await GetConstants();
             await account.Sync(_provider);
-            var request = EsdtTokenTransactionRequest.TransferEsdtNftTransactionRequest(
-                constants,
-                account,
-                receiver,
-                token.TokenIdentifier.TokenIdentifier,
-                token.TokenId,
-                1
-            );
+
+            TransactionRequest request;
+            switch (token.TokenType)
+            {
+                case EsdtToken.EsdtTokenType.ESDT:
+                    request = EsdtTokenTransactionRequest.TransferEsdtTransactionRequest(
+                        constants,
+                        account,
+                        receiver,
+                        token.TokenIdentifier.TokenIdentifier,
+                        quantity
+                    );
+
+                    break;
+                case EsdtToken.EsdtTokenType.SFT:
+                case EsdtToken.EsdtTokenType.NFT:
+                    request = EsdtTokenTransactionRequest.TransferEsdtNftTransactionRequest(
+                        constants,
+                        account,
+                        receiver,
+                        token.TokenIdentifier.TokenIdentifier,
+                        token.TokenId,
+                        quantity);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var transaction = await request.Send(_provider, wallet);
+            await transaction.WaitForExecution(_provider);
+            transaction.EnsureTransactionSuccess();
+        }
+
+        public async Task TransferEsdtTokenToSmartContract(Wallet wallet, EsdtToken token, AddressValue smartContract,
+            string functionName, BigInteger quantity, params IBinaryType[] args)
+        {
+            var account = wallet.GetAccount();
+            var constants = await GetConstants();
+            await account.Sync(_provider);
+
+            TransactionRequest request;
+            switch (token.TokenType)
+            {
+                case EsdtToken.EsdtTokenType.ESDT:
+                    request = EsdtTokenTransactionRequest.TransferEsdtTransactionRequest(
+                        constants,
+                        account,
+                        smartContract,
+                        token.TokenIdentifier.TokenIdentifier,
+                        quantity
+                    );
+                    break;
+                case EsdtToken.EsdtTokenType.SFT:
+                case EsdtToken.EsdtTokenType.NFT:
+                    request = EsdtTokenTransactionRequest.TransferEsdtNftTransactionRequest(
+                        constants,
+                        account,
+                        smartContract,
+                        token.TokenIdentifier.TokenIdentifier,
+                        token.TokenId,
+                        quantity);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            var parameters = new List<IBinaryType> {BytesValue.FromUtf8(functionName)};
+            parameters.AddRange(args);
+            request.AddArgument(parameters.ToArray());
+            request.SetGasLimit(new GasLimit(60000000));
 
             var transaction = await request.Send(_provider, wallet);
 

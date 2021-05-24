@@ -24,7 +24,7 @@ namespace Elrond.Dotnet.Sdk.Provider
         /// <param name="tokenIdentifier">The token identifier.</param>
         /// <param name="tokenId">The nonce after the NFT creation..</param>
         /// <returns></returns>
-        Task<EsdtItemDto> GetEsdtNftToken(string address, string tokenIdentifier, ulong tokenId);
+        Task<EsdtNftItemDto> GetEsdtNftToken(string address, string tokenIdentifier, ulong tokenId);
 
         Task<EsdtDataDto> GetEsdtToken(string address, string tokenIdentifier);
 

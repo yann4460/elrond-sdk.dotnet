@@ -16,7 +16,7 @@ namespace Elrond.Dotnet.Sdk.Domain
 
         public string Name { get; set; }
         public ulong TokenId { get; set; }
-        public string Hash { get; set; }
+        public byte[] Hash { get; set; }
 
         public Dictionary<string, string> Attributes { get; set; }
 
@@ -25,24 +25,33 @@ namespace Elrond.Dotnet.Sdk.Domain
         public AddressValue Creator { get; set; }
         public Uri[] Uris { get; set; }
 
-        public static EsdtToken From(EsdtItemDto esdt)
+        public EsdtTokenType TokenType { get; set; }
+
+        public enum EsdtTokenType
         {
-            //var attributes = esdt.Attributes.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            ESDT,
+            SFT,
+            NFT
+        }
+
+        public static EsdtToken From(EsdtNftItemDto esdtNft)
+        {
+            //var attributes = esdtNft.Attributes.Split(';', StringSplitOptions.RemoveEmptyEntries);
             //var attributesDic = attributes.ToDictionary(
             //    s => s.Split(":", StringSplitOptions.RemoveEmptyEntries).First(),
             //    v => v.Split(":", StringSplitOptions.RemoveEmptyEntries).Last());
 
-            var uris = esdt.Uris.Select(u => new Uri(Encoding.UTF8.GetString(Convert.FromBase64String(u)))).ToArray();
+            var uris = esdtNft.Uris.Select(u => new Uri(Encoding.UTF8.GetString(Convert.FromBase64String(u)))).ToArray();
             return new EsdtToken
             {
-                Name = esdt.Name,
-                TokenIdentifier = TokenIdentifierValue.From(esdt.TokenIdentifier),
-                TokenId = esdt.Nonce,
-                Royalties = ushort.Parse(esdt.Royalties),
+                Name = esdtNft.Name,
+                TokenIdentifier = TokenIdentifierValue.From(esdtNft.TokenIdentifier),
+                TokenId = esdtNft.Nonce,
+                Royalties = ushort.Parse(esdtNft.Royalties),
                 //Attributes = attributesDic,
-                Creator = AddressValue.FromBech32(esdt.Creator),
+                Creator = AddressValue.FromBech32(esdtNft.Creator),
                 Uris = uris,
-                Hash = esdt.Hash
+                Hash = Convert.FromHexString(esdtNft.Hash)
             };
         }
     }

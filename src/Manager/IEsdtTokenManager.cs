@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Values;
@@ -21,11 +22,13 @@ namespace Elrond.Dotnet.Sdk.Manager
             ushort royalties,
             Dictionary<string, string> attributes,
             Uri[] uris,
-            string hash = null);
+            byte[] hash = null);
 
 
         Task<EsdtToken> GetNftToken(AddressValue address, string tokenIdentifier, ulong tokenId);
 
-        Task TransferNftToken(Wallet wallet, EsdtToken token, AddressValue receiver);
+        Task TransferEsdtToken(Wallet wallet, EsdtToken token, AddressValue receiver, BigInteger quantity);
+
+        Task TransferEsdtTokenToSmartContract(Wallet wallet, EsdtToken token, AddressValue smartContract, string functionName, BigInteger quantity, params IBinaryType[] args);
     }
 }

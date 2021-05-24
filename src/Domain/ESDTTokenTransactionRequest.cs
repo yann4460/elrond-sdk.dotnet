@@ -9,15 +9,16 @@ namespace Elrond.Dotnet.Sdk.Domain
 {
     public class EsdtTokenTransactionRequest
     {
-        private static readonly AddressValue EsdtNftAddress = AddressValue.FromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+        private static readonly AddressValue EsdtNftAddress =
+            AddressValue.FromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
 
         private const string Issue = "issue";
-        private const string SetSpecialRole = "setSpecialRole";
         private const string IssueSemiFungible = "issueSemiFungible";
         private const string IssueNonFungible = "issueNonFungible";
+        private const string SetSpecialRole = "setSpecialRole";
         private const string EsdtNftTransfer = "ESDTNFTTransfer";
-        private const string EsdtTransfer = "ESDTTransfer";
         private const string EsdtNftCreate = "ESDTNFTCreate";
+        private const string EsdtTransfer = "ESDTTransfer";
 
         public static class NFTRoles
         {
@@ -187,7 +188,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             AddressValue receiver,
             string tokenIdentifier,
             ulong tokenId,
-            ulong quantity)
+            BigInteger quantity)
         {
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(constants,
                 account,
@@ -196,7 +197,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
                 NumericValue.U64Value(tokenId),
-                NumericValue.U64Value(quantity),
+                NumericValue.BigUintValue(quantity),
                 receiver
             );
 
@@ -220,7 +221,7 @@ namespace Elrond.Dotnet.Sdk.Domain
             Account account,
             AddressValue receiver,
             string tokenIdentifier,
-            ulong quantity)
+            BigInteger quantity)
         {
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(
                 constants,
@@ -229,7 +230,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 EsdtTransfer,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
-                NumericValue.U64Value(quantity));
+                NumericValue.BigIntValue(quantity));
 
             transaction.SetGasLimit(new GasLimit(500000));
 
@@ -254,16 +255,13 @@ namespace Elrond.Dotnet.Sdk.Domain
             string tokenIdentifier,
             string name,
             ushort royalties,
-            string hash,
+            byte[] hash,
             Dictionary<string, string> attributes,
             Uri[] uris)
         {
             if (royalties > 10000)
                 throw new ArgumentException("Value should be between 0 an 10000 (0 meaning 0% and 10000 meaning 100%",
                     nameof(royalties));
-
-            if (!string.IsNullOrEmpty(hash) && Encoding.UTF8.GetBytes(hash).Length != 32)
-                throw new ArgumentException("Hash should be a 32 bytes length H256", nameof(hash));
 
             if (uris.Length == 0)
                 throw new ArgumentException("At least one URI should be provided", nameof(uris));
@@ -278,14 +276,10 @@ namespace Elrond.Dotnet.Sdk.Domain
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
                 NumericValue.BigUintValue(1),
-                BytesValue.FromUtf8(name),
+                TokenIdentifierValue.From(name),
                 NumericValue.U16Value(royalties),
-                string.IsNullOrEmpty(hash)
-                    ? OptionValue.NewMissing()
-                    : OptionValue.NewProvided(BytesValue.FromUtf8(hash)),
-                string.IsNullOrEmpty(attributeValue)
-                    ? OptionValue.NewMissing()
-                    : OptionValue.NewProvided(BytesValue.FromUtf8(attributeValue)));
+                BytesValue.FromBuffer(hash ?? new byte[0]),
+                BytesValue.FromUtf8(attributeValue));
 
             transaction.AddArgument(urisValue);
 
