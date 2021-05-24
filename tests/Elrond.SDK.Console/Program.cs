@@ -326,12 +326,12 @@ namespace Elrond.SDK.Console
             System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken - Result : {token.TokenId}");
 
 
-
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken");
             var receiver = AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
             await tokenManager.TransferNftToken(wallet, token, receiver);
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken - Result : Ok");
 
-            var transferredToken =
-                await tokenManager.GetNftToken(receiver, token.TokenIdentifier.TokenIdentifier, token.TokenId);
+            var transferredToken = await tokenManager.GetNftToken(receiver, token.TokenIdentifier.TokenIdentifier, token.TokenId);
 
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
             return token;

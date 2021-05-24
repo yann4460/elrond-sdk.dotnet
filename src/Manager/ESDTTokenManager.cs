@@ -55,7 +55,8 @@ namespace Elrond.Dotnet.Sdk.Manager
                 }
             });
 
-            return response.Data.ReturnData.Select(Convert.FromBase64String).Select(decoded => Encoding.UTF8.GetString(decoded)).ToList();
+            return response.Data.ReturnData.Select(Convert.FromBase64String)
+                .Select(decoded => Encoding.UTF8.GetString(decoded)).ToList();
         }
 
         public async Task SetSpecialRole(Wallet wallet, string tokenIdentifier, params string[] roles)
@@ -73,7 +74,7 @@ namespace Elrond.Dotnet.Sdk.Manager
             var transaction = await request.Send(_provider, wallet);
             await transaction.WaitForExecution(_provider);
             transaction.EnsureTransactionSuccess();
-            await Task.Delay(5000); // Hack to ensure that result is apply cross shard
+            await Task.Delay(5000); // Hack to prevent issue when trying to create a token
         }
 
         public async Task<EsdtToken> CreateNftToken(

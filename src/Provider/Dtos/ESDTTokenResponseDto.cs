@@ -14,9 +14,14 @@ namespace Elrond.Dotnet.Sdk.Provider.Dtos
         public string TokenIdentifier { get; set; }
     }
 
+    public class EsdtTokenData
+    {
+        public EsdtItemDto TokenData { get; set; }
+    }
+
     public class EsdtItemDto
     {
-        public string Attributes { get; set; }
+        //public string Attributes { get; set; }
         public string Balance { get; set; }
         public string Creator { get; set; }
         public string Hash { get; set; }

@@ -27,10 +27,10 @@ namespace Elrond.Dotnet.Sdk.Domain
 
         public static EsdtToken From(EsdtItemDto esdt)
         {
-            var attributes = esdt.Attributes.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            var attributesDic = attributes.ToDictionary(
-                s => s.Split(":", StringSplitOptions.RemoveEmptyEntries).First(),
-                v => v.Split(":", StringSplitOptions.RemoveEmptyEntries).Last());
+            //var attributes = esdt.Attributes.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            //var attributesDic = attributes.ToDictionary(
+            //    s => s.Split(":", StringSplitOptions.RemoveEmptyEntries).First(),
+            //    v => v.Split(":", StringSplitOptions.RemoveEmptyEntries).Last());
 
             var uris = esdt.Uris.Select(u => new Uri(Encoding.UTF8.GetString(Convert.FromBase64String(u)))).ToArray();
             return new EsdtToken
@@ -39,7 +39,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 TokenIdentifier = TokenIdentifierValue.From(esdt.TokenIdentifier),
                 TokenId = esdt.Nonce,
                 Royalties = ushort.Parse(esdt.Royalties),
-                Attributes = attributesDic,
+                //Attributes = attributesDic,
                 Creator = AddressValue.FromBech32(esdt.Creator),
                 Uris = uris,
                 Hash = esdt.Hash

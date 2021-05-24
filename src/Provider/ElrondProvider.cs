@@ -45,6 +45,9 @@ namespace Elrond.Dotnet.Sdk.Provider
 
         public async Task<ESDTTokenDataDto> GetEsdtTokens(string address)
         {
+            //TODO : Use the API instead ?
+            //https://testnet-api.elrond.com/accounts/erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx/tokens
+
             var response = await _httpClient.GetAsync($"address/{address}/esdt");
             var result = await response.Content.ReadFromJsonAsync<ElrondGatewayResponseDto<ESDTTokenDataDto>>();
             result.EnsureSuccessStatusCode();
@@ -54,11 +57,14 @@ namespace Elrond.Dotnet.Sdk.Provider
 
         public async Task<EsdtItemDto> GetEsdtNftToken(string address, string tokenIdentifier, ulong tokenId)
         {
+            //TODO : Use the API instead ?
+            //https://testnet-api.elrond.com/accounts/erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx/tokens/MTKN2-089d29
+
             var response = await _httpClient.GetAsync($"address/{address}/nft/{tokenIdentifier}/nonce/{tokenId}");
-            var result = await response.Content.ReadFromJsonAsync<ElrondGatewayResponseDto<EsdtItemDto>>();
+            var result = await response.Content.ReadFromJsonAsync<ElrondGatewayResponseDto<EsdtTokenData>>();
             result.EnsureSuccessStatusCode();
 
-            return result.Data;
+            return result.Data.TokenData;
         }
 
         public async Task<EsdtDataDto> GetEsdtToken(string address, string tokenIdentifier)
