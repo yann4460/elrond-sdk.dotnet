@@ -74,7 +74,7 @@ namespace Elrond.Dotnet.Sdk.Manager
             var transaction = await request.Send(_provider, wallet);
             await transaction.WaitForExecution(_provider);
             transaction.EnsureTransactionSuccess();
-            await Task.Delay(5000); // Hack to prevent issue when trying to create a token
+            await Task.Delay(6 * 5000); // Hack to prevent issue when trying to create a token
         }
 
         public async Task<EsdtToken> CreateNftToken(

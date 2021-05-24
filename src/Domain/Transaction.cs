@@ -50,7 +50,6 @@ namespace Elrond.Dotnet.Sdk.Domain
             return decodedResponses;
         }
 
-
         public List<IBinaryType> GetSmartContractResult(string endpoint, AbiDefinition abiDefinition)
         {
             if (_smartContractResult == null || _smartContractResult.Length == 0)
