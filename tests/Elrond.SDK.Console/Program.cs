@@ -353,7 +353,7 @@ namespace Elrond.SDK.Console
 
             var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqqfpjhksl9nwruxm6fscs8c85cj6z0dfkmxjqk9pfty");
 
-            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(-5)).ToUnixTimeSeconds();
+            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(15)).ToUnixTimeSeconds();
             await tokenManager.TransferEsdtTokenToSmartContract(
                 wallet,
                 token,
