@@ -16,16 +16,13 @@ namespace Elrond_sdk.dotnet.tests.Domain
         public void Setup()
         {
             var mock = new Mock<IElrondProvider>();
-            mock.Setup(s => s.GetConstants()).ReturnsAsync(new ConfigResponseDto
+            mock.Setup(s => s.GetConstants()).ReturnsAsync(new ConfigDataDto
             {
-                Data = new ConfigDataDto
+                Config = new ConfigDto
                 {
-                    Config = new ConfigDto
-                    {
-                        erd_min_gas_limit = 50000,
-                        erd_gas_per_data_byte = 1500,
-                        erd_min_gas_price = 1000000000
-                    }
+                    erd_min_gas_limit = 50000,
+                    erd_gas_per_data_byte = 1500,
+                    erd_min_gas_price = 1000000000
                 }
             });
             _elrondProvider = mock.Object;

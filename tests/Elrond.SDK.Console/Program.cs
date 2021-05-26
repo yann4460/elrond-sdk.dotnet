@@ -1,11 +1,15 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Numerics;
 using System.Threading.Tasks;
+using Elrond.Dotnet.Sdk;
 using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Values;
+using Elrond.Dotnet.Sdk.Manager;
 using Elrond.Dotnet.Sdk.Provider;
 using Elrond.Dotnet.Sdk.Provider.Dtos;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Elrond.SDK.Console
 {
@@ -13,31 +17,42 @@ namespace Elrond.SDK.Console
     {
         public static async Task Main(string[] args)
         {
-            var password = "&KEiHn!rdBTRCPtaF9Bf";
-            var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
-            var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
+            var services = new ServiceCollection();
+            services.AddElrondProvider(Extension.Network.TestNet);
 
-            var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
+            var serviceProvider = services.BuildServiceProvider();
 
-            var client = new HttpClient {BaseAddress = new Uri("https://testnet-gateway.elrond.com")};
-            var provider = new ElrondProvider(client);
-            var constants = await Constants.GetFromNetwork(provider);
+            var provider = serviceProvider.GetRequiredService<IElrondProvider>();
+            {
+                var password = "&KEiHn!rdBTRCPtaF9Bf";
+                var address = "erd17rnvj9shx2x9vh2ckw0nf53vvlylj6235lmrhu668rg2c9a8mxjqvjrhq5";
+                var keyFile = KeyFile.FromFilePath($"Wallets/{address}.json");
+                var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
+                var constants = await Constants.GetFromNetwork(provider);
 
-            await CreateNFT(provider, constants, wallet);
+                //var sc = await DeploySmartContract(provider, constants, wallet, "SmartContracts/auction/auction.wasm");
 
-            await SynchronizingNetworkParameter();
-            await SynchronizingAnAccountObject(provider);
+                await CreateNFTTokenThenTransfer(
+                    serviceProvider.GetRequiredService<IEsdtTokenManager>(),
+                    serviceProvider.GetRequiredService<IElrondProvider>(),
+                    wallet);
 
-            await CreatingValueTransferTransactions(provider, constants, wallet);
 
-            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
-            await QueryAuctionSmartContractWithoutAbi(provider, auction);
-            await QueryAuctionSmartContractWithAbi(provider, auction);
-            await QueryAuctionSmartContractWithMultiResult(provider, auction);
+                await SynchronizingNetworkParameter();
+                await SynchronizingAnAccountObject(provider);
 
-            var adder = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
-            await QueryAdderSmartContract(provider, constants, wallet, adder);
-            await CallAdderSmartContract(provider, constants, wallet, adder);
+                await CreatingValueTransferTransactions(provider, constants, wallet);
+
+                // This sc is already deployed
+                var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+                await QueryAuctionSmartContractWithoutAbi(provider, auction);
+                await QueryAuctionSmartContractWithAbi(provider, auction);
+                await QueryAuctionSmartContractWithMultiResult(provider, auction);
+
+                var adder = await DeploySmartContract(provider, constants, wallet, "SmartContracts/adder/adder.wasm");
+                await QueryAdderSmartContract(provider, constants, wallet, adder);
+                await CallAdderSmartContract(provider, constants, wallet, adder);
+            }
         }
 
         private static async Task SynchronizingNetworkParameter()
@@ -75,8 +90,8 @@ namespace Elrond.SDK.Console
             var receiver = AddressValue.FromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
             await sender.Sync(provider);
 
-            var transaction = TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("2.15"));
-
+            var transaction =
+                TransactionRequest.CreateTransaction(sender, constants, receiver, Balance.EGLD("0.0000054715"));
             transaction.SetData("Hello world !");
             transaction.SetGasLimit(GasLimit.ForTransfer(constants, transaction));
 
@@ -100,8 +115,6 @@ namespace Elrond.SDK.Console
                 scAddress,
                 "getSum",
                 Balance.Zero());
-
-            queryTransaction.SetGasLimit(await GasLimit.ForTransaction(queryTransaction, provider));
 
             var transaction = await queryTransaction.Send(provider, wallet);
             await transaction.WaitForExecution(provider);
@@ -243,7 +256,6 @@ namespace Elrond.SDK.Console
                 NumericValue.BigIntValue(12)
             );
 
-            addRequest.SetGasLimit(new GasLimit(60000000));
             var addRequestTransaction = await addRequest.Send(provider, wallet);
             await addRequestTransaction.WaitForExecution(provider);
             addRequestTransaction.EnsureTransactionSuccess();
@@ -255,7 +267,7 @@ namespace Elrond.SDK.Console
                 ScAddress = scAddress.Bech32
             });
 
-            var sumBytes = Convert.FromBase64String(result.Data.Data.ReturnData[0]);
+            var sumBytes = Convert.FromBase64String(result.Data.ReturnData[0]);
             var sumHex = Convert.ToHexString(sumBytes);
             System.Console.WriteLine($"sumHex : {sumHex}");
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
@@ -279,8 +291,6 @@ namespace Elrond.SDK.Console
                 new CodeMetadata(false, true, false),
                 NumericValue.BigIntValue(5));
 
-            deployRequest.SetGasLimit(new GasLimit(60000000));
-
             // Get the deployed smart contract address based on account address and transaction nonce
             var smartContractAddress = SmartContract.ComputeAddress(account.Address, account.Nonce);
             var deployTransaction = await deployRequest.Send(provider, wallet);
@@ -293,22 +303,86 @@ namespace Elrond.SDK.Console
             return smartContractAddress;
         }
 
-
-        private static async Task CreateNFT(IElrondProvider provider, Constants constants, Wallet wallet)
+        private static async Task<EsdtToken> CreateNFTTokenThenTransfer(
+            IEsdtTokenManager tokenManager,
+            IElrondProvider provider,
+            Wallet wallet)
         {
-            System.Console.WriteLine("CreateNFT");
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNFTTokenThenTransfer");
 
-            var manager = new ESDTTokenManager(provider, constants, wallet);
+            var tokenIdentifier = "STR-94b1f5";
+            //{
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken");
+            //    var tokenIdentifier = await tokenManager.IssueNonFungibleToken(wallet, "MyToken2", "MTKN2");
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] IssueNonFungibleToken - Result : {tokenIdentifier}");
 
-            var tokenIdentifier = await manager.IssueNonFungibleToken("MyToken1", "MTKN");
-            System.Console.WriteLine($"Issue token : {tokenIdentifier}");
 
-            await manager.SetSpecialRole(tokenIdentifier, ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole");
+            //    await tokenManager.SetSpecialRole(wallet, tokenIdentifier,
+            //        EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate);
+            //    System.Console.WriteLine($"[{DateTime.UtcNow:O}] SetSpecialRole - Result : Ok ");
+            //    var roles = await tokenManager.GetSpecialRole(tokenIdentifier);
+            //    foreach (var role in roles)
+            //    {
+            //        System.Console.WriteLine($"[{DateTime.UtcNow:O}] Roles : " + role);
+            //    }
+            //}
 
-            var tokenId = await manager.CreateNFT(tokenIdentifier, "My token name can be a longer one");
-            System.Console.WriteLine($"Create token  '{tokenIdentifier}:{tokenId}'");
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken");
+            var token = await tokenManager.CreateNftToken(wallet, tokenIdentifier, "My beautiful token xoxoxoxoxo", 500,
+                new Dictionary<string, string>()
+                {
+                    {"Artist", "Famous artist"},
+                    {"Duration", "03.17"}
+                },
+                new[]
+                {
+                    new Uri("https://www.google.fr")
+                }, Convert.FromHexString("5589558955895589558955895589"));
+
+            System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken - Result : {token.TokenId}");
+
+            if (false)
+            {
+                System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken");
+                var receiver =
+                    AddressValue.FromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+                await tokenManager.TransferEsdtToken(wallet, token, receiver, BigInteger.One);
+                System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken - Result : Ok");
+            }
+
+            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqqfpjhksl9nwruxm6fscs8c85cj6z0dfkmxjqk9pfty");
+
+            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(15)).ToUnixTimeSeconds();
+            await tokenManager.TransferEsdtTokenToSmartContract(
+                wallet,
+                token,
+                auction,
+                "auctionToken",
+                BigInteger.One,
+                NumericValue.Balance(Balance.EGLD("0.1")),
+                NumericValue.Balance(Balance.EGLD("2")),
+                NumericValue.U64Value(unixTime),
+                TokenIdentifierValue.EGLD());
+
+            var abiDefinition = await AbiDefinition.FromJsonFilePath("SmartContracts/auction/auction.abi.json");
+            var getFullAuctionData = await SmartContract.QuerySmartContractWithAbiDefinition(
+                provider,
+                auction,
+                abiDefinition,
+                "getFullAuctionData",
+                token.TokenIdentifier,
+                NumericValue.U64Value(token.TokenId));
+
+            // Need to use the value define in the ABI file (Here it's a StructValue)
+            var optFullAuctionData = getFullAuctionData.ValueOf<OptionValue>();
+            if (optFullAuctionData.IsSet())
+            {
+                var fullAuctionData = optFullAuctionData.Value.ValueOf<StructValue>().Fields;
+            }
 
             System.Console.WriteLine("-*-*-*-*-*" + Environment.NewLine);
+            return token;
         }
     }
 }

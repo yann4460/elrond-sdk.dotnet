@@ -28,13 +28,13 @@ namespace Elrond.Dotnet.Sdk.Domain
         private TransactionRequest(Account account, Constants constants)
         {
             _account = account;
+            _chainId = constants.ChainId;
             Sender = account.Address;
             Receiver = AddressValue.Zero();
             Value = new Balance(0);
             Nonce = account.Nonce;
             GasLimit = new GasLimit(constants.MinGasLimit);
             GasPrice = constants.MinGasPrice;
-            _chainId = constants.ChainId;
         }
 
         public static TransactionRequest CreateTransaction(Account account, Constants constants)
@@ -116,26 +116,14 @@ namespace Elrond.Dotnet.Sdk.Domain
             return Transaction.From(result);
         }
 
-        public void ComputeGasLimitForTransfer(Constants constants)
-        {
-            var gasLimit = GasLimit.ForTransfer(constants, this);
-            SetGasLimit(gasLimit);
-        }
-
-        public async Task ComputeGasLimit(IElrondProvider provider)
-        {
-            var gasLimit = await GasLimit.ForTransaction(this, provider);
-            SetGasLimit(gasLimit);
-        }
-
         public void AddArgument(IBinaryType[] args)
         {
             if (!args.Any())
                 return;
 
             var binaryCodec = new BinaryCodec();
-            var data = args.Aggregate(GetDecodedData(),
-                (c, arg) => c + $"@{Convert.ToHexString(binaryCodec.EncodeTopLevel(arg))}");
+            var decodedData = GetDecodedData();
+            var data = args.Aggregate(decodedData, (c, arg) => c + $"@{Convert.ToHexString(binaryCodec.EncodeTopLevel(arg))}");
             SetData(data);
         }
     }

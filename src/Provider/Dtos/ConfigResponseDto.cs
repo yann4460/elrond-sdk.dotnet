@@ -1,12 +1,5 @@
 ﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
 {
-    public class ConfigResponseDto
-    {
-        public ConfigDataDto Data { get; set; }
-        public string Error { get; set; }
-        public string Code { get; set; }
-    }
-
     public class ConfigDataDto
     {
         public ConfigDto Config { get; set; }

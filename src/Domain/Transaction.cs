@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
@@ -21,9 +23,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             TxHash = hash;
         }
 
-        public static Transaction From(CreateTransactionResponseDto createTransactionResponse)
+        public static Transaction From(CreateTransactionResponseDataDto createTransactionResponse)
         {
-            return new Transaction(createTransactionResponse.Data.TxHash);
+            return new Transaction(createTransactionResponse.TxHash);
         }
 
         public List<IBinaryType> GetSmartContractResult(TypeValue[] typeValues, int smartContractIndex = 0)
@@ -47,7 +49,6 @@ namespace Elrond.Dotnet.Sdk.Domain
 
             return decodedResponses;
         }
-
 
         public List<IBinaryType> GetSmartContractResult(string endpoint, AbiDefinition abiDefinition)
         {
@@ -119,7 +120,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public async Task Sync(IElrondProvider provider)
         {
             var detail = await provider.GetTransactionDetail(TxHash);
-            var transaction = detail.Data.Transaction;
+            var transaction = detail.Transaction;
             _smartContractResult = transaction.SmartContractResults;
             Status = transaction.Status;
         }
@@ -139,7 +140,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         public async Task WaitForExecution(IElrondProvider provider, TimeSpan? timeout = null)
         {
             if (!timeout.HasValue)
-                timeout = TimeSpan.FromSeconds(30);
+                timeout = TimeSpan.FromSeconds(60);
 
             var currentIteration = 0;
             do
@@ -149,17 +150,19 @@ namespace Elrond.Dotnet.Sdk.Domain
                 currentIteration++;
             } while (IsPending() && currentIteration < timeout.Value.TotalSeconds);
 
+            if (_smartContractResult != null && _smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
+            {
+                var returnMessages = _smartContractResult.Select(x => x.ReturnMessage).ToArray();
+                var message = string.Join(Environment.NewLine, returnMessages);
+                throw new Exception($"Transaction '{TxHash}' has smart contract error : {message}");
+            }
+
             if (IsInvalid())
                 throw new Exception($"Transaction '{TxHash}' is invalid");
 
-            if (_smartContractResult.Any(s => !string.IsNullOrEmpty(s.ReturnMessage)))
-            {
-                var message = string.Join(Environment.NewLine, _smartContractResult.Select(x => x.ReturnMessage).ToArray());
-                throw new Exception($"Smart contract error : {message}");
-            }
-
             if (!IsExecuted())
-                throw new Exception($"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
+                throw new Exception(
+                    $"Transaction '{TxHash}' is not yet executed after {timeout.Value.TotalSeconds} seconds");
         }
     }
 }

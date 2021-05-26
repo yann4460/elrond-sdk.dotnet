@@ -39,7 +39,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "TKN";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueNonFungibleTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueNonFungibleTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -64,7 +64,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "TKN";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueSemiFungibleTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueSemiFungibleTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -89,7 +89,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenTicker = "ALC";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.IssueESDTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.IssueEsdtTransactionRequest(
                 _constants,
                 _account,
                 tokenName,
@@ -115,7 +115,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.TransferESDTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.TransferEsdtTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
@@ -140,7 +140,7 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.TransferESDTNFTTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.TransferEsdtNftTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
@@ -153,10 +153,8 @@ namespace Elrond_sdk.dotnet.tests.Domain
             Assert.That(transaction.Receiver, Is.EqualTo(_account.Address));
             Assert.That(transaction.Sender, Is.EqualTo(_account.Address));
 
-            Assert.That(Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data)),
-                Is.EqualTo(
-                    "ESDTNFTTransfer@414C432D363235386432@0C@01@8049D639E5A6980D1CD2392ABCCE41029CDA74A1563523A202F09641CC2618F8"));
-            Assert.That(transaction.GasLimit.Value, Is.EqualTo(500000));
+            Assert.That(Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data)), Is.EqualTo("ESDTNFTTransfer@414C432D363235386432@0C@01@8049D639E5A6980D1CD2392ABCCE41029CDA74A1563523A202F09641CC2618F8"));
+            Assert.That(transaction.GasLimit.Value, Is.EqualTo(1000000));
             Assert.That(transaction.Value.Number.ToString(), Is.EqualTo(0.ToString()));
         }
 
@@ -167,13 +165,13 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.SetSpecialRoleTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.SetSpecialRoleTransactionRequest(
                 _constants,
                 _account,
                 _receiver,
                 tokenIdentifier,
-                ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate,
-                ESDTTokenTransactionRequest.NFTRoles.ESDTRoleNFTBurn);
+                EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTCreate,
+                EsdtTokenTransactionRequest.NFTRoles.ESDTRoleNFTBurn);
 
             // Assert
             Assert.That(transaction, Is.Not.Null);
@@ -196,20 +194,19 @@ namespace Elrond_sdk.dotnet.tests.Domain
             const string tokenIdentifier = "ALC-6258d2";
 
             // Act
-            var transaction = ESDTTokenTransactionRequest.CreateESDTNFTTokenTransactionRequest(
+            var transaction = EsdtTokenTransactionRequest.CreateEsdtNftTokenTransactionRequest(
                 _constants,
                 _account,
                 tokenIdentifier,
-                BigInteger.One,
                 "Beautiful song",
                 7500,
-                "",
+                null,
                 new Dictionary<string, string>
                 {
                     {"Artist", "Famous artist"},
                     {"Duration", "03.17"},
                 },
-                new[] {"URL_to_decentralized_storage/song.mp3"});
+                new[] {new Uri("https://wwww.to_decentralized_storage/song.mp3")});
 
             // Assert
             Assert.That(transaction, Is.Not.Null);
@@ -218,8 +215,8 @@ namespace Elrond_sdk.dotnet.tests.Domain
 
             var hex = Encoding.UTF8.GetString(Convert.FromBase64String(transaction.Data));
             Assert.That(hex,
-                Is.EqualTo($"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@4172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@55524C5F746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
-            Assert.That(transaction.GasLimit.Value, Is.EqualTo(9927000));
+                Is.EqualTo($"ESDTNFTCreate@414C432D363235386432@01@42656175746966756C20736F6E67@1D4C@@4172746973743A46616D6F7573206172746973743B4475726174696F6E3A30332E3137@68747470733A2F2F777777772E746F5F646563656E7472616C697A65645F73746F726167652F736F6E672E6D7033"));
+            Assert.That(transaction.GasLimit.Value, Is.EqualTo(10404000));
             Assert.That(transaction.Value.Number.ToString(), Is.EqualTo(0.ToString()));
         }
     }

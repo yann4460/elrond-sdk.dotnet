@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Elrond.Dotnet.Sdk.Domain;
 using Elrond.Dotnet.Sdk.Domain.Codec;
 using Elrond.Dotnet.Sdk.Domain.Values;
 using NUnit.Framework;

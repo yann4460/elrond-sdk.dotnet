@@ -9,7 +9,6 @@ namespace Elrond.Dotnet.Sdk.Domain
         public AddressValue Address { get; }
         public Balance Balance { get; private set; }
         public int Nonce { get; private set; }
-        public string Code { get; private set; }
         public string UserName { get; private set; }
 
         public Account(AddressValue address)
@@ -26,10 +25,11 @@ namespace Elrond.Dotnet.Sdk.Domain
         public async Task Sync(IElrondProvider provider)
         {
             var accountDto = await provider.GetAccount(Address.Bech32);
-            Balance = new Balance(accountDto.Data.Account.Balance);
-            Nonce = accountDto.Data.Account.Nonce;
-            Code = accountDto.Code;
-            UserName = accountDto.Data.Account.Username;
+            var account = accountDto.Account;
+
+            Balance = new Balance(account.Balance);
+            Nonce = account.Nonce;
+            UserName = account.Username;
         }
 
         /// <summary>

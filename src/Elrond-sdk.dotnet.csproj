@@ -14,7 +14,7 @@
     <RepositoryType>Github</RepositoryType>
     <Company />
     <Description>Elrond SDK for .NET Core</Description>
-    <Version>1.0.13</Version>
+    <Version>1.0.15</Version>
     <RootNamespace>Elrond.Dotnet.Sdk</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -22,5 +22,7 @@
     <PackageReference Include="dotnetstandard-bip39" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="5.0.3" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
   </ItemGroup>
 </Project>

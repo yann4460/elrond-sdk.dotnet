@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using Elrond.Dotnet.Sdk.Domain.Values;
-using Elrond.Dotnet.Sdk.Provider.Dtos;
 
 namespace Elrond.Dotnet.Sdk.Domain
 {
-    public class ESDTTokenTransactionRequest
+    public class EsdtTokenTransactionRequest
     {
         private static readonly AddressValue EsdtNftAddress =
             AddressValue.FromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
 
         private const string Issue = "issue";
-        private const string SetSpecialRole = "setSpecialRole";
         private const string IssueSemiFungible = "issueSemiFungible";
         private const string IssueNonFungible = "issueNonFungible";
-        private const string EsdtnftTransfer = "ESDTNFTTransfer";
+        private const string SetSpecialRole = "setSpecialRole";
+        private const string EsdtNftTransfer = "ESDTNFTTransfer";
+        private const string EsdtNftCreate = "ESDTNFTCreate";
         private const string EsdtTransfer = "ESDTTransfer";
-        private const string ESDTNFTCreate = "ESDTNFTCreate";
 
         public static class NFTRoles
         {
@@ -61,7 +61,7 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="initialSupply">The initial supply</param>
         /// <param name="numberOfDecimals">Number of decimals, should be a numerical value between 0 and 18</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest IssueESDTTransactionRequest(
+        public static TransactionRequest IssueEsdtTransactionRequest(
             Constants constants,
             Account account,
             string tokenName,
@@ -110,7 +110,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 TokenIdentifierValue.From(tokenIdentifier),
                 receiver);
 
-            transaction.AddArgument(roles.Select(BytesValue.FromUtf8).ToArray());
+            transaction.AddArgument(roles.Select<string, IBinaryType>(BytesValue.FromUtf8).ToArray());
             transaction.SetGasLimit(new GasLimit(60000000));
 
             return transaction;
@@ -182,26 +182,27 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="tokenId">The nonce after the NFT creation</param>
         /// <param name="quantity">Should be 1 if NFT</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest TransferESDTNFTTransactionRequest(
+        public static TransactionRequest TransferEsdtNftTransactionRequest(
             Constants constants,
             Account account,
             AddressValue receiver,
             string tokenIdentifier,
             ulong tokenId,
-            ulong quantity)
+            BigInteger quantity)
         {
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(constants,
                 account,
                 account.Address,
-                EsdtnftTransfer,
+                EsdtNftTransfer,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
                 NumericValue.U64Value(tokenId),
-                NumericValue.U64Value(quantity),
+                NumericValue.BigUintValue(quantity),
                 receiver
             );
 
-            transaction.SetGasLimit(new GasLimit(500000));
+            //GasLimit: 1000000 + length of Data field in bytes * 1500
+            transaction.SetGasLimit(new GasLimit(1000000));
 
             return transaction;
         }
@@ -215,12 +216,12 @@ namespace Elrond.Dotnet.Sdk.Domain
         /// <param name="tokenIdentifier">The token identifier</param>
         /// <param name="quantity">Quantity to transfer</param>
         /// <returns>The transaction request</returns>
-        public static TransactionRequest TransferESDTTransactionRequest(
+        public static TransactionRequest TransferEsdtTransactionRequest(
             Constants constants,
             Account account,
             AddressValue receiver,
             string tokenIdentifier,
-            ulong quantity)
+            BigInteger quantity)
         {
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(
                 constants,
@@ -229,7 +230,7 @@ namespace Elrond.Dotnet.Sdk.Domain
                 EsdtTransfer,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
-                NumericValue.U64Value(quantity));
+                NumericValue.BigIntValue(quantity));
 
             transaction.SetGasLimit(new GasLimit(500000));
 
@@ -237,42 +238,47 @@ namespace Elrond.Dotnet.Sdk.Domain
         }
 
         /// <summary>
-        /// 
+        /// Create a NFT token
         /// </summary>
         /// <param name="constants"></param>
         /// <param name="account">Account with ESDTRoleNFTCreate role</param>
         /// <param name="tokenIdentifier">The token identifier</param>
-        /// <param name="initialQuantity">The quantity of the token. If NFT, it must be 1</param>
         /// <param name="name">The name of the NFT or SFT</param>
         /// <param name="royalties">Allows the creator to receive royalties for any transaction involving their NFT (Base format is a numeric value between 0 an 10000 (0 meaning 0% and 10000 meaning 100%)</param>
         /// <param name="hash">Arbitrary field that should contain the hash of the NFT metadata.</param>
         /// <param name="attributes">Arbitrary field that should contain a set of attributes in the format desired by the creator</param>
         /// <param name="uris">Minimum one field that should contain the Uniform Resource Identifier. Can be a URL to a media file or something similar.</param>
         /// <returns></returns>
-        public static TransactionRequest CreateESDTNFTTokenTransactionRequest(
+        public static TransactionRequest CreateEsdtNftTokenTransactionRequest(
             Constants constants,
             Account account,
             string tokenIdentifier,
-            BigInteger initialQuantity,
             string name,
             ushort royalties,
-            string hash,
+            byte[] hash,
             Dictionary<string, string> attributes,
-            string[] uris)
+            Uri[] uris)
         {
+            if (royalties > 10000)
+                throw new ArgumentException("Value should be between 0 an 10000 (0 meaning 0% and 10000 meaning 100%",
+                    nameof(royalties));
+
+            if (uris.Length == 0)
+                throw new ArgumentException("At least one URI should be provided", nameof(uris));
+
             var attributeValue = string.Join(";", attributes.Select(x => x.Key + ":" + x.Value).ToArray());
-            var urisValue = uris.Select(u => (IBinaryType) BytesValue.FromUtf8(u)).ToArray();
+            var urisValue = uris.Select(u => (IBinaryType) BytesValue.FromUtf8(u.AbsoluteUri)).ToArray();
             var transaction = SmartContract.CreateCallSmartContractTransactionRequest(
                 constants,
                 account,
                 account.Address,
-                ESDTNFTCreate,
+                EsdtNftCreate,
                 Balance.Zero(),
                 TokenIdentifierValue.From(tokenIdentifier),
-                NumericValue.BigUintValue(initialQuantity),
-                BytesValue.FromUtf8(name),
-                NumericValue.U64Value(royalties),
-                BytesValue.FromUtf8(hash),
+                NumericValue.BigUintValue(1),
+                TokenIdentifierValue.From(name),
+                NumericValue.U16Value(royalties),
+                BytesValue.FromBuffer(hash ?? new byte[0]),
                 BytesValue.FromUtf8(attributeValue));
 
             transaction.AddArgument(urisValue);
@@ -281,7 +287,9 @@ namespace Elrond.Dotnet.Sdk.Domain
             // Transaction payload cost: Data field length * 1500 (GasPerDataByte = 1500)
             var transactionCost = Convert.FromBase64String(transaction.Data).Length * constants.GasPerDataByte;
             // Storage cost: Size of NFT data * 50000 (StorePerByte = 50000)
-            var storageCost = storePerByte * BytesValue.FromUtf8(attributeValue).GetLength() +
+            var storageCost = (string.IsNullOrEmpty(attributeValue)
+                                  ? 0
+                                  : storePerByte * BytesValue.FromUtf8(attributeValue).GetLength()) +
                               storePerByte * urisValue.Sum(u => u.ValueOf<BytesValue>().GetLength());
             transaction.SetGasLimit(new GasLimit(6000000 + transactionCost + storageCost));
 
