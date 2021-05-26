@@ -30,6 +30,7 @@ namespace Elrond.SDK.Console
                 var wallet = Wallet.DeriveFromKeyFile(keyFile, password);
                 var constants = await Constants.GetFromNetwork(provider);
 
+                //var sc = await DeploySmartContract(provider, constants, wallet, "SmartContracts/auction/auction.wasm");
 
                 await CreateNFTTokenThenTransfer(
                     serviceProvider.GetRequiredService<IEsdtTokenManager>(),
@@ -337,7 +338,7 @@ namespace Elrond.SDK.Console
                 new[]
                 {
                     new Uri("https://www.google.fr")
-                },Convert.FromHexString("5589558955895589558955895589"));
+                }, Convert.FromHexString("5589558955895589558955895589"));
 
             System.Console.WriteLine($"[{DateTime.UtcNow:O}] CreateNftToken - Result : {token.TokenId}");
 
@@ -350,9 +351,9 @@ namespace Elrond.SDK.Console
                 System.Console.WriteLine($"[{DateTime.UtcNow:O}] TransferNftToken - Result : Ok");
             }
 
-            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqjc4rtxq4q7ap37ujrud855ydy6rkslu5rdpqsum6wy");
+            var auction = AddressValue.FromBech32("erd1qqqqqqqqqqqqqpgqqfpjhksl9nwruxm6fscs8c85cj6z0dfkmxjqk9pfty");
 
-            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(5)).ToUnixTimeSeconds();
+            var unixTime = (ulong) ((DateTimeOffset) DateTime.Now.AddMinutes(-5)).ToUnixTimeSeconds();
             await tokenManager.TransferEsdtTokenToSmartContract(
                 wallet,
                 token,
