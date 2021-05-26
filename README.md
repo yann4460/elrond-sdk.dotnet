@@ -1,5 +1,5 @@
 # Elrond SDK for .NET Core 
-[![Build status](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml/badge.svg)](httpshttps://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml)  
+[![Build status](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml)  
 
 ## How to install ? 
 Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
