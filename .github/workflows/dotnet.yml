@@ -19,11 +19,11 @@ jobs:
         dotnet-version: 5.0.x
       
     - name: Build with dotnet
-      run: dotnet build Elrondnet.sln --configuration Release
+      run: dotnet build Erdcsharp.sln --configuration Release
       working-directory: src
       
     - name: Test
-      working-directory: tests/Elrond-sdk.dotnet.tests
+      working-directory: tests/Erdcsharp.Tests
       run: dotnet test --configuration Release --no-build --verbosity normal
 
     - name: Publish on nuget.org
