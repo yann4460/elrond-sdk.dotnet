@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Elrond C# SDK for interacting with the Elrond Network (in general) and Smart Contracts (in particular).</Description>
-    <TargetFrameworks>netstandard2.0;net5.0;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net5.0;net461;net47;</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>elrond-sdk-erdsharp</PackageId>
-    <Authors></Authors>
+    <PackageId>elrond-sdk.dotnet</PackageId>
+    <Authors>GUILLIN Yannick</Authors>
     <Product />
     <PackageTags>elrond</PackageTags>
-    <PackageLicenseExpression></PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/ElrondNetwork/elrond-sdk-erdcsharp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ElrondNetwork/elrond-sdk-erdcsharp</RepositoryUrl>
+    <AssemblyName>Elrond-sdk.dotnet</AssemblyName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/yann4460/elrond-sdk.dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/yann4460/elrond-sdk.dotnet</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <Company />
-    <Version>1.0.0</Version>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Description>Elrond SDK for .NET Core</Description>
+    <Version>2.0.0</Version>
+    <RootNamespace>Elrond.Dotnet.Sdk</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
