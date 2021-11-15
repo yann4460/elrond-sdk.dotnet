@@ -1,5 +1,13 @@
-# elrond-sdk-erdcsharp
-[![Build status](https://github.com/ElrondNetwork/elrond-sdk-erdcsharp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/ElrondNetwork/elrond-sdk-erdcsharp/actions/workflows/dotnet.yml)  [![Package](https://img.shields.io/nuget/v/elrond-sdk-erdcsharp)](https://www.nuget.org/packages/elrond-sdk-erdcsharp/)
+# Elrond SDK for .NET Core 
+[![Build status](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml/badge.svg)](https://github.com/yann4460/elrond-sdk.dotnet/actions/workflows/dotnet.yml)  
+
+## How to install ? 
+Elronford SDK for .NET Core is delivered via nuget package, therefore it can be installed as follows:
+
+`Install-Package elrond-sdk.dotnet`
+
+[![Package](https://img.shields.io/nuget/v/elrond-sdk.dotnet)](https://www.nuget.org/packages/elrond-sdk.dotnet/)
+
 
 Elrond C# SDK for interacting with the Elrond Network (in general) and Smart Contracts (in particular).
 
