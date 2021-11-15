@@ -1,18 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
+using Erdcsharp.Domain.Helper;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class MultiValue : IBinaryType
+    public class MultiValue : BaseBinaryValue
     {
-        public TypeValue Type { get; }
         public Dictionary<TypeValue, IBinaryType> Values { get; }
 
-        public MultiValue(TypeValue type, Dictionary<TypeValue, IBinaryType> values)
+        public MultiValue(TypeValue type, Dictionary<TypeValue, IBinaryType> values) : base(type)
         {
-            Type = type;
             Values = values;
         }
 
@@ -26,15 +24,20 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         {
             var builder = new StringBuilder();
             builder.AppendLine(Type.Name);
-            foreach (var (key, value) in Values)
+            foreach (var value in Values)
             {
-                builder.AppendLine($"{key}:{value}");
+                builder.AppendLine($"{value.Key}:{value}");
             }
 
             return builder.ToString();
         }
 
-        public string ToJSON()
+        public override T ToObject<T>()
+        {
+            return JsonSerializerWrapper.Deserialize<T>(ToJson());
+        }
+
+        public override string ToJson()
         {
             var dic = new Dictionary<string, object>();
             for (var i = 0; i < Values.Count; i++)
@@ -42,8 +45,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                 var value = Values.ToArray()[i];
                 if (value.Value.Type.BinaryType == TypeValue.BinaryTypes.Struct)
                 {
-                    var json = value.Value.ToJSON();
-                    var jsonObject = JsonSerializer.Deserialize<dynamic>(json);
+                    var json       = value.Value.ToJson();
+                    var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
                     dic.Add($"Multi_{i}", jsonObject);
                 }
                 else
@@ -52,10 +55,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                 }
             }
 
-            return JsonSerializer.Serialize(dic, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
+            return JsonSerializerWrapper.Serialize(dic);
         }
     }
 }

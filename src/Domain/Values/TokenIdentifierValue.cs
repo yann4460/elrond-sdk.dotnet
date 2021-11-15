@@ -1,18 +1,17 @@
 ﻿using System.Text;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class TokenIdentifierValue : IBinaryType
+    public class TokenIdentifierValue : BaseBinaryValue
     {
-        public TokenIdentifierValue(byte[] data, TypeValue type)
+        public TokenIdentifierValue(byte[] data, TypeValue type) : base(type)
         {
             Buffer = data;
-            Type = type;
-            TokenIdentifier = Encoding.UTF8.GetString(data);
+            Value  = Encoding.UTF8.GetString(data);
         }
 
-        public string TokenIdentifier { get; }
-        public TypeValue Type { get; }
+        public string Value { get; }
+
         public byte[] Buffer { get; }
 
         public static TokenIdentifierValue From(byte[] data)
@@ -20,6 +19,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new TokenIdentifierValue(data, TypeValue.TokenIdentifierValue);
         }
 
+        // ReSharper disable once InconsistentNaming
         public static TokenIdentifierValue EGLD()
         {
             return new TokenIdentifierValue(new byte[0], TypeValue.TokenIdentifierValue);
@@ -36,7 +36,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             if (Buffer.Length == 0)
                 return true;
 
-            if (TokenIdentifier == "EGLD")
+            if (Value == Constants.EGLD)
                 return true;
 
             return false;
@@ -44,7 +44,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public override string ToString()
         {
-            return TokenIdentifier;
+            return Value;
         }
     }
 }

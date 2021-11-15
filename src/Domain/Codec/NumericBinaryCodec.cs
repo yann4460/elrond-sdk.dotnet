@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using dotnetstandard_bip32;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Helper;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class NumericBinaryCodec : IBinaryCodec
     {
@@ -15,26 +15,23 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             if (type.HasFixedSize())
             {
-                const int offset = 0;
-                var length = type.SizeInBytes();
-                var payload = data.Slice(offset, offset + length);
-                var result = DecodeTopLevel(payload, type);
-
-                var decodedLength = length + offset;
-                return (result, decodedLength);
+                var length  = type.SizeInBytes();
+                var payload = data.Slice(0, length);
+                var result  = DecodeTopLevel(payload, type);
+                return (result, length);
             }
             else
             {
-                const int offset = 4;
-                var sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, offset));
+                const int u32Size     = 4;
+                var       sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, u32Size), 0);
                 if (BitConverter.IsLittleEndian)
                 {
-                    sizeInBytes = (int) BitConverter.ToUInt32(data.Slice(0, offset).Reverse().ToArray());
+                    sizeInBytes = (int)BitConverter.ToUInt32(data.Slice(0, u32Size).Reverse().ToArray(), 0);
                 }
 
-                var payload = data.Skip(offset).Take(sizeInBytes).ToArray();
-                var bigNumber = new BigInteger(payload, !type.HasSign(), isBigEndian: true);
-                return (new NumericValue(type, bigNumber), sizeInBytes + offset);
+                var payload   = data.Skip(u32Size).Take(sizeInBytes).ToArray();
+                var bigNumber = Converter.ToBigInteger(payload, !type.HasSign(), isBigEndian: true);
+                return (new NumericValue(type, bigNumber), sizeInBytes + u32Size);
             }
         }
 
@@ -45,7 +42,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 return new NumericValue(type, new BigInteger(0));
             }
 
-            var bigNumber = new BigInteger(data, !type.HasSign(), true);
+            var bigNumber = Converter.ToBigInteger(data, !type.HasSign(), isBigEndian: true);
             return new NumericValue(type, bigNumber);
         }
 
@@ -55,14 +52,14 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             if (value.Type.HasFixedSize())
             {
                 var sizeInBytes = value.Type.SizeInBytes();
-                var number = numericValue.Number;
-                var fullArray = Enumerable.Repeat((byte) 0x00, sizeInBytes).ToArray();
+                var number      = numericValue.Number;
+                var fullArray   = Enumerable.Repeat((byte)0x00, sizeInBytes).ToArray();
                 if (number.IsZero)
                 {
                     return fullArray;
                 }
 
-                var payload = number.ToByteArray(!value.Type.HasSign(), true);
+                var payload       = Converter.FromBigInteger(number, !value.Type.HasSign(), true);
                 var payloadLength = payload.Length;
 
                 var buffer = new List<byte>();
@@ -73,7 +70,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             }
             else
             {
-                var payload = EncodeTopLevel(value);
+                var payload   = EncodeTopLevel(value);
                 var sizeBytes = BitConverter.GetBytes(payload.Length).ToList();
                 if (BitConverter.IsLittleEndian)
                 {
@@ -91,14 +88,13 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeTopLevel(IBinaryType value)
         {
             var numericValue = value.ValueOf<NumericValue>();
-            // Nothing or Zero:
             if (numericValue.Number.IsZero)
             {
                 return new byte[0];
             }
 
             var isUnsigned = !value.Type.HasSign();
-            var buffer = numericValue.Number.ToByteArray(isUnsigned, isBigEndian: true);
+            var buffer     = Converter.FromBigInteger(numericValue.Number, isUnsigned, isBigEndian: true);
 
             return buffer;
         }

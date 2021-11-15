@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class BinaryCodec
     {
@@ -52,7 +52,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             var codec = _codecs.SingleOrDefault(c => c.Type == value.Type.BinaryType);
             if (codec == null)
                 throw new BinaryCodecException($"No codec found for {value.Type.BinaryType}");
-           
+
             var encode = codec.EncodeNested(value);
             return encode;
         }
@@ -62,7 +62,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             var codec = _codecs.SingleOrDefault(c => c.Type == value.Type.BinaryType);
             if (codec == null)
                 throw new BinaryCodecException($"No codec found for {value.Type.BinaryType}");
-            
+
             var encode = codec.EncodeTopLevel(value);
             return encode;
         }

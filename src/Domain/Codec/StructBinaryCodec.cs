@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class StructBinaryCodec : IBinaryCodec
     {
         private readonly BinaryCodec _binaryCodec;
-        public string Type => TypeValue.BinaryTypes.Struct;
+        public           string      Type => TypeValue.BinaryTypes.Struct;
 
         public StructBinaryCodec(BinaryCodec binaryCodec)
         {
@@ -17,16 +17,16 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)
         {
             var fieldDefinitions = type.GetFieldDefinitions();
-            var fields = new List<StructField>();
-            var buffer = data.ToList();
-            var offset = 0;
+            var fields           = new List<StructField>();
+            var buffer           = data.ToList();
+            var offset           = 0;
             foreach (var fieldDefinition in fieldDefinitions)
             {
                 var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), fieldDefinition.Type);
                 fields.Add(new StructField(fieldDefinition.Name, value));
 
                 offset += bytesLength;
-                buffer = buffer.Skip(bytesLength).ToList();
+                buffer =  buffer.Skip(bytesLength).ToList();
             }
 
             var structObject = new StructValue(type, fields.ToArray());
@@ -43,8 +43,8 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeNested(IBinaryType value)
         {
             var structValue = value.ValueOf<StructValue>();
-            var buffers = new List<byte[]>();
-            var fields = structValue.Fields;
+            var buffers     = new List<byte[]>();
+            var fields      = structValue.Fields;
 
             foreach (var field in fields)
             {

@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
+using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Helper;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class StructValue : IBinaryType
+    public class StructValue : BaseBinaryValue
     {
-        public TypeValue Type { get; }
         public StructField[] Fields { get; }
 
-        public StructValue(TypeValue structType, StructField[] fields)
+        public StructValue(TypeValue structType, StructField[] fields) : base(structType)
         {
-            Type = structType;
             Fields = fields;
             CheckTyping();
         }
@@ -34,9 +32,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
             for (var i = 0; i < Fields.Length; i++)
             {
-                var field = Fields[i];
+                var field      = Fields[i];
                 var definition = definitions[i];
-                var fieldType = field.Value.Type;
+                var fieldType  = field.Value.Type;
 
                 if (fieldType.RustType != definition.Type.RustType)
                     throw new BinaryCodecException("field rustType vs. field definitions rustType");
@@ -55,15 +53,20 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return builder.ToString();
         }
 
-        public string ToJSON()
+        public override T ToObject<T>()
+        {
+            return JsonSerializerWrapper.Deserialize<T>(ToJson());
+        }
+
+        public override string ToJson()
         {
             var dic = new Dictionary<string, object>();
             foreach (var field in Fields)
             {
                 if (field.Value.Type.BinaryType == TypeValue.BinaryTypes.Struct)
                 {
-                    var json = field.Value.ToJSON();
-                    var jsonObject = JsonSerializer.Deserialize<dynamic>(json);
+                    var json       = field.Value.ToJson();
+                    var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
                     dic.Add(field.Name, jsonObject);
                 }
                 else
@@ -72,11 +75,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
                 }
             }
 
-            return JsonSerializer.Serialize(dic, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            });
+            return JsonSerializerWrapper.Serialize(dic);
         }
     }
 }

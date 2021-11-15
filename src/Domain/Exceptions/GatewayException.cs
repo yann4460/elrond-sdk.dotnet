@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Elrond.Dotnet.Sdk.Domain.Exceptions
+namespace Erdcsharp.Domain.Exceptions
 {
     public class GatewayException : Exception
     {
         public GatewayException(string errorMessage, string code)
-            : base($"Error when calling Gateway : {errorMessage} with code : {code}")
+            : base($"Error when calling Gateway : {errorMessage} with smartContractCode : {code}")
         {
         }
     }

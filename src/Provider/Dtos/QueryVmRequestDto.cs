@@ -1,9 +1,9 @@
-﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
+﻿namespace Erdcsharp.Provider.Dtos
 {
     public class QueryVmRequestDto
     {
         /// <summary>
-        /// The AddressValue (bech32) of the Smart Contract.
+        /// The Address (bech32) of the Smart Contract.
         /// </summary>
         public string ScAddress { get; set; }
 
@@ -18,13 +18,13 @@
         public string[] Args { get; set; }
 
         /// <summary>
-        /// The AddressValue (bech32) of the caller.
+        /// The Address (bech32) of the caller.
         /// </summary>
-        public string? Caller { get; set; }
+        public string Caller { get; set; }
 
         /// <summary>
         /// The Value to transfer (can be zero).
         /// </summary>
-        public string? value { get; set; }
+        public string value { get; set; }
     }
 }

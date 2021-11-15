@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using dotnetstandard_bip32;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Helper;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class OptionBinaryCodec : IBinaryCodec
     {

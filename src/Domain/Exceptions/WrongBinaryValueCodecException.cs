@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elrond.Dotnet.Sdk.Domain.Exceptions
+namespace Erdcsharp.Domain.Exceptions
 {
     public class WrongBinaryValueCodecException : Exception
     {

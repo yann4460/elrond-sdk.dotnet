@@ -1,18 +1,16 @@
-﻿using System.Text.Json;
+﻿using Erdcsharp.Domain.Helper;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class OptionValue : IBinaryType
+    public class OptionValue : BaseBinaryValue
     {
-        public TypeValue Type { get; }
-        public TypeValue InnerType { get; }
-        public IBinaryType Value { get; }
+        public TypeValue   InnerType { get; }
+        public IBinaryType Value     { get; }
 
-        private OptionValue(TypeValue type, TypeValue innerType = null, IBinaryType value = null)
+        private OptionValue(TypeValue type, TypeValue innerType = null, IBinaryType value = null) : base(type)
         {
-            Type = type;
             InnerType = innerType;
-            Value = value;
+            Value     = value;
         }
 
         public static OptionValue NewMissing()
@@ -30,21 +28,19 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return Value != null;
         }
 
-
         public override string ToString()
         {
             return IsSet() ? Value.ToString() : "";
         }
 
-        public T ToObject<T>()
+        public override T ToObject<T>()
         {
-            var json = ToJSON();
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializerWrapper.Deserialize<T>(ToJson());
         }
 
-        string ToJSON()
+        public override string ToJson()
         {
-            return IsSet() ? Value.ToJSON() : "{}";
+            return IsSet() ? Value.ToJson() : "{}";
         }
     }
 }

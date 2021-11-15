@@ -1,36 +1,53 @@
-﻿using System.Threading.Tasks;
-using Elrond.Dotnet.Sdk.Provider;
-
-namespace Elrond.Dotnet.Sdk.Domain
+﻿namespace Erdcsharp.Domain
 {
-    public class Constants
+    public static class Constants
     {
-        private Constants()
+        public const string ArwenVirtualMachine = "0500";
+
+        /// <summary>
+        /// Human-Readable Part
+        /// </summary>
+        public const string Hrp = "erd";
+
+        /// <summary>
+        /// eGold ticker
+        /// </summary>
+        public const string EGLD = "EGLD";
+
+        public static class SmartContractAddress
         {
+            public const string EsdtSmartContract = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
         }
 
-        public string ChainId { get; set; }
-        public long GasPerDataByte { get; set; }
-        public long MinGasLimit { get; set; }
-        public long MinGasPrice { get; set; }
-        public int MinTransactionVersion { get; set; }
-
-        public static async Task<Constants> GetFromNetwork(IElrondProvider provider)
+        public static class EsdtNftSpecialRoles
         {
-            var constants = await provider.GetConstants();
-            return new Constants
-            {
-                ChainId = constants.Config.erd_chain_id,
-                GasPerDataByte = constants.Config.erd_gas_per_data_byte,
-                MinGasLimit = constants.Config.erd_min_gas_limit,
-                MinGasPrice = constants.Config.erd_min_gas_price,
-                MinTransactionVersion = constants.Config.erd_min_transaction_version
-            };
+            /// <summary>
+            /// This role allows one to create a new NFT
+            /// </summary>
+            public const string EsdtRoleNftCreate = "ESDTRoleNFTCreate";
+
+            /// <summary>
+            /// This role allows one to burn quantity of a specific NFT
+            /// </summary>
+            public const string EsdtRoleNftBurn = "ESDTRoleNFTBurn";
         }
 
-        public static Constants New()
+        public static class EsdtSftSpecialRoles
         {
-            return new Constants();
+            /// <summary>
+            /// This role allows one to create a new SemiFungible
+            /// </summary>
+            public const string EsdtRoleNftCreate = "ESDTRoleNFTCreate";
+
+            /// <summary>
+            /// This role allows one to burn quantity of a specific SemiFungible
+            /// </summary>
+            public const string EsdtRoleNftBurn = "ESDTRoleNFTBurn";
+
+            /// <summary>
+            /// This role allows one to add quantity of a specific SemiFungible
+            /// </summary>
+            public const string EsdtRoleNftAddQuantity = "ESDTRoleNFTAddQuantity";
         }
     }
 }

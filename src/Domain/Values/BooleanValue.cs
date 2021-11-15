@@ -1,12 +1,11 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿namespace Erdcsharp.Domain.Values
 {
-    public class BooleanValue : IBinaryType
+    public class BooleanValue : BaseBinaryValue
     {
-        public TypeValue Type => TypeValue.BooleanValue;
-
         private readonly bool _value;
 
         public BooleanValue(bool value)
+            : base(TypeValue.BooleanValue)
         {
             _value = value;
         }

@@ -27,12 +27,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Elrond.Dotnet.Sdk.Cryptography
+namespace Erdcsharp.Cryptography
 {
     public static class Bech32Engine
     {
         // used for polymod
-        private static readonly uint[] generator = { 0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3 };
+        private static readonly uint[] generator = {0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3};
 
         // charset is the sequence of ascii characters that make up the bech32
         // alphabet.  Each character represents a 5-bit squashed byte.
@@ -45,14 +45,9 @@ namespace Elrond.Dotnet.Sdk.Cryptography
         // position values.
         private static readonly short[] icharset =
         {
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            15, -1, 10, 17, 21, 20, 26, 30, 7, 5, -1, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1,
-            -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1,
-            1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, 15, -1, 10, 17, 21, 20, 26, 30, 7, 5, -1, -1, -1, -1, -1, -1, -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1, 1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1,
+            -1, -1, -1, 29, -1, 24, 13, 25, 9, 8, 23, -1, 18, 22, 31, 27, 19, -1, 1, 0, 3, 16, 11, 28, 12, 14, 6, 4, 2, -1, -1, -1, -1, -1
         };
 
         // PolyMod takes a byte slice and returns the 32-bit BCH checksum.
@@ -74,6 +69,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                     }
                 }
             }
+
             return chk;
         }
 
@@ -88,6 +84,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                 data = null;
                 return;
             }
+
             data = Bytes5to8(squashed);
         }
 
@@ -97,7 +94,9 @@ namespace Elrond.Dotnet.Sdk.Cryptography
             adr = CheckAndFormat(adr);
             if (adr == null)
             {
-                data = null; hrp = null; return;
+                data = null;
+                hrp  = null;
+                return;
             }
 
             // find the last "1" and split there
@@ -105,7 +104,9 @@ namespace Elrond.Dotnet.Sdk.Cryptography
             if (splitLoc == -1)
             {
                 Debug.WriteLine("1 separator not present in address");
-                data = null; hrp = null; return;
+                data = null;
+                hrp  = null;
+                return;
             }
 
             // hrp comes before the split
@@ -115,14 +116,16 @@ namespace Elrond.Dotnet.Sdk.Cryptography
             var squashed = StringToSquashedBytes(adr.Substring(splitLoc + 1));
             if (squashed == null)
             {
-                data = null; return;
+                data = null;
+                return;
             }
 
             // make sure checksum works
             if (!VerifyChecksum(hrp, squashed))
             {
                 Debug.WriteLine("Checksum invalid");
-                data = null; return;
+                data = null;
+                return;
             }
 
             // chop off checksum to return only payload
@@ -135,7 +138,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
         private static string CheckAndFormat(string adr)
         {
             // make an all lowercase and all uppercase version of the input string
-            var lowAdr = adr.ToLower();
+            var lowAdr  = adr.ToLower();
             var highAdr = adr.ToUpper();
 
             // if there's mixed case, that's not OK
@@ -151,7 +154,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
 
         private static bool VerifyChecksum(string hrp, byte[] data)
         {
-            var values = HRPExpand(hrp).Concat(data).ToArray();
+            var values   = HRPExpand(hrp).Concat(data).ToArray();
             var checksum = PolyMod(values);
             // make sure it's 1 (from the LSB flip in CreateChecksum
             return checksum == 1;
@@ -164,13 +167,14 @@ namespace Elrond.Dotnet.Sdk.Cryptography
 
             for (int i = 0; i < input.Length; i++)
             {
-                var c = input[i];
+                var c      = input[i];
                 var buffer = icharset[c];
                 if (buffer == -1)
                 {
                     Debug.WriteLine("contains invalid character " + c);
                     return null;
                 }
+
                 squashed[i] = (byte)buffer;
             }
 
@@ -244,6 +248,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                 var c = input[i];
                 output[i + input.Length + 1] = (byte)(c & 0x1f);
             }
+
             return output;
         }
 
@@ -258,6 +263,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                     Debug.WriteLine("high bits set at position {0}: {1}", i, c);
                     return null;
                 }
+
                 s += charset[c];
             }
 
@@ -281,10 +287,10 @@ namespace Elrond.Dotnet.Sdk.Cryptography
         // when going from 5 to 8
         private static byte[] ByteSquasher(byte[] input, int inputWidth, int outputWidth)
         {
-            int bitstash = 0;
-            int accumulator = 0;
-            List<byte> output = new List<byte>();
-            var maxOutputValue = (1 << outputWidth) - 1;
+            int        bitstash       = 0;
+            int        accumulator    = 0;
+            List<byte> output         = new List<byte>();
+            var        maxOutputValue = (1 << outputWidth) - 1;
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -294,8 +300,9 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                     Debug.WriteLine("byte {0} ({1}) high bits set", i, c);
                     return null;
                 }
-                accumulator = (accumulator << inputWidth) | c;
-                bitstash += inputWidth;
+
+                accumulator =  (accumulator << inputWidth) | c;
+                bitstash    += inputWidth;
                 while (bitstash >= outputWidth)
                 {
                     bitstash -= outputWidth;
@@ -317,6 +324,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                 Debug.WriteLine("invalid padding from {0} to {1} bits", inputWidth, outputWidth);
                 return null;
             }
+
             return output.ToArray();
         }
     }

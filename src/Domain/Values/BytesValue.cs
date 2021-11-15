@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Text;
+using Erdcsharp.Domain.Helper;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class BytesValue : IBinaryType
+    public class BytesValue : BaseBinaryValue
     {
         public BytesValue(byte[] data, TypeValue type)
+            : base(type)
         {
             Buffer = data;
-            Type = type;
         }
 
         public int GetLength()
@@ -23,7 +24,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public static BytesValue FromHex(string hexString)
         {
-            return new BytesValue(Convert.FromHexString(hexString), TypeValue.BytesValue);
+            return new BytesValue(Converter.FromHexString(hexString), TypeValue.BytesValue);
         }
 
         public static BytesValue FromBuffer(byte[] data)
@@ -31,13 +32,11 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             return new BytesValue(data, TypeValue.BytesValue);
         }
 
-        public TypeValue Type { get; }
-
         public byte[] Buffer { get; }
 
         public override string ToString()
         {
-            return Convert.ToHexString(Buffer);
+            return Converter.ToHexString(Buffer);
         }
     }
 }

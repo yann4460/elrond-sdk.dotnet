@@ -1,7 +1,7 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Exceptions;
-using Elrond.Dotnet.Sdk.Domain.Values;
+﻿using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class TokenIdentifierCodec : IBinaryCodec
     {
@@ -29,7 +29,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeNested(IBinaryType value)
         {
             var tokenIdentifierValue = Get(value);
-            var byteValue = new BytesValue(tokenIdentifierValue.Buffer, TypeValue.TokenIdentifierValue);
+            var byteValue            = new BytesValue(tokenIdentifierValue.Buffer, TypeValue.TokenIdentifierValue);
             return _bytesBinaryCodec.EncodeNested(byteValue);
         }
 

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Elrond.Dotnet.Sdk.Provider;
+using Erdcsharp.Provider;
 
-namespace Elrond.Dotnet.Sdk.Domain
+namespace Erdcsharp.Domain
 {
     public class GasLimit
     {
@@ -13,30 +13,41 @@ namespace Elrond.Dotnet.Sdk.Domain
             Value = value;
         }
 
-        public static GasLimit ForTransfer(Constants constants, TransactionRequest transaction)
+        /// <summary>
+        /// Compute GasLimit for transaction
+        /// </summary>
+        /// <param name="networkConfig">The network config</param>
+        /// <param name="transaction">The transaction</param>
+        /// <returns>A GasLimit</returns>
+        public static GasLimit ForTransfer(NetworkConfig networkConfig, TransactionRequest transaction)
         {
-            var value = constants.MinGasLimit;
+            var value = networkConfig.MinGasLimit;
             if (string.IsNullOrEmpty(transaction.Data)) return new GasLimit(value);
             var bytes = Convert.FromBase64String(transaction.Data);
-            value += constants.GasPerDataByte * bytes.Length;
+            value += networkConfig.GasPerDataByte * bytes.Length;
 
             return new GasLimit(value);
         }
 
-        public static GasLimit ForSmartContractCall(Constants constants, TransactionRequest transaction)
+        /// <summary>
+        /// Compute GasLimit for a smat contract call
+        /// </summary>
+        /// <param name="networkConfig">The network config</param>
+        /// <param name="transaction">The transaction</param>
+        /// <returns>A GasLimit</returns>
+        public static GasLimit ForSmartContractCall(NetworkConfig networkConfig, TransactionRequest transaction)
         {
-            var value = constants.MinGasLimit + 6000000;
+            var value = networkConfig.MinGasLimit + 6000000;
             if (string.IsNullOrEmpty(transaction.Data))
                 return new GasLimit(value);
-            
+
             var bytes = Convert.FromBase64String(transaction.Data);
-            value += constants.GasPerDataByte * bytes.Length;
+            value += networkConfig.GasPerDataByte * bytes.Length;
 
             return new GasLimit(value);
         }
 
-        public static async Task<GasLimit> ForTransaction(TransactionRequest transactionRequest,
-            IElrondProvider provider)
+        public static async Task<GasLimit> ForTransaction(TransactionRequest transactionRequest, IElrondProvider provider)
         {
             var cost = await provider.GetTransactionCost(transactionRequest.GetTransactionRequest());
             if (cost.TxGasUnits == 0)

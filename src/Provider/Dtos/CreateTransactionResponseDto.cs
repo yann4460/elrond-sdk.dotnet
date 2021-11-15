@@ -1,4 +1,4 @@
-﻿namespace Elrond.Dotnet.Sdk.Provider.Dtos
+﻿namespace Erdcsharp.Provider.Dtos
 {
     public class CreateTransactionResponseDataDto
     {

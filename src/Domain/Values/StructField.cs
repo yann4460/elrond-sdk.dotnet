@@ -1,14 +1,14 @@
-﻿namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿namespace Erdcsharp.Domain.Values
 {
     public class StructField
     {
         public IBinaryType Value { get; }
-        public string Name { get; }
+        public string      Name  { get; }
 
         public StructField(string name, IBinaryType value)
         {
             Value = value;
-            Name = name;
+            Name  = name;
         }
 
         public override string ToString()

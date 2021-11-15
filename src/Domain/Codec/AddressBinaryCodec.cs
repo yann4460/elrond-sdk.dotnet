@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class AddressBinaryCodec : IBinaryCodec
     {
@@ -12,7 +12,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         {
             // We don't check the size of the buffer, we just read 32 bytes.
             var addressBytes = data.Take(32).ToArray();
-            var value = AddressValue.FromBytes(addressBytes);
+            var value        = Address.FromBytes(addressBytes);
             return (value, addressBytes.Length);
         }
 
@@ -34,9 +34,9 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
             return address.PublicKey();
         }
 
-        private static AddressValue Get(IBinaryType value)
+        private static Address Get(IBinaryType value)
         {
-            if (value is AddressValue address)
+            if (value is Address address)
             {
                 return address;
             }

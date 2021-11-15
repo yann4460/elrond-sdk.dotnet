@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Elrond C# SDK for interacting with the Elrond Network (in general) and Smart Contracts (in particular).</Description>
+    <TargetFrameworks>netstandard2.0;net5.0;net461;net47;</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>elrond-sdk-erdsharp</PackageId>
+    <Authors></Authors>
+    <Product />
+    <PackageTags>elrond</PackageTags>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ElrondNetwork/elrond-sdk-erdcsharp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ElrondNetwork/elrond-sdk-erdcsharp</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <Company />
+    <Version>1.0.0</Version>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dotnetstandard-bip39" Version="1.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System.Numerics" Version="4.0.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

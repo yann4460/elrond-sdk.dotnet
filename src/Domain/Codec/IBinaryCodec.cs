@@ -1,6 +1,6 @@
-﻿using Elrond.Dotnet.Sdk.Domain.Values;
+﻿using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     internal interface IBinaryCodec
     {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Elrond.Dotnet.Sdk.Domain.Values;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class MultiBinaryCodec : IBinaryCodec
     {
@@ -25,7 +25,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
                 var (value, bytesLength) = _binaryCodec.DecodeNested(buffer.ToArray(), multiType);
                 result.Add(multiType, value);
                 offset += bytesLength;
-                buffer = buffer.Skip(bytesLength).ToList();
+                buffer =  buffer.Skip(bytesLength).ToList();
             }
 
             var multiValue = new MultiValue(type, result);
@@ -41,7 +41,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Codec
         public byte[] EncodeNested(IBinaryType value)
         {
             var multiValueObject = value.ValueOf<MultiValue>();
-            var buffers = new List<byte[]>();
+            var buffers          = new List<byte[]>();
 
             foreach (var multiValue in multiValueObject.Values)
             {

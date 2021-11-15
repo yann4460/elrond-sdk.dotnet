@@ -1,17 +1,17 @@
 ﻿using System.Security.Cryptography;
 
-namespace Elrond.Dotnet.Sdk.Cryptography
+namespace Erdcsharp.Cryptography
 {
     public sealed class AesCtr
     {
         public static byte[] Encrypt(byte[] psk, byte[] iv, byte[] inData)
         {
             var aesObj = Aes.Create();
-            aesObj.Mode = CipherMode.ECB;
+            aesObj.Mode    = CipherMode.ECB;
             aesObj.Padding = PaddingMode.None;
-            var zeroIv = new byte[16];
+            var zeroIv  = new byte[16];
             var encrypt = aesObj.CreateEncryptor(psk, zeroIv);
-            var counter = new byte[16]; // copy input iv (do not modify it)
+            var counter = new byte[16];
             for (var i = 0; i < 16; i++)
             {
                 counter[i] = iv[i];
@@ -19,7 +19,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
 
             var ctrOut = new byte[16];
             var output = new byte[inData.Length];
-            var pos = 0;
+            var pos    = 0;
             while (true)
             {
                 if (pos >= inData.Length)
@@ -35,7 +35,7 @@ namespace Elrond.Dotnet.Sdk.Cryptography
                         break;
                     }
 
-                    output[pos] = (byte) (inData[pos] ^ ctrOut[i]);
+                    output[pos] = (byte)(inData[pos] ^ ctrOut[i]);
                     pos++;
                 }
 

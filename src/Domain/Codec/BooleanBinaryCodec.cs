@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
-using Elrond.Dotnet.Sdk.Domain.Values;
+﻿using Erdcsharp.Domain.Exceptions;
+using Erdcsharp.Domain.Values;
 
-namespace Elrond.Dotnet.Sdk.Domain.Codec
+namespace Erdcsharp.Domain.Codec
 {
     public class BooleanBinaryCodec : IBinaryCodec
     {
         public string Type => TypeValue.BinaryTypes.Boolean;
 
-        private const byte True = 0x01;
+        private const byte True  = 0x01;
         private const byte False = 0x00;
 
         public (IBinaryType Value, int BytesLength) DecodeNested(byte[] data, TypeValue type)

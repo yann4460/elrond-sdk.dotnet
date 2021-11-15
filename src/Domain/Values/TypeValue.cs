@@ -1,39 +1,37 @@
-﻿using System;
-
-namespace Elrond.Dotnet.Sdk.Domain.Values
+﻿namespace Erdcsharp.Domain.Values
 {
     public class TypeValue
     {
         public string Name { get; private set; }
 
-        public string BinaryType { get; }
-        public string RustType { get; }
-        public TypeValue? InnerType { get; }
+        public string      BinaryType { get; }
+        public string      RustType   { get; }
+        public TypeValue   InnerType  { get; }
         public TypeValue[] MultiTypes { get; }
 
-        private readonly int? _sizeInBytes;
-        private readonly bool? _withSign;
+        private readonly int?              _sizeInBytes;
+        private readonly bool?             _withSign;
         private readonly FieldDefinition[] _fieldDefinitions;
 
         public TypeValue(string binaryType, string rustType, int? sizeInBytes = null, bool? withSign = null)
         {
-            BinaryType = binaryType;
-            RustType = rustType;
+            BinaryType   = binaryType;
+            RustType     = rustType;
             _sizeInBytes = sizeInBytes;
-            _withSign = withSign;
+            _withSign    = withSign;
         }
 
         public TypeValue(string binaryType, string rustType, FieldDefinition[] fieldDefinitions)
         {
-            BinaryType = binaryType;
-            RustType = rustType;
+            BinaryType        = binaryType;
+            RustType          = rustType;
             _fieldDefinitions = fieldDefinitions;
         }
 
         public TypeValue(string binaryType, TypeValue innerType = null)
         {
             BinaryType = binaryType;
-            InnerType = innerType;
+            InnerType  = innerType;
         }
 
         public TypeValue(string binaryType, TypeValue[] multiTypes)
@@ -66,34 +64,34 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
 
         public static class BinaryTypes
         {
-            public const string Boolean = nameof(Boolean);
-            public const string Address = nameof(Address);
-            public const string Numeric = nameof(Numeric);
-            public const string Struct = nameof(Struct);
-            public const string Bytes = nameof(Bytes);
+            public const string Boolean         = nameof(Boolean);
+            public const string Address         = nameof(Address);
+            public const string Numeric         = nameof(Numeric);
+            public const string Struct          = nameof(Struct);
+            public const string Bytes           = nameof(Bytes);
             public const string TokenIdentifier = nameof(TokenIdentifier);
-            public const string Option = nameof(Option);
-            public const string Multi = nameof(Multi);
+            public const string Option          = nameof(Option);
+            public const string Multi           = nameof(Multi);
         }
 
         public static class RustTypes
         {
-            public const string U8 = "u8";
-            public const string U16 = "u16";
-            public const string U32 = "u32";
-            public const string U64 = "u64";
+            public const string U8      = "u8";
+            public const string U16     = "u16";
+            public const string U32     = "u32";
+            public const string U64     = "u64";
             public const string BigUint = "BigUint";
 
-            public const string I8 = "i8";
-            public const string I16 = "i16";
-            public const string I32 = "i32";
-            public const string I64 = "i64";
+            public const string I8     = "i8";
+            public const string I16    = "i16";
+            public const string I32    = "i32";
+            public const string I64    = "i64";
             public const string Bigint = "BigInt";
 
-            public const string Bool = "bool";
-            public const string Bytes = "bytes";
-            public const string Address = "Address";
-            public const string H256 = "H256";
+            public const string Bool            = "bool";
+            public const string Bytes           = "bytes";
+            public const string Address         = "Address";
+            public const string H256            = "H256";
             public const string TokenIdentifier = "TokenIdentifier";
         }
 
@@ -110,16 +108,16 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public static TypeValue I64TypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.I64, 8, true);
 
         public static TypeValue BigUintTypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.BigUint, null, false);
-        public static TypeValue BigIntTypeValue => new TypeValue(BinaryTypes.Numeric, RustTypes.Bigint, null, true);
+        public static TypeValue BigIntTypeValue  => new TypeValue(BinaryTypes.Numeric, RustTypes.Bigint, null, true);
 
         public static TypeValue BooleanValue => new TypeValue(BinaryTypes.Boolean, RustTypes.Bool);
         public static TypeValue AddressValue => new TypeValue(BinaryTypes.Address, RustTypes.Address);
 
-        public static TypeValue TokenIdentifierValue =>
-            new TypeValue(BinaryTypes.TokenIdentifier, RustTypes.TokenIdentifier);
+        public static TypeValue TokenIdentifierValue => new TypeValue(BinaryTypes.TokenIdentifier, RustTypes.TokenIdentifier);
+        public static TypeValue ScResult             => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
 
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
-        public static TypeValue H256Value => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
+        public static TypeValue H256Value  => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
 
         public static TypeValue OptionValue(TypeValue innerType = null) => new TypeValue(BinaryTypes.Option, innerType);
         public static TypeValue MultiValue(TypeValue[] multiTypes) => new TypeValue(BinaryTypes.Multi, multiTypes);
@@ -170,11 +168,6 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
         public FieldDefinition[] GetFieldDefinitions()
         {
             return _fieldDefinitions;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_sizeInBytes, _withSign, RustType);
         }
     }
 }

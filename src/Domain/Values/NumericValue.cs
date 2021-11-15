@@ -1,20 +1,18 @@
 ﻿using System.Numerics;
-using Elrond.Dotnet.Sdk.Domain.Exceptions;
+using Erdcsharp.Domain.Exceptions;
 
-namespace Elrond.Dotnet.Sdk.Domain.Values
+namespace Erdcsharp.Domain.Values
 {
-    public class NumericValue : IBinaryType
+    public class NumericValue : BaseBinaryValue
     {
-        public NumericValue(TypeValue type, BigInteger number)
+        public NumericValue(TypeValue type, BigInteger number) : base(type)
         {
-            Type = type;
             Number = number;
             if (number.Sign == -1 && !type.HasSign())
                 throw new BinaryCodecException("negative, but binaryType is unsigned");
         }
 
         public BigInteger Number { get; }
-        public TypeValue Type { get; }
 
         public static NumericValue U8Value(byte value) =>
             new NumericValue(TypeValue.U8TypeValue, new BigInteger(value));
@@ -44,7 +42,7 @@ namespace Elrond.Dotnet.Sdk.Domain.Values
             new NumericValue(TypeValue.BigUintTypeValue, value);
 
         public static NumericValue BigIntValue(BigInteger value) => new NumericValue(TypeValue.BigIntTypeValue, value);
-        public static NumericValue Balance(Balance value) => new NumericValue(TypeValue.BigUintTypeValue, value.Number);
+        public static NumericValue TokenAmount(TokenAmount value) => new NumericValue(TypeValue.BigUintTypeValue, value.Value);
 
         public override string ToString()
         {
