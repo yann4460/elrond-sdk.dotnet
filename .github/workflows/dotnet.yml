@@ -27,8 +27,8 @@ jobs:
       working-directory: src
       
     - name: Test
+      run: dotnet test Erdcsharp.UnitTests.csproj --configuration Release --no-build --verbosity normal
       working-directory: tests/Erdcsharp.Tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
 
     - name: Publish on nuget.org
       working-directory: src
