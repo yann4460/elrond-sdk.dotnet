@@ -37,7 +37,7 @@ namespace Erdcsharp.Domain
             BigInteger initialSupply,
             int numberOfDecimals)
         {
-            var balance = networkConfig.ChainId == "T" ? TokenAmount.EGLD("5") : TokenAmount.EGLD("0.05");
+            var balance = TokenAmount.EGLD("0.05");
             var transaction = TransactionRequest.CreateCallSmartContractTransactionRequest(networkConfig,
                                                                                            account,
                                                                                            EsdtNftAddress,
@@ -98,7 +98,7 @@ namespace Erdcsharp.Domain
             string tokenName,
             string tokenTicker)
         {
-            var balance = networkConfig.ChainId == "T" ? TokenAmount.EGLD("5") : TokenAmount.EGLD("0.05");
+            var balance = TokenAmount.EGLD("0.05");
             var transaction = TransactionRequest.CreateCallSmartContractTransactionRequest(networkConfig,
                                                                                            account,
                                                                                            EsdtNftAddress,
@@ -126,7 +126,7 @@ namespace Erdcsharp.Domain
             string tokenName,
             string tokenTicker)
         {
-            var balance = networkConfig.ChainId == "T" ? TokenAmount.EGLD("5") : TokenAmount.EGLD("0.05");
+            var balance = TokenAmount.EGLD("0.05");
             var transaction = TransactionRequest.CreateCallSmartContractTransactionRequest(networkConfig,
                                                                                            account,
                                                                                            EsdtNftAddress,
