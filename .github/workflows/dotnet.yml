@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet: [ '2.1.x', '5.0.x' ]
       
     - name: Build with dotnet
       run: dotnet build Erdcsharp.sln --configuration Release
