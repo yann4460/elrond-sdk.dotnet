@@ -22,7 +22,7 @@ namespace Erdcsharp.Domain.Codec
 
             var payload = data.Slice(BytesSizeOfU32, BytesSizeOfU32 + sizeInBytes);
 
-            return (new BytesValue(payload, type), sizeInBytes + payload.Length);
+            return (new BytesValue(payload, type), BytesSizeOfU32 + payload.Length);
         }
 
         public IBinaryType DecodeTopLevel(byte[] data, TypeValue type)
