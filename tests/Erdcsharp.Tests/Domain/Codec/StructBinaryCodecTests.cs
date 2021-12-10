@@ -143,5 +143,37 @@ namespace Erdcsharp.UnitTests.Domain.Codec
             var creator_royalties_percentage = structValue.GetStructField("creator_royalties_percentage").Value;
             Assert.That(creator_royalties_percentage.ValueOf<NumericValue>().Number.ToString(), Is.EqualTo("0"));
         }
+
+        [Test]
+        public void Decode_Complex_Value()
+        {
+            // Arrange
+            var esdtToken = TypeValue.StructValue("EsdtToken", new[]
+            {
+                new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+                new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+            });
+
+            // Act
+            var actual = _sut.EncodeNested(new StructValue(esdtToken,
+                                                           new[]
+                                                           {
+                                                               new StructField("token", TokenIdentifierValue.From("FRAMEIT-556945")),
+                                                               new StructField("nonce", new NumericValue(TypeValue.U64TypeValue, new BigInteger(1)))
+                                                           }));
+            
+            var hexEncode = Convert.ToHexString(actual);
+
+                     //0000000E4652414D4549542D3535363934350000000000000001
+            var hex = "0000000e4652414d4549542d3535363934350000000000000001";
+            var data = Convert.FromHexString(hex);
+
+            // Arrange
+            
+
+            var decode = _sut.DecodeNested(data, esdtToken);
+
+        }
+
     }
 }
