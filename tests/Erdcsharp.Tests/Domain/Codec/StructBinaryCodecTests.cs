@@ -161,19 +161,62 @@ namespace Erdcsharp.UnitTests.Domain.Codec
                                                                new StructField("token", TokenIdentifierValue.From("FRAMEIT-556945")),
                                                                new StructField("nonce", new NumericValue(TypeValue.U64TypeValue, new BigInteger(1)))
                                                            }));
-            
+
             var hexEncode = Convert.ToHexString(actual);
 
-                     //0000000E4652414D4549542D3535363934350000000000000001
-            var hex = "0000000e4652414d4549542d3535363934350000000000000001";
+            //0000000E4652414D4549542D3535363934350000000000000001
+            var hex  = "0000000e4652414d4549542d3535363934350000000000000001";
             var data = Convert.FromHexString(hex);
 
             // Arrange
-            
+
 
             var decode = _sut.DecodeNested(data, esdtToken);
-
         }
 
+
+        [Test]
+        public void Decode_Complex_Value_From_Vm()
+        {
+            var data =
+                "AAAADkZSQU1FSVQtNTU2OTQ1AAAAAAAAAEEAAAABAQEAAAAERUdMRAAAAAAAAAAAAAAABwONfqTGgAABAAAACBTREg17FgAAAAAAAGHDcy4AAAAAYl2IiAZDfyQkrs85UMPwiblXPfL5+adcSHpoU40nC0p6qK2NAAAABwONfqTGgAAMV1PPzBMQw+vMERf0jm82fvEIFkxlb0GCpkcQVfTtEwAAAAFkAAAAAgPo";
+            var bytes = Convert.FromBase64String(data);
+
+            var esdtToken = TypeValue.StructValue("EsdtToken",
+                                                  new[]
+                                                  {
+                                                      new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+                                                      new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+                                                  });
+
+            var auctionType = TypeValue.EnumValue("AuctionType",
+                                                  new[]
+                                                  {
+                                                      new EnumVariantDefinition("None", 0),
+                                                      new EnumVariantDefinition("Nft", 1),
+                                                      new EnumVariantDefinition("SftAll", 2),
+                                                      new EnumVariantDefinition("SftOnePerPayment", 3)
+                                                  });
+
+            var auction = TypeValue.StructValue("Auction",
+                                                new[]
+                                                {
+                                                    new FieldDefinition("auctioned_token", "", esdtToken),
+                                                    new FieldDefinition("nr_auctioned_tokens", "", TypeValue.BigUintTypeValue),
+                                                    new FieldDefinition("auction_type", "", auctionType),
+                                                    new FieldDefinition("payment_token", "", esdtToken),
+                                                    new FieldDefinition("min_bid", "", TypeValue.BigUintTypeValue),
+                                                    new FieldDefinition("max_bid", "", TypeValue.OptionValue(TypeValue.BigUintTypeValue)),
+                                                    new FieldDefinition("start_time", "", TypeValue.U64TypeValue), new FieldDefinition("deadline", "", TypeValue.U64TypeValue),
+                                                    new FieldDefinition("original_owner", "", TypeValue.AddressValue),
+                                                    new FieldDefinition("current_bid", "", TypeValue.BigUintTypeValue),
+                                                    new FieldDefinition("current_winner", "", TypeValue.AddressValue),
+                                                    new FieldDefinition("marketplace_cut_percentage", "", TypeValue.BigUintTypeValue),
+                                                    new FieldDefinition("creator_royalties_percentage", "", TypeValue.BigUintTypeValue)
+                                                });
+
+            var structBinaryCodec = new StructBinaryCodec(new BinaryCodec());
+            var decoded           = structBinaryCodec.DecodeTopLevel(bytes, auction);
+        }
     }
 }

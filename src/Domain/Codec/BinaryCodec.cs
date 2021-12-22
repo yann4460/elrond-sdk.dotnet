@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Elrond.Dotnet.Sdk.Domain.Codec;
 using Erdcsharp.Domain.Exceptions;
 using Erdcsharp.Domain.Values;
 
@@ -20,6 +21,7 @@ namespace Erdcsharp.Domain.Codec
                 new TokenIdentifierCodec(),
                 new StructBinaryCodec(this),
                 new OptionBinaryCodec(this),
+                new EnumBinaryCodec(this)
             };
         }
 
