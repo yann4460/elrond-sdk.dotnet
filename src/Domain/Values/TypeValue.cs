@@ -1,4 +1,6 @@
-﻿namespace Erdcsharp.Domain.Values
+﻿using System.Linq;
+
+namespace Erdcsharp.Domain.Values
 {
     public class TypeValue
     {
@@ -9,9 +11,10 @@
         public TypeValue   InnerType  { get; }
         public TypeValue[] MultiTypes { get; }
 
-        private readonly int?              _sizeInBytes;
-        private readonly bool?             _withSign;
-        private readonly FieldDefinition[] _fieldDefinitions;
+        private readonly int?                    _sizeInBytes;
+        private readonly bool?                   _withSign;
+        private readonly FieldDefinition[]       _fieldDefinitions;
+        private readonly EnumVariantDefinition[] _variantDefinitions;
 
         public TypeValue(string binaryType, string rustType, int? sizeInBytes = null, bool? withSign = null)
         {
@@ -26,6 +29,13 @@
             BinaryType        = binaryType;
             RustType          = rustType;
             _fieldDefinitions = fieldDefinitions;
+        }
+
+        public TypeValue(string binaryType, string rustType, EnumVariantDefinition[] variantDefinitions)
+        {
+            BinaryType          = binaryType;
+            RustType            = rustType;
+            _variantDefinitions = variantDefinitions;
         }
 
         public TypeValue(string binaryType, TypeValue innerType = null)
@@ -68,6 +78,7 @@
             public const string Address         = nameof(Address);
             public const string Numeric         = nameof(Numeric);
             public const string Struct          = nameof(Struct);
+            public const string Enum            = nameof(Enum);
             public const string Bytes           = nameof(Bytes);
             public const string TokenIdentifier = nameof(TokenIdentifier);
             public const string Option          = nameof(Option);
@@ -114,10 +125,12 @@
         public static TypeValue AddressValue => new TypeValue(BinaryTypes.Address, RustTypes.Address);
 
         public static TypeValue TokenIdentifierValue => new TypeValue(BinaryTypes.TokenIdentifier, RustTypes.TokenIdentifier);
-        public static TypeValue ScResult             => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
 
         public static TypeValue BytesValue => new TypeValue(BinaryTypes.Bytes, RustTypes.Bytes);
         public static TypeValue H256Value  => new TypeValue(BinaryTypes.Bytes, RustTypes.H256);
+
+        public static TypeValue EnumValue(string name, EnumVariantDefinition[] variantDefinitions) =>
+            new TypeValue(BinaryTypes.Enum, name, variantDefinitions);
 
         public static TypeValue OptionValue(TypeValue innerType = null) => new TypeValue(BinaryTypes.Option, innerType);
         public static TypeValue MultiValue(TypeValue[] multiTypes) => new TypeValue(BinaryTypes.Multi, multiTypes);
@@ -168,6 +181,15 @@
         public FieldDefinition[] GetFieldDefinitions()
         {
             return _fieldDefinitions;
+        }
+
+        public EnumVariantDefinition GetVariantByDiscriminant(int discriminant)
+        {
+            return _variantDefinitions.SingleOrDefault(s => s.Discriminant == discriminant);
+        }
+        public EnumVariantDefinition GetVariantByName(string name)
+        {
+            return _variantDefinitions.SingleOrDefault(s => s.Name == name);
         }
     }
 }
