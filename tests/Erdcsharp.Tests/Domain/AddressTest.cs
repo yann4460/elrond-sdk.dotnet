@@ -60,15 +60,5 @@ namespace Erdcsharp.UnitTests.Domain
             // Assert
             Assert.That(isSmartContract, Is.EqualTo(expectedResult));
         }
-
-        [TestCase("foo")]
-        [TestCase("aaaaaaa")]
-        [TestCase("0D65416545")]
-        [TestCase("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2")]
-        [TestCase("xerd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz")]
-        public void From_Should_Throw_Error_When_Invalid_Input(string input)
-        {
-            Assert.Throws<CannotCreateAddressException>(() => Address.From(input));
-        }
     }
 }
