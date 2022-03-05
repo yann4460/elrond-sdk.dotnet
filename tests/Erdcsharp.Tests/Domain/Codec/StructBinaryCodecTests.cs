@@ -216,7 +216,51 @@ namespace Erdcsharp.UnitTests.Domain.Codec
                                                 });
 
             var structBinaryCodec = new StructBinaryCodec(new BinaryCodec());
-            var decoded           = structBinaryCodec.DecodeTopLevel(bytes, auction);
+            var decoded = structBinaryCodec.DecodeTopLevel(bytes, auction);
+        }
+
+
+        [Test]
+        public void Decode_Complex_Value_From_Vm_With_Optional_Arg()
+        {
+            var data = "AAAABEVHTEQAAAAAAAAAAAAAAAcjhvJvwQAAAAAAD01JTlRURVNULWJhYzEyNwAAAARUZXN0AAAAJnFzZGtxc2pkbGtxanNsZGtqc3FrbGRqcXNsa2Rqc3FkcXNkc3FkAQABAAAAZAEBAAAAZAAAAGQAAAAAAAAAMgEBAAEAAAAyAAAAMgAAAAAAAAAy";
+            var bytes = Convert.FromBase64String(data);
+
+            var esdtToken = TypeValue.StructValue("EsdtToken",
+                                                  new[]
+                                                  {
+                                                      new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue),
+                                                      new FieldDefinition("nonce", "", TypeValue.U64TypeValue)
+                                                  });
+
+            var drop = TypeValue.StructValue("Drop",
+                                             new[]
+                                             {
+                                                 new FieldDefinition("drop_id", "", TypeValue.U16TypeValue), new FieldDefinition("total_token_for_drop", "", TypeValue.U32TypeValue),
+                                                 new FieldDefinition("total_token_left_for_drop", "", TypeValue.U32TypeValue),
+                                                 new FieldDefinition("total_token_minted_for_drop", "", TypeValue.U32TypeValue),
+                                                 new FieldDefinition("limit_per_address_for_drop", "", TypeValue.U32TypeValue)
+                                             });
+
+            var minter = TypeValue.StructValue("Minter",
+                                               new[]
+                                               {
+                                                   new FieldDefinition("payment_token", "", esdtToken), new FieldDefinition("token_price", "", TypeValue.BigUintTypeValue),
+                                                   new FieldDefinition("token_type", "", TypeValue.TokenIdentifierValue), new FieldDefinition("token_name", "", TypeValue.BytesValue),
+                                                   new FieldDefinition("base_cid", "", TypeValue.BytesValue), new FieldDefinition("is_paused", "", TypeValue.BooleanValue),
+                                                   new FieldDefinition("is_allow_list_enabled", "", TypeValue.BooleanValue), new FieldDefinition("is_shuffled", "", TypeValue.BooleanValue),
+                                                   new FieldDefinition("total_token_loaded", "", TypeValue.U32TypeValue),
+                                                   new FieldDefinition("is_initial_indexes_populate_done", "", TypeValue.BooleanValue),
+                                                   new FieldDefinition("can_create", "", TypeValue.BooleanValue), new FieldDefinition("total_token", "", TypeValue.U32TypeValue),
+                                                   new FieldDefinition("total_token_left", "", TypeValue.U32TypeValue), new FieldDefinition("total_token_minted", "", TypeValue.U32TypeValue),
+                                                   new FieldDefinition("limit_per_address_total", "", TypeValue.U32TypeValue), new FieldDefinition("is_registered", "", TypeValue.BooleanValue),
+                                                   new FieldDefinition("drop", "", TypeValue.OptionValue(drop))
+                                               });
+
+            var structBinaryCodec = new StructBinaryCodec(new BinaryCodec());
+            var decoded = structBinaryCodec.DecodeTopLevel(bytes, minter);
+
+            var json = decoded.ToJson();
         }
     }
 }
