@@ -72,11 +72,16 @@ namespace Erdcsharp.Domain.Values
                         dic.Add(field.Name, jsonObject);
                         continue;
                     }
-                    case TypeValue.BinaryTypes.Option when field.Value.Type.InnerType.BinaryType == TypeValue.BinaryTypes.Struct:
+                    case TypeValue.BinaryTypes.Option when field.Value.Type.InnerType?.BinaryType == TypeValue.BinaryTypes.Struct:
                     {
                         var json       = field.Value.ToJson();
                         var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
                         dic.Add(field.Name, jsonObject);
+                        continue;
+                    }
+                    case TypeValue.BinaryTypes.Option when field.Value.Type.InnerType == null:
+                    {
+                        dic.Add(field.Name, null);
                         continue;
                     }
                     default:
