@@ -63,15 +63,25 @@ namespace Erdcsharp.Domain.Values
             var dic = new Dictionary<string, object>();
             foreach (var field in Fields)
             {
-                if (field.Value.Type.BinaryType == TypeValue.BinaryTypes.Struct)
+                switch (field.Value.Type.BinaryType)
                 {
-                    var json       = field.Value.ToJson();
-                    var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
-                    dic.Add(field.Name, jsonObject);
-                }
-                else
-                {
-                    dic.Add(field.Name, field.ToString());
+                    case TypeValue.BinaryTypes.Struct:
+                    {
+                        var json       = field.Value.ToJson();
+                        var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
+                        dic.Add(field.Name, jsonObject);
+                        continue;
+                    }
+                    case TypeValue.BinaryTypes.Option when field.Value.Type.InnerType.BinaryType == TypeValue.BinaryTypes.Struct:
+                    {
+                        var json       = field.Value.ToJson();
+                        var jsonObject = JsonSerializerWrapper.Deserialize<object>(json);
+                        dic.Add(field.Name, jsonObject);
+                        continue;
+                    }
+                    default:
+                        dic.Add(field.Name, field.ToString());
+                        break;
                 }
             }
 

@@ -51,7 +51,7 @@ namespace Erdcsharp.Domain
         {
             try
             {
-                return IsValidHex(value) ? FromHex(value) : FromBech32(value);
+                return value.StartsWith(Constants.Hrp) ? FromBech32(value) : FromHex(value);
             }
             catch
             {
