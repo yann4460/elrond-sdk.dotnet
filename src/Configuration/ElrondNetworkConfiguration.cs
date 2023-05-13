@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Erdcsharp.Configuration
 {
@@ -10,16 +10,16 @@ namespace Erdcsharp.Configuration
             switch (network)
             {
                 case Network.MainNet:
-                    GatewayUri  = new Uri("https://gateway.elrond.com");
-                    ExplorerUri = new Uri("https://explorer.elrond.com/");
+                    GatewayUri  = new Uri("https://gateway.multiversx.com");
+                    ExplorerUri = new Uri("https://explorer.multiversx.com/");
                     break;
                 case Network.TestNet:
-                    GatewayUri  = new Uri("https://testnet-gateway.elrond.com");
-                    ExplorerUri = new Uri("https://testnet-explorer.elrond.com/");
+                    GatewayUri  = new Uri("https://testnet-gateway.multiversx.com");
+                    ExplorerUri = new Uri("https://testnet-explorer.multiversx.com/");
                     break;
                 case Network.DevNet:
-                    GatewayUri  = new Uri("https://devnet-gateway.elrond.com");
-                    ExplorerUri = new Uri("https://devnet-explorer.elrond.com/");
+                    GatewayUri  = new Uri("https://devnet-gateway.multiversx.com");
+                    ExplorerUri = new Uri("https://devnet-explorer.multiversx.com/");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(network), network, null);
